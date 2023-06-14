@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import {
  
@@ -12,7 +12,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
+  FlatList,Animated,Easing,
 Image
 } from "react-native";
 
@@ -104,6 +104,15 @@ function Complete() {
    
   });
   const navigation = useNavigation();
+  const translation = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(translation, {
+      toValue: 100,
+      delay: 0,
+      easing:  Easing.elastic(4),
+      useNativeDriver: true,
+    }).start();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       
@@ -138,14 +147,33 @@ function Complete() {
           </View>
         )}
       />
-      <TouchableOpacity 
-      onPress={() => navigation.navigate(ScreenNames.ADD_TASKS)}
-        // onPress={() => navigation.navigate(ScreenNames.ADD_APPOINTMENT)}
+      <Animated.View
+            style={{
+             
+              alignItems: "center",
+              justifyContent: "center",
+             
+              position: "absolute",
 
-      style={styles.floating_btn}>
+              right: "12%",
+              width: Dimensions.get('window').width * 0.18,
+    height: Dimensions.get('window').width * 0.18,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
+             
+              
+              transform: [{ translateY: translation }],
+              bottom: (height + 180)*0.22,
+              elevation: 5,
+            }}
+          >
+            <TouchableOpacity 
+        onPress={() => navigation.navigate(ScreenNames.ADD_TASKS)}
+
+      >
 <Image source={Images.addNote} style={{height:60, width:60, resizeMode:'contain'}}/>
-
       </TouchableOpacity>
+          </Animated.View>
     </SafeAreaView>
   );
 }

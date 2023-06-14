@@ -43,7 +43,7 @@ function Profile({data}) {
   const [modalTitle2, setModalTitle2] = useState(data?.pinned_by);
   // console.log(icon_note)
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <TouchableOpacity style={styles.box1}
          onPress={() => {navigation.navigate("Saved_searches",{data:User_data})}}
       >
@@ -105,8 +105,8 @@ function Profile({data}) {
         { icon_note == "Yes" ? (
           <Image
             style={{
-              height: height * 0.07,
-              width: width * 0.2,
+              width: Dimensions.get('window').width * 0.18,
+              height: Dimensions.get('window').width * 0.18,
               resizeMode: "contain",
             }}
             source={Images.pencil_box}
@@ -114,9 +114,9 @@ function Profile({data}) {
         ) : (
           <Image
             style={{
-              height: height * 0.07,
-              width: width * 0.2,
-              resizeMode: "contain",
+              width: Dimensions.get('window').width * 0.18,
+                  height: Dimensions.get('window').width * 0.18,
+                  resizeMode: "contain",
             }}
             source={Images.plus_box}
           ></Image>
@@ -152,7 +152,7 @@ function Profile({data}) {
                   <View style={styles.modal_page}>
                     <View style={styles.modalView1}>
                       <View style={styles.pin2}>
-                        <Text style={styles.modalText1}>{modalTitle2}</Text>
+                        <Text style={styles.modalText1}>Pin Note</Text>
                         <Pressable
                           onPress={() => (
                             setModalVisible(!modalVisible), setd(0)
@@ -338,7 +338,7 @@ function Profile({data}) {
               ) : null}
           
       
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   modal_page: {
     flex: 1,
     backgroundColor: "rgba(52, 52, 52, 0.7)",
-    marginTop: "10%",
+    marginTop: height*0.12,
   },
   pin: {
     flexDirection: "row",
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
-    marginTop: "52%",
+    marginTop: height*0.22,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",

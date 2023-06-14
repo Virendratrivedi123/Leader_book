@@ -53,7 +53,7 @@ marginRight:50
     // borderRadius: 20,
     
     // fontSize: 14, fontFamily:"Inter-Black2",
-    fontSize:14,borderColor:"yellow",borderWidth:1.3,borderRadius:20,color:"yellow",fontFamily:"Inter-Black2",
+    
   },
   add_text: {
     color: "yellow",
@@ -100,7 +100,7 @@ marginRight:50
     marginStart: "3%",marginTop:"1%"
   },
   button: {
-    height: "6%",
+    height: "8%",
     width: "90%",
     marginTop: "5%",
 

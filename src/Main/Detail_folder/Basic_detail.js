@@ -59,7 +59,7 @@ function Basic_detail({ data }) {
   const [icon_note, seticon_note] = useState(data?.pined_note);
   const [modalTitle2, setModalTitle2] = useState(data?.pinned_by);
 
-  console.log(note)
+  // console.log(height)
 
   useEffect(() => {
     (async () => {
@@ -362,7 +362,7 @@ function Basic_detail({ data }) {
                   <View style={styles.modal_page}>
                     <View style={styles.modalView1}>
                       <View style={styles.pin2}>
-                        <Text style={styles.modalText1}>{modalTitle2}</Text>
+                        <Text style={styles.modalText1}>Pin Note</Text>
                         <Pressable
                           onPress={() => (
                             setModalVisible(!modalVisible), setd(0)
@@ -371,7 +371,7 @@ function Basic_detail({ data }) {
                           <Entypo name="cross" size={30} color="black" />
                         </Pressable>
                       </View>
-                      <View style={styles.line2}></View>
+                      <View style={styles.line}></View>
 
                       <KeyboardAvoidingView enabled>
                         <View style={styles.input}>
@@ -479,7 +479,7 @@ function Basic_detail({ data }) {
                   <View style={styles.modal_page}>
                     <View style={styles.modalView}>
                       <View style={styles.pin}>
-                        <Text style={styles.modalText}>Pin note</Text>
+                        <Text style={styles.modalText}>Pin Note</Text>
                         <Pressable
                           style={{}}
                           onPress={() => setModalVisible(!modalVisible)}
@@ -711,8 +711,8 @@ function Basic_detail({ data }) {
             {icon_note == "Yes" ? (
               <Image
                 style={{
-                  height: height * 0.07,
-                  width: width * 0.2,
+                  width: Dimensions.get('window').width * 0.18,
+                  height: Dimensions.get('window').width * 0.18,
                   resizeMode: "contain",
                 }}
                 source={Images.pencil_box}
@@ -720,9 +720,9 @@ function Basic_detail({ data }) {
             ) : (
               <Image
                 style={{
-                  height: height * 0.07,
-                  width: width * 0.2,
-                  resizeMode: "contain",
+                  width: Dimensions.get('window').width * 0.18,
+    height: Dimensions.get('window').width * 0.18,
+    resizeMode: "contain",
                 }}
                 source={Images.plus_box}
               ></Image>
@@ -824,7 +824,7 @@ const styles = StyleSheet.create({
   modal_page: {
     flex: 1,
     backgroundColor: "rgba(52, 52, 52, 0.7)",
-    marginTop: "10%",
+    marginTop: height*0.12,
   },
   pin: {
     flexDirection: "row",
@@ -836,7 +836,7 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
-    marginTop: "52%",
+    marginTop: height*0.22,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",

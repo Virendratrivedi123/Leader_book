@@ -53,7 +53,7 @@ export default function Main_Screen({ navigation }) {
       }
     })();
   }, []);
-
+// console.log(height)
   React.useEffect(
     () =>
       navigation.addListener("beforeRemove", (e) => {
@@ -181,6 +181,7 @@ export default function Main_Screen({ navigation }) {
           setcom("RECENT")
         )}
       </View>
+      
 
       <Modal
         transparent={true}
@@ -254,6 +255,7 @@ export default function Main_Screen({ navigation }) {
           </View>
         </TouchableOpacity>
       </Modal>
+
     </SafeAreaView>
   );
 }

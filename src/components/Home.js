@@ -35,8 +35,8 @@ function Home() {
         onPress={() => navigation.navigate(ScreenNames.LAST_LOGGED_USERS)}
         style={STYLES.button}
       >
-        <View style={{ flexDirection: "row", marginStart: "2%" }}>
-          <Ionicons name="md-person-sharp" size={25} color="white" />
+        <View style={{ flexDirection: "row", marginStart: "3%" }}>
+          <Ionicons name="md-person-sharp" size={23} color="white" />
           <Text style={styles.login}>Last Logged Users</Text>
         </View>
       </TouchableOpacity>
@@ -44,8 +44,8 @@ function Home() {
         onPress={() => navigation.navigate(ScreenNames.MOST_ACTIVE_USERS)}
         style={STYLES.button}
       >
-        <View style={{ flexDirection: "row", marginStart: "2%" }}>
-          <Ionicons name="md-person-sharp" size={25} color="white" />
+        <View style={{ flexDirection: "row", marginStart: "3%" }}>
+          <Ionicons name="md-person-sharp" size={23} color="white" />
           <Text style={styles.login}>Most Active Users</Text>
         </View>
       </TouchableOpacity>
@@ -53,8 +53,8 @@ function Home() {
         onPress={() => navigation.goBack()}
         style={STYLES.button}
       >
-        <View style={{ flexDirection: "row", marginStart: "2%" }}>
-          <Ionicons name="md-person-sharp" size={25} color="white" />
+        <View style={{ flexDirection: "row", marginStart: "3%" }}>
+          <Ionicons name="md-person-sharp" size={23} color="white" />
           <Text style={styles.login}>Recent Leads</Text>
         </View>
       </TouchableOpacity>
@@ -62,8 +62,8 @@ function Home() {
         onPress={() => navigation.navigate(ScreenNames.EDIT_PROFILE)}
         style={STYLES.button}
       >
-        <View style={{ flexDirection: "row", marginStart: "2%" }}>
-          <Ionicons name="md-person-sharp" size={25} color="white" />
+        <View style={{ flexDirection: "row", marginStart: "3%" }}>
+          <Ionicons name="md-person-sharp" size={23} color="white" />
           <Text style={styles.login}>Edit Profile</Text>
         </View>
       </TouchableOpacity>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   login: {
     
     color: "white",
-    fontSize: 18,
+    fontSize: 17,
     marginStart: "3%",
     fontFamily:"Inter-Black",
   },

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Image, View, TouchableOpacity, Text } from "react-native";
+import { StyleSheet, Image, View, TouchableOpacity, Text,Dimensions } from "react-native";
 
 import {
   widthPercentageToDP as wp,
@@ -9,7 +9,8 @@ import { Colors } from "../constant/colors";
 import { STYLES } from "../constant/styles";
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
-
+const height = Dimensions.get("window").height;
+const width = Dimensions.get("window").width;
 export default function Header({
   label,
   rightIcon,
@@ -57,8 +58,8 @@ export default function Header({
           />
         </TouchableOpacity>
       ) : customRight ? (
-        <TouchableOpacity style={{alignItems:"center",justifyContent:"center"}} onPress={onRightPress}>
-          <Text style={STYLES.save_text}> SAVE </Text>
+        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"yellow",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
+          <Text style={{fontSize:15,color:"yellow",fontFamily:"Inter-Black2",}}> SAVE </Text>
         </TouchableOpacity>
       ) : (
         <View />
@@ -73,13 +74,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: wp("100%"),
-    height: hp("8%"),
+    height: hp("10%"),
     backgroundColor: Colors.MAIN_COLOR,
     paddingHorizontal: wp("4%"),
   },
   headerTitle: {
     // fontFamily: Fonts.poppinsMeduim,
-    fontSize: wp("5.61%"),
+    fontSize: wp("7%"),
     color: "white",
     flex: 1,
     textAlign: "center",fontFamily:"Inter-Black2"

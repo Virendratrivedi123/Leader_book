@@ -160,7 +160,10 @@ export default function System_tag() {
                       justifyContent: "space-between",
                     }}
                   >
-                    <Text style={styles.name}>{item.name}</Text>
+                    <View style={{borderRadius:12,
+                     backgroundColor: "grey",
+                    }}>
+                    <Text style={styles.name}>{item.name}</Text></View>
 
                     <TouchableOpacity onPress={() =>  press(item)  }>
                       {item.s ?<Ionicons
@@ -214,11 +217,11 @@ const styles = StyleSheet.create({
   },
   
   name: {
-    backgroundColor: "grey",
+    
     paddingHorizontal: "4%",
-    borderRadius: 20,
+   
     paddingVertical: "0.5%",
-    fontSize: 15,
+    fontSize: 16,
     fontFamily:"Inter-Black2",
     color: "white",
   },

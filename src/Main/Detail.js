@@ -292,10 +292,10 @@ const styles = StyleSheet.create({
 paddingBottom:8
   },
   circle: {
-    height: height * 0.075,
-    width: width * 0.15,
+    width: Dimensions.get('window').width * 0.17,
+    height: Dimensions.get('window').width * 0.17,
 
-    borderRadius: 40,
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
     alignItems: "center",
     justifyContent: "center",
     marginStart: "5%",

@@ -27,7 +27,7 @@ function Npage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{height: height * 0.08,
+      <View style={{height: height * 0.1,
     backgroundColor: Colors.MAIN_COLOR,
     alignItems: "center",
 
@@ -39,7 +39,7 @@ function Npage() {
           >
            <Image
             source={Images.backArrow}
-            style={{ height: height*0.028, width: 30, resizeMode: "contain" }}
+            style={{ height: height*0.032, width: 30, resizeMode: "contain" }}
           />
           </TouchableOpacity>
         <Text
@@ -56,20 +56,13 @@ function Npage() {
             style={{
               
               
-              alignItems: "center",
-              justifyContent: "center",marginEnd:"5%"
+              alignItems:"center",marginEnd:"3%",justifyContent:"center",borderColor:"yellow",borderWidth:1.3,borderRadius:15,height:25
             }}
             onPress={() => {}}
           >
             <Text
               style={{
-                color: "yellow",
-                borderWidth: 1,
-                borderColor: "yellow",
-                paddingVertical: "0.5%",
-                borderRadius: 20,
-                fontWeight: "500",
-                fontSize: 15,paddingHorizontal:"1%"
+                fontSize:15,color:"yellow",fontFamily:"Inter-Black2",paddingHorizontal:2
               }}
             >
               SAVE
@@ -99,7 +92,7 @@ const styles = StyleSheet.create({
     padding: 20,
     
     
-    color: "grey",
+    color: "#6c6c6c",
     fontSize: 17,fontWeight:"500"
   },
   button: {

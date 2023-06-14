@@ -87,7 +87,7 @@ export default function Related({ data }) {
   }, []);
   // console.log(t.length)
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {loading ? (
         <Loader loading={loading} />
       ) : t && t.length > 0 ? (
@@ -174,18 +174,18 @@ export default function Related({ data }) {
         {loading ? null : icon_note == "Yes" ? (
           <Image
             style={{
-              height: height * 0.07,
-              width: width * 0.2,
-              resizeMode: "contain",
+              width: Dimensions.get('window').width * 0.18,
+                  height: Dimensions.get('window').width * 0.18,
+                  resizeMode: "contain",
             }}
             source={Images.pencil_box}
           ></Image>
         ) : (
           <Image
             style={{
-              height: height * 0.07,
-              width: width * 0.2,
-              resizeMode: "contain",
+              width: Dimensions.get('window').width * 0.18,
+                  height: Dimensions.get('window').width * 0.18,
+                  resizeMode: "contain",
             }}
             source={Images.plus_box}
           ></Image>
@@ -219,7 +219,7 @@ export default function Related({ data }) {
           <View style={styles.modal_page}>
             <View style={styles.modalView1}>
               <View style={styles.pin2}>
-                <Text style={styles.modalText1}>{modalTitle2}</Text>
+                <Text style={styles.modalText1}>Pin Note</Text>
                 <Pressable
                   onPress={() => (setModalVisible(!modalVisible), setd(0))}
                 >
@@ -334,7 +334,7 @@ export default function Related({ data }) {
           <View style={styles.modal_page}>
             <View style={styles.modalView}>
               <View style={styles.pin}>
-                <Text style={styles.modalText}>Pin note</Text>
+                <Text style={styles.modalText}>Pin Note</Text>
                 <Pressable
                   style={{}}
                   onPress={() => setModalVisible(!modalVisible)}
@@ -401,7 +401,7 @@ export default function Related({ data }) {
           </View>
         </Modal>
       ) : null}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   modal_page: {
     flex: 1,
     backgroundColor: "rgba(52, 52, 52, 0.7)",
-    marginTop: "10%",
+    marginTop: height*0.12,
   },
   pin: {
     flexDirection: "row",
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
-    marginTop: "52%",
+    marginTop: height*0.22,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
@@ -605,22 +605,24 @@ const styles = StyleSheet.create({
   count_txt: {
     color: "white",
     fontSize: 12,
-    backgroundColor: Colors.MAIN_COLOR,
-    paddingHorizontal: 10,
-    borderRadius: 10,
+    
+    
   },
   count: {
-    // backgroundColor: Colors.MAIN_COLOR,
+    backgroundColor: Colors.MAIN_COLOR,
     // height: height * 0.02,
     // width: width * 0.085,
-    // borderRadius: 30,
+    borderRadius: 10,paddingHorizontal:"3%"
   },
   circle: {
-    height: height * 0.055,
+    width: Dimensions.get('window').width * 0.12,
+    height: Dimensions.get('window').width * 0.12,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
     marginRight: 20,
-    width: width * 0.12,
+   
     backgroundColor: "#009973",
-    borderRadius: 40,
+   
     alignItems: "center",
     justifyContent: "center",
   },

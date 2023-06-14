@@ -361,7 +361,7 @@ export default function All() {
                   <View style={styles.modal_page}>
                     <View style={styles.modalView1}>
                       <View style={styles.pin2}>
-                        <Text style={styles.modalText1}>{modalTitle2}</Text>
+                        <Text style={styles.modalText1}>Pin Note</Text>
                         <Pressable
                           onPress={() => (
                             setModalVisible(!modalVisible), setd1(0)
@@ -478,7 +478,7 @@ export default function All() {
                   <View style={styles.modal_page}>
                     <View style={styles.modalView}>
                       <View style={styles.pin}>
-                        <Text style={styles.modalText}>Pin note</Text>
+                        <Text style={styles.modalText}>Pin Note</Text>
                         <Pressable
                           style={{}}
                           onPress={() => setModalVisible(!modalVisible)}
@@ -570,15 +570,18 @@ export default function All() {
              
               alignItems: "center",
               justifyContent: "center",
-              width: width * 0.18,
+              width: Dimensions.get('window').width * 0.18,
+    height: Dimensions.get('window').width * 0.18,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
               position: "absolute",
 
               right: "8%",
-              height: height * 0.09,
+             
               backgroundColor: Colors.float_btn,
-              borderRadius: 50,
+              
               transform: [{ translateY: translation }],
-              marginTop: (height + height * 0.15) * 0.47,
+              bottom: (height + 180)*0.22,
               elevation: 5,
             }}
           >
@@ -665,7 +668,7 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
-    marginTop: "52%",
+    marginTop: height*0.22,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
@@ -697,9 +700,10 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   note2: {
-    height: height * 0.065,
-    width: width * 0.14,
+    width: Dimensions.get('window').width * 0.15,
+    height: Dimensions.get('window').width * 0.15,
     resizeMode: "contain",
+
 
     
   },
@@ -797,9 +801,9 @@ const styles = StyleSheet.create({
   phone_icon: {  flex:0.17,marginStart: "5%" },
   circle_icon: {  marginStart: "5%",marginEnd:"3%" },
   sms: {
-    height: height * 0.041,
-    width: width * 0.1,
-    resizeMode: "stretch",
+    width: Dimensions.get('window').width * 0.11,
+    height: Dimensions.get('window').width * 0.11,
+    resizeMode: "contain",
     marginTop: 6,
   },
   voice_icon: { flex: 0.16, marginStart: "5%" },
@@ -837,11 +841,11 @@ const styles = StyleSheet.create({
 
   circleview: {   alignItems: "center" },
   circle: {
-    height: height * 0.075,
-    width: width * 0.155,
-    backgroundColor: "#f2f2f2",
-    borderRadius: 50,
-    justifyContent: "center",
+    width: Dimensions.get('window').width * 0.17,
+    height: Dimensions.get('window').width * 0.17,
+backgroundColor: "#f2f2f2",
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
+justifyContent: "center",
   },
   circle_text: {
     fontSize: 30,

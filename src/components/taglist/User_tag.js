@@ -9,7 +9,7 @@ import {
   FlatList,
   Modal,
   Pressable,
-  TextInput,Animated,Easing,SafeAreaView
+  TextInput,Animated,Easing,SafeAreaView,Image
 } from "react-native";
 
 const height = Dimensions.get("window").height;
@@ -20,12 +20,13 @@ import {
  
   FontAwesome,
   
-  MaterialCommunityIcons,
+  MaterialCommunityIcons,Entypo
 } from "@expo/vector-icons";
 
 
 import { Colors } from "../../constant/colors";
 import { useFonts } from 'expo-font';
+import { Images } from "../../constant/images";
 
 export default function User_tag({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -198,7 +199,7 @@ export default function User_tag({ navigation }) {
       <View style={styles.input}>
         <TextInput
           ref={searchref}
-          style={{fontSize:15,}}
+          style={{fontSize:17,}}
           onChangeText={(text) => {
             onsearch(text), setsearch(text);
           }}
@@ -207,7 +208,7 @@ export default function User_tag({ navigation }) {
           placeholder="Search Tags"
           placeholderTextColor={"#cccccc"}
         />
-        <FontAwesome name="search" size={20} color="black" />
+        <FontAwesome name="search" size={22} color="black" />
       </View>
 
       <FlatList
@@ -304,15 +305,18 @@ export default function User_tag({ navigation }) {
              
               alignItems: "center",
               justifyContent: "center",
-              width: width * 0.18,
+             
               position: "absolute",
 
-              right: "8%",
-              height: height * 0.09,
+              right: "12%",
+              width: Dimensions.get('window').width * 0.18,
+    height: Dimensions.get('window').width * 0.18,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
               backgroundColor: Colors.float_btn,
-              borderRadius: 50,
+              
               transform: [{ translateY: translation }],
-              marginTop: (height + height * 0.15) * 0.44,
+              bottom: (height + 180)*0.22,
               elevation: 5,
             }}
           >
@@ -321,7 +325,10 @@ export default function User_tag({ navigation }) {
               onPress={() => setModalVisible(true)}
               // style={styles.floating_btn}
             >
-              <Ionicons name="person-add" size={40} color="white" />
+              <Image
+                source={Images.addLeads}
+                style={{ height: 60, width: 60, resizeMode: "contain" }}
+              />
             </TouchableOpacity>
           </Animated.View>
 
@@ -349,7 +356,7 @@ export default function User_tag({ navigation }) {
                 style={{}}
                 onPress={() => setModalVisible(!modalVisible)}
               >
-                <Text style={{ fontSize: 20 }}>X</Text>
+                <Entypo name="cross" size={30} color="black" />
               </Pressable>
             </View>
             <View
@@ -421,7 +428,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(52, 52, 52, 0.5)",
     alignItems: "center",
-    justifyContent: "center",
+    
   },
   main_view:{
     flexDirection: "row",
@@ -447,10 +454,10 @@ const styles = StyleSheet.create({
     marginTop: "4%",
     fontFamily:"Inter-Black",
   },
-  create_txt:{ color: "white", fontSize: 17,fontFamily:"Inter-Black", },
+  create_txt:{ color: "white", fontSize: 17,fontFamily:"Inter-Black",paddingHorizontal:"5%",paddingVertical:"3%" },
   create:{
-    height: "17%",
-    width: "38%",
+    
+    
     backgroundColor: "orange",
     alignSelf: "center",
     marginVertical: "7%",
@@ -471,7 +478,7 @@ const styles = StyleSheet.create({
     marginTop: "1%",
   },
   input: {
-    height: height * 0.048,
+    height: height * 0.075,
     width: width * 0.95,
     marginVertical: "2%",
 
@@ -483,7 +490,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 5,borderWidth:0.7,
+    paddingHorizontal: "3%",borderWidth:0.7,
   },
   centeredView: {
     flex: 1,
@@ -492,13 +499,13 @@ const styles = StyleSheet.create({
     // backgroundColor: "rgba(5, 5, 52, 0.3)",
   },
   modalView: {
-    height: height * 0.42,
-    width: "85%",
+    // height: height * 0.42,
+    width: "87%",
     backgroundColor: "white",
     borderRadius: 6,
 
     elevation: 15,
-    alignSelf: "center",
+    alignSelf: "center",marginTop:"50%"
   },
   button: {
     borderRadius: 20,

@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   home_text: {
-    fontSize: 17,
-    fontFamily:"Inter-Black2",
+    fontSize: 16,
+    fontFamily:"Inter-Black3",
     color: "white",
     textAlign: "center",
     paddingVertical: "3%",

@@ -171,19 +171,21 @@ function Customdrawer(props) {
 }
 const styles = StyleSheet.create({
   
-  gap: { marginVertical: "6.5%" },
+  gap: { marginVertical: "9.1%" },
   circle: {
-    height: height * 0.09,
-    width: width * 0.185,
+    width: Dimensions.get('window').width * 0.22,
+    height: Dimensions.get('window').width * 0.22,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
     backgroundColor: "white",
-    borderRadius: 50,
+   
     alignItems: "center",
     justifyContent: "center",elevation:30,
   },
   circle_text: {
     fontSize: 35,
   
-    color: "#a9a9a9",fontFamily:"Inter-Black3"
+    color: "#a9a9a9",fontFamily:"Inter-Black2"
   },
   name_text: {
     fontSize: 18,

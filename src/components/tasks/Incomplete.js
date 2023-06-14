@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import {
   Entypo,
@@ -22,7 +22,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
+  FlatList,Animated,Easing,
 Image
 } from "react-native";
 import { useFonts } from 'expo-font';
@@ -38,7 +38,7 @@ const width = Dimensions.get("window").width;
 const DATA = [
   {
     id: "0",
-    name: "test4",
+    name: "Task 2",
     Number: "Test 3 Test",
     voicemail: "5 May 2022 14:02 PM",
     email: "praful.mishra121@gmail.com",
@@ -110,6 +110,15 @@ function InComplete() {
    
   });
   const navigation = useNavigation();
+  const translation = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(translation, {
+      toValue: 100,
+      delay: 0,
+      easing:  Easing.elastic(4),
+      useNativeDriver: true,
+    }).start();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       
@@ -149,12 +158,34 @@ function InComplete() {
           </View>
         )}
       />
-      <TouchableOpacity 
+           <Animated.View
+            style={{
+             
+              alignItems: "center",
+              justifyContent: "center",
+             
+              position: "absolute",
+
+              right: "12%",
+              width: Dimensions.get('window').width * 0.18,
+    height: Dimensions.get('window').width * 0.18,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
+             
+              
+              transform: [{ translateY: translation }],
+              bottom: (height + 180)*0.22,
+              elevation: 5,
+            }}
+          >
+            <TouchableOpacity 
         onPress={() => navigation.navigate(ScreenNames.ADD_TASKS)}
 
-      style={styles.floating_btn}>
+      >
 <Image source={Images.addNote} style={{height:60, width:60, resizeMode:'contain'}}/>
       </TouchableOpacity>
+          </Animated.View>
+      
     </SafeAreaView>
   );
 }
@@ -196,10 +227,10 @@ const styles = StyleSheet.create({
   },
 
   text1: {
-    fontSize: 16,
+    fontSize: 17,
     
     // color: "#808080",
-    fontFamily:"Inter-Black2",
+    fontFamily:"Inter-Black",
     marginStart: "2%",
     color: "black",marginTop:"0%"
   },

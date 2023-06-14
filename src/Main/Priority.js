@@ -37,6 +37,7 @@ export default function Priority() {
   const navigation = useNavigation();
   const translation = useRef(new Animated.Value(0)).current;
   const [d1, setd1] = useState(false);
+  
 
   useEffect(() => {
     (async () => {
@@ -108,15 +109,18 @@ export default function Priority() {
              
               alignItems: "center",
               justifyContent: "center",
-              width: width * 0.18,
+             
               position: "absolute",
 
               right: "8%",
-              height: height * 0.09,
+    
               backgroundColor: Colors.float_btn,
-              borderRadius: 50,
+              width: Dimensions.get('window').width * 0.18,
+    height: Dimensions.get('window').width * 0.18,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
               transform: [{ translateY: translation }],
-              marginTop: (height + height * 0.15) * 0.48,
+              bottom: (height + 180) * 0.22,
             }}
           >
             <TouchableOpacity
