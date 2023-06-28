@@ -37,6 +37,7 @@ export default function Priority() {
   const navigation = useNavigation();
   const translation = useRef(new Animated.Value(0)).current;
   const [d1, setd1] = useState(false);
+  const h = 18/100*height
   
 
   useEffect(() => {
@@ -56,7 +57,7 @@ export default function Priority() {
           setDATA(result?.data?.leadpriorities);
           setd1(true);
           Animated.timing(translation, {
-            toValue: 100,
+            toValue: h,
             delay: 0,
             easing: Easing.elastic(4),
             useNativeDriver: true,
@@ -112,15 +113,14 @@ export default function Priority() {
              
               position: "absolute",
 
-              right: "8%",
+              right: "6%",
     
               backgroundColor: Colors.float_btn,
-              width: Dimensions.get('window').width * 0.18,
-    height: Dimensions.get('window').width * 0.18,
+              
 
 borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
               transform: [{ translateY: translation }],
-              bottom: (height + 180) * 0.22,
+              bottom: (height )*0.28,
             }}
           >
             <TouchableOpacity
@@ -130,7 +130,8 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
             >
               <Image
                 source={Images.addLeads}
-                style={{ height: 60, width: 60, resizeMode: "contain" }}
+                style={{ width: Dimensions.get('window').width * 0.18,
+                height: Dimensions.get('window').width * 0.18, resizeMode: "contain" }}
               />
 
               {/* <Ionicons name="person-add" size={40} color="white" /> */}

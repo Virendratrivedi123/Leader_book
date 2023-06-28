@@ -80,10 +80,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     // fontFamily: Fonts.poppinsMeduim,
-    fontSize: wp("7%"),
+    fontSize: wp("6%"),
     color: "white",
     flex: 1,
-    textAlign: "center",fontFamily:"Inter-Black2"
+    textAlign: "center",fontFamily:"Inter-Black"
   },
   penIconView: {
     // backgroundColor: '#4E4E50',
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   icon2: {
-    height: 23,
-    width: 23,
+   height: hp("4.21%"),
+    width: wp("7.58%"),
     resizeMode: "contain",
   },
 });

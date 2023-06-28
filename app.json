@@ -2,7 +2,7 @@
   "expo": {
     "name": "LeadBooker",
     "slug": "LeadBooker",
-    "version": "1.0.0",
+    "version": "2.4.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.SellingToolz.LeadBooker"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +30,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "937f2064-c5f0-4dc4-bac3-c9655a8edf9d"
+        "projectId": "0bc23378-99a1-4c49-995d-8b45e79f1cb6"
       }
     }
   }

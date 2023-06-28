@@ -18,13 +18,17 @@ import All from "./All";
 import { Colors } from "../constant/colors";
 import { STYLES } from "../constant/styles";
 import { BackHandler } from "react-native";
-import Header from "../components/header";
+import Header3 from "../components/header3";
 import { Images } from "../constant/images";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import * as SplashScreen from 'expo-splash-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function Main_Screen({ navigation }) {
   const [com, setcom] = useState(false);
@@ -82,12 +86,12 @@ export default function Main_Screen({ navigation }) {
 
   return (
     <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <Header
+      <Header3
         label="Leads"
         leftIcon={Images.menu}
         rightIcon={Images.search}
         onLeftPress={() => navigation.toggleDrawer()}
-        // onRightPress={}
+        onRightPress={() => navigation.navigate("Search")}
       />
       <View>
         <View style={styles.tab}>
@@ -98,7 +102,7 @@ export default function Main_Screen({ navigation }) {
             }}
           >
             <View style={styles.home_text}>
-            <Text style={{ fontSize: 15,
+            <Text style={{ fontSize: wp("4.93%"),
     fontFamily:com == "RECENT" ? "Inter-Black3" : "Inter-Black2",
     color: "white",
     marginBottom: "2%",
@@ -113,7 +117,7 @@ export default function Main_Screen({ navigation }) {
             }}
           >
             <View style={styles.home_text}>
-            <Text style={{ fontSize: 15,
+            <Text style={{ fontSize: wp("4.93%"),
     fontFamily:com == "PRIORITY" ? "Inter-Black3" : "Inter-Black2",
     color: "white",
     marginBottom: "2%",
@@ -127,8 +131,8 @@ export default function Main_Screen({ navigation }) {
             }}
           >
             <View style={styles.home_text}>
-              <Text style={{ fontSize: 15,
-    fontFamily:com == "All" ? "Inter-Black3" : "Inter-Black2",
+              <Text style={{  fontSize: wp("4.93%"),
+    fontFamily:com == "ALL" ? "Inter-Black3" : "Inter-Black2",
     color: "white",
     marginBottom: "2%",
     marginTop: "4%",}}>ALL</Text>

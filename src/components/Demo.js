@@ -1,157 +1,161 @@
-import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, Text, View, Pressable, StatusBar, FlatList } from 'react-native';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { get_leads } from "../Services";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
-const data = [
-    { value: 1, txt: 'React Native', isChecked: false },
-    { value: 2, txt: 'Javascript', isChecked: false },
-    { value: 3, txt: 'Laravel', isChecked: false },
-    { value: 4, txt: 'PHP', isChecked: false },
-    { value: 5, txt: 'jQuery', isChecked: false },
-    { value: 6, txt: 'Boostrap', isChecked: false },
-    { value: 7, txt: 'HTML', isChecked: false },
-];
-
+import React, { useState } from "react";
+import { View, Text, Dimensions, StyleSheet, Image } from "react-native";
+import CalendarPicker from "react-native-calendar-picker";
+import { Colors } from "../constant/colors";
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { Images } from "../constant/images";
+const height = Dimensions.get("window").height;
+const width = Dimensions.get("window").width;
+import { useFonts } from "expo-font";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Header4 from "./header4";
 const Demo = () => {
-    const [DATA, setDATA] = React.useState([]);
-    const [d, setd] = useState(false);
-
-    useEffect(() => {
-      (async () => {
-        const user_data = await AsyncStorage.getItem("user_data");
-  
-        const d = JSON.parse(user_data);
-  
-        // console.log(dr)
-        const data = {
-          email: d.email,
-          password: d.password,
-        };
-  
-        get_leads(data)
-          .then((response) => response.json())
-          .then((result) => {
-            // console.log(result?.data?.leads)
-            var a = [];
-            result?.data?.leads.map((i) => {
-            a.push({
-              ...i.Lead,
-
-              isChecked: false,
-            });
-          });
-            setDATA(a);
-            
-          })
-          
-          .catch((error) => console.log("error", error));
-      })();
-    }, []);
-
-    // console.log(DATA)
-
-    const handleChange = (id) => {
-        let temp = DATA.map((i) => {
-            if (id === i.id) {
-                return { ...i, isChecked: !i.isChecked };
-            }
-            return i;
-        });
-        setDATA(temp);
+  const [d, setd] = useState(false);
+  const [fontsLoaded] = useFonts({
+    "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black4": require("../../assets/fonts/Mulish-Regular.ttf"),
+  });
+  const navigation = useNavigation();
+  const [selected, setSelected] = useState("");
+  const [selected2, setSelected2] = useState("");
+  const startDate = selected ? selected.format("YYYY-MM-DD").toString() : "";
+  const EndDate = selected2 ? selected2.format("YYYY-MM-DD").toString() : "";
+  const start_end_date = `${startDate} To ${EndDate}`;
+  const customDayHeaderStylesCallback = (dayOfWeek, month, year) => {
+    return {
+      style: {
+        backgroundColor: "#6c6c6c",
+        innerHeight: 50,
+        outerHeight: 50,
+      },
+      textStyle: {
+        color: "white",
+        fontSize: 12,
+      },
     };
-
-    let selected = DATA.filter((i) => i.isChecked);
-    // console.log(selected)
-   
-
-    const selectAlldata = () => {
-      let temp = DATA.map((i) => {
-       if(d == false)  {
-            return { ...i, isChecked: true };
-        }
-        if(d == true)  {
-          return { ...i, isChecked: false };
-      }
-        
-    });
-    setd(!d);
-    setDATA(temp);
-    };
-
-   
-        return (
-          <View>
-             <Text
-            onPress={()=>{selectAlldata()}}
-            style={styles.text}>Selected </Text>
-            <FlatList
-                data={DATA}
-                renderItem={({ item }) => (
-                   
-                        <View style={styles.card}>
-                          {d == true?
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    flex: 1,
-                                    justifyContent: 'space-between',
-                                }}>
-                                <Pressable onPress={() => handleChange(item.id)} >
-                                    <MaterialCommunityIcons
-                                        name={item.isChecked ? 'checkbox-marked' : 'checkbox-blank-outline'} size={24} color="#000" />
-                                </Pressable>
-                                <Text>{item.first_name}</Text>
-                            </View>: <View
-                                style={{
-                                    flexDirection: 'row',
-                                    flex: 1,
-                                    justifyContent: 'space-between',
-                                }}>
-                                
-                                <Text>{item.first_name}</Text>
-                            </View> }
-                        </View>
-                   
-                )}
-            />
-            
-            </View>
-        );
+  };
+  // const date = new Date(selected);  // 2009-11-10
+  // const month = date.toLocaleString('default', { month: 'long' });
+  // console.log(month);
+  return (
+    <SafeAreaView style={styles.container}>
+      
     
+      {/* <Text>{start_end_date}</Text> */}
+      <View
+        style={styles.date_view}
+      >
+        <View style={styles.date_box}>
+          {d?<Text style={styles.start_end_date}>
+          {start_end_date}
+          </Text>:
+          <Text style={styles.start_end_date}>
+             Date Search
+          </Text>}
+          
+        </View>
 
+        <Image source={Images.close_icon} style={styles.icon2} />
+      </View>
+      
+      <CalendarPicker
+      
+       headerWrapperStyle={{marginStart:"10%"}}
+      scaleFactor={400}
+        customDayHeaderStyles={customDayHeaderStylesCallback}
+        scrollable={true}
+        monthYearHeaderWrapperStyle={{ paddingStart: "52%", }}
+        monthTitleStyle={styles.month}
+        yearTitleStyle={styles.month}
+        nextTitleStyle={{ marginStart: "50%" }}
+        previousTitle="From"
+        previousTitleStyle={styles.previous}
+        dayLabelsWrapper={styles.day}
+        horizontal
+        startFromMonday={false}
+        // allowRangeSelection={true}
+        // minDate={minDate}
+        // maxDate={maxDate}
+        todayBackgroundColor="#f2e6ff"
+        selectedDayColor="white"
+        onDateChange={(date) => {
+          setSelected(date),setd(true)
+        }}
+        textStyle={{ fontSize: 12 }}
+        showDayStragglers={true}
+      />
+      <CalendarPicker
+      
+      headerWrapperStyle={{backgroundColor:"white",width:"87%",alignSelf:"center",height:height*0.055,borderRadius:1}}
+      
+      scaleFactor={400}
+        customDayHeaderStyles={customDayHeaderStylesCallback}
+        scrollable={true}
+        monthYearHeaderWrapperStyle={{ paddingStart: "58%" }}
+        monthTitleStyle={styles.month}
+        yearTitleStyle={styles.month}
+        
+        nextTitle=""
+        previousTitle="To"
+        previousTitleStyle={styles.previous}
+        dayLabelsWrapper={styles.day}
+        horizontal
+        startFromMonday={false}
+        // allowRangeSelection={true}
+        // minDate={minDate}
+        // maxDate={maxDate}
+        todayBackgroundColor="#f2e6ff"
+        selectedDayColor="white"
+        onDateChange={(date) => {
+          setSelected2(date);
+        }}
+        textStyle={{ fontSize: 10 }}
+        showDayStragglers={true}
+      />
    
-}
-
+    </SafeAreaView>
+  );
+};
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        paddingTop: 50,
-        backgroundColor: '#ecf0f1',
-        padding: 8,
-    },
-    card: {
-        padding: 10,
-        margin: 5,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    modalView: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 5,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        elevation: 5,
-    },
-    text: {
-        textAlign: 'center',
-        fontWeight: 'bold',marginTop:50
-    },
+  container: {
+    flex: 1,
+  },
+  start_end_date:{ fontSize: 15, color: "#cccccc",fontFamily: "Inter-Black4", },
+  previous:{
+    fontSize: 13,
+    color: Colors.MAIN_COLOR,
+    fontWeight: "bold",width:width*0.12,
+    
+  },
+  day:{ backgroundColor: "#6c6c6c", marginTop: "-2%" },
+  month:{ fontSize: wp("4%"), color: "#6c6c6c" },
+  date_view:{
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: "6%",marginBottom:"-4%"
+  },
+  date_box: {
+    height: height * 0.07,
+    width: "86%",
+    // alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    marginVertical: "5%",
+    borderRadius: 6,paddingStart:"3%"
+  },
+
+  icon2: {
+    height: hp("5.21%"),
+    width: wp("6.08%"),
+    resizeMode: "contain",
+    marginStart: "3%",
+  },
 });
 
 export default Demo;

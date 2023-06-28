@@ -14,8 +14,9 @@ import {
   TextInput,
   Image,
   SafeAreaView,
+  Alert,
 } from "react-native";
-import { useFonts } from 'expo-font';
+import { useFonts } from "expo-font";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 import {
@@ -28,7 +29,7 @@ import {
 import * as Linking from "expo-linking";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { get_leads, get_leads_All } from "../Services";
+import { Pin_note, get_leads, get_leads_All } from "../Services";
 import { useNavigation } from "@react-navigation/native";
 import Loader from "../constant/Loader";
 import { ScreenNames } from "../constant/ScreenNames";
@@ -37,19 +38,18 @@ import { Images } from "../constant/images";
 
 export default function All() {
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black3': require('../../assets/fonts/Mulish-Regular.ttf'),
-   
+    "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black3": require("../../assets/fonts/Mulish-Regular.ttf"),
   });
-
- 
 
   // if (!fontsLoaded) {
   //   return null;
   // }
   const [d, setd] = useState(false);
+  const [t, sett] = useState(false);
+  const [t2, sett2] = useState(false);
   const navigation = useNavigation();
 
   const [DATA, setDATA] = useState([]);
@@ -64,11 +64,9 @@ export default function All() {
   const [note, setnote] = useState("");
   const [n, setn] = useState("");
   const [modalTitle2, setModalTitle2] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
   const translation = useRef(new Animated.Value(0)).current;
-
-  
-
-  
+  const h = (18 / 100) * height;
 
   useEffect(() => {
     (async () => {
@@ -101,7 +99,7 @@ export default function All() {
           // setnote(result?.data?.leads?.first_name)
           setd2(true);
           Animated.timing(translation, {
-            toValue: 100,
+            toValue: h,
             delay: 0,
             easing: Easing.elastic(4),
             useNativeDriver: true,
@@ -139,6 +137,105 @@ export default function All() {
     setDATA(temp);
   };
 
+  const selectAlldata2 = () => {
+    let temp = DATA.map((i) => {
+      if (d == true) {
+        return { ...i, isChecked: true };
+      }
+    });
+    sett2(false);
+
+    setDATA(temp);
+  };
+  const UnselectAlldata = () => {
+    let temp = DATA.map((i) => {
+      if (d == true) {
+        return { ...i, isChecked: false };
+      }
+    });
+    sett(false);
+    setd(!d);
+    setDATA(temp);
+  };
+  // console.log(d);
+
+  const handleChange2 = (id) => {
+    let temp = DATA.map((i) => {
+      if (id === i.id) {
+        return { ...i, isChecked: (i.isChecked = true) };
+      }
+
+      return i;
+    });
+    sett2(!t2);
+    setd(!d);
+    setDATA(temp);
+    // sett2(true)
+  };
+
+  const postdata = async () => {
+    try {
+      const user_data = await AsyncStorage.getItem("user_data");
+      // const drop_data = await AsyncStorage.getItem("dropdown_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+        pin_text: note,
+        id: modalTitle,
+        password: d.password,
+      };
+      Pin_note(data).then((response) => {
+        response.json().then((data) => {
+          console.log(data);
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const call_api = async () => {
+    try {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+      };
+
+      get_leads_All(data)
+        .then((response) => response.json())
+        .then((result) => {
+          // console.log(result?.data?.leads)
+          var a = [];
+          result?.data?.leads.map((i) => {
+            a.push({
+              ...i.Lead,
+
+              isChecked: false,
+              note_value: "",
+            });
+          });
+          setDATA(a);
+
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+          setd2(true);
+          Animated.timing(translation, {
+            toValue: h,
+            delay: 0,
+            easing: Easing.elastic(4),
+            useNativeDriver: true,
+          }).start();
+          setLoading(false);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
   // console.log(DATA);
 
   return (
@@ -149,40 +246,78 @@ export default function All() {
           <Loader loading={loading} />
         ) : DATA && DATA.length > 0 ? (
           <>
-            <View
-              style={{
-                flexDirection: "row",
-                alignSelf: "center",
-                height: height * 0.045,
-                width: width * 0.38,
-                backgroundColor: d == true ? "orange" : null,
-                margin: "3%",
-                alignItems: "center",
-                justifyContent: "center",
-                borderWidth: 0.8,
-                borderRadius: 25,
-                borderColor: "black",
-              }}
-            >
-              <TouchableOpacity
-                style={{ alignItems: "center" }}
-                onPress={() => {
-                  selectAlldata();
+            {t ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "center",
+                  height: height * 0.045,
+                  width: width * 0.4,
+                  // backgroundColor: d == true ? "orange" : null,
+                  margin: "3%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderWidth: 0.8,
+                  borderRadius: 25,
+                  borderColor: "black",
                 }}
               >
-                <Text
-                  style={{
-                    color: d == true ? "white" : "#999999",
-                    fontSize: 16,fontFamily:"Inter-Black"
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPress={() => {
+                    t2 ? selectAlldata2() : UnselectAlldata();
                   }}
                 >
-                  Select All
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  <Text
+                    style={{
+                      color: "#999999",
+                      fontSize: 18,
+                      fontFamily: "Inter-Black",
+                    }}
+                  >
+                    Select All
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "center",
+                  height: height * 0.045,
+                  width: width * 0.4,
+                  backgroundColor: d == true ? "orange" : null,
+                  margin: "3%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderWidth: 0.8,
+                  borderRadius: 25,
+                  borderColor: "black",
+                }}
+              >
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPress={() => {
+                    selectAlldata();
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: d == true ? "white" : "#999999",
+                      fontSize: 18,
+                      fontFamily: "Inter-Black",
+                    }}
+                  >
+                    Select All
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             <FlatList
               style={styles.flat}
               data={DATA}
+              extraData={DATA}
               keyExtractor={(item) => item.id}
               renderItem={({ item, index }) => (
                 <View>
@@ -204,11 +339,15 @@ export default function All() {
                         )}
                       </Pressable>
                     ) : null}
-                    <View
+                    <TouchableOpacity
+                      activeOpacity={0.6}
+                      onLongPress={() => {
+                        handleChange2(item.id), sett(true);
+                      }}
                       style={{
                         backgroundColor: "white",
 
-                        width: d == true ? width * 0.8 : width * 0.95,
+                        width: d == true ? width * 0.8 : width * 0.93,
 
                         elevation: 5,
                         alignSelf: "center",
@@ -217,20 +356,29 @@ export default function All() {
                         shadowColor: "white",
                       }}
                     >
-                      
-                      
                       <View style={styles.set}>
-                       
-                       <View style={styles.circle_icon}>
-                         
-                          <View style={styles.circle}>
+                        <View style={styles.circle_icon}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              navigation.navigate(ScreenNames.DETAIL, {
+                                user: {
+                                  name: item.name,
+                                  id: item.id,
+                                  logo: item.name_initials,
+                                },
+                                index: index,
+                                DATA: DATA,
+                              });
+                              // AsyncStorage.setItem("user_id", item.id);
+                            }}
+                            style={styles.circle}
+                          >
                             <Text style={styles.circle_text}>
                               {item.name_initials}
                             </Text>
-                        
+                          </TouchableOpacity>
                         </View>
-                       </View>
-                       <Text
+                        <Text
                           onPress={() => {
                             navigation.navigate(ScreenNames.DETAIL, {
                               user: {
@@ -240,23 +388,29 @@ export default function All() {
                               },
                               index: index,
                               DATA: DATA,
-                            })
-                              // AsyncStorage.setItem("user_id", item.id);
+                            });
+                            // AsyncStorage.setItem("user_id", item.id);
                           }}
                           style={styles.name}
                         >
                           {item.name}
                         </Text>
-                       
-                       
 
-                       <TouchableOpacity
-                          style={{ marginTop: "6%" }}
+                        <TouchableOpacity
+                          style={{
+                            marginTop: "6%",
+                            shadowColor: "#000",
+                            shadowOffset: { width: 2, height: 4 },
+                            shadowOpacity: 0.95,
+                            shadowRadius: 2.84,
+                            elevation: 5,
+                          }}
                           activeOpacity={1}
                           onPress={() => {
                             item.pined_note == "Yes" ? setd1(3) : setd1(0);
                             setModalVisible(true),
                               setModalTitle2(item.pinned_by),
+                              setModalTitle(item.id),
                               setnote(item.pined_note_text),
                               setpin_date(item.pinned_date),
                               setpin_note(item.pined_note);
@@ -265,20 +419,18 @@ export default function All() {
                           {item.pined_note == "Yes" ? (
                             <Image
                               style={styles.note2}
-                              source={Images.pencil_box}
+                              source={Images.pencil_note}
                             ></Image>
                           ) : (
                             <Image
                               style={styles.note2}
-                              source={Images.plus_box}
+                              source={Images.plus_note}
                             ></Image>
                           )}
                         </TouchableOpacity>
-                        
-                     </View>
-                     <View style={styles.line2}></View>
+                      </View>
+                      <View style={styles.line2}></View>
                       <View style={styles.set}>
-                       
                         <View style={styles.phone_icon}>
                           <Feather
                             name="phone"
@@ -294,18 +446,13 @@ export default function All() {
                         >
                           {item.phone ? item.phone : "no number"}
                         </Text>
-                        
-                        
 
                         <TouchableOpacity
                           onPress={() => {
                             Linking.openURL(`sms:${item.phone}`);
                           }}
                         >
-                          <Image
-                            style={styles.sms}
-                            source={Images.sms}
-                          ></Image>
+                          <Image style={styles.sms} source={Images.sms}></Image>
                         </TouchableOpacity>
                       </View>
                       <View style={styles.line2}></View>
@@ -339,7 +486,7 @@ export default function All() {
                           {item.voicemail ? item.voicemail : "Voicemail"}
                         </Text>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   </View>
                   <View style={styles.line}></View>
                 </View>
@@ -384,7 +531,7 @@ export default function All() {
                         {n.length > 0 ? (
                           <TouchableOpacity
                             onPress={() => {
-                              setd1(3);
+                              postdata(), setd1(3);
                             }}
                             style={styles.modal_btn}
                           >
@@ -445,7 +592,7 @@ export default function All() {
                       <View style={styles.modal_btn_box}>
                         <TouchableOpacity
                           onPress={() => {
-                            setd1(3);
+                            postdata(), setd1(3);
                           }}
                           style={styles.modal_btn}
                         >
@@ -524,7 +671,10 @@ export default function All() {
                         <Pressable
                           style={{}}
                           onPress={() => (
-                            setModalVisible(!modalVisible), setd1(0), setn("")
+                            call_api(),
+                            setModalVisible(!modalVisible),
+                            setd1(0),
+                            setn("")
                           )}
                         >
                           <Entypo name="cross" size={30} color="black" />
@@ -546,6 +696,44 @@ export default function All() {
               ) : null}
             </View>
 
+            {d2 ? (
+              <Animated.View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+
+                  borderRadius:
+                    Math.round(
+                      Dimensions.get("window").width +
+                        Dimensions.get("window").height
+                    ) / 2,
+                  position: "absolute",
+
+                  right: "6%",
+
+                  backgroundColor: Colors.float_btn,
+
+                  transform: [{ translateY: translation }],
+                  bottom: height * 0.28,
+                  elevation: 5,
+                }}
+              >
+                <TouchableOpacity
+                  // onPress={() => navigation.navigate(ScreenNames.NEW_LEADS)}
+                  onPress={() => navigation.navigate("demo")}
+                  // style={styles.floating_btn}
+                >
+                  <Image
+                    source={Images.addLeads}
+                    style={{
+                      width: Dimensions.get("window").width * 0.18,
+                      height: Dimensions.get("window").width * 0.18,
+                      resizeMode: "contain",
+                    }}
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            ) : null}
             <View style={styles.tag_box}>
               {d == true ? (
                 <View style={styles.tag_view}>
@@ -564,39 +752,6 @@ export default function All() {
             </View>
           </>
         ) : null}
-        {d2 ? (
-          <Animated.View
-            style={{
-             
-              alignItems: "center",
-              justifyContent: "center",
-              width: Dimensions.get('window').width * 0.18,
-    height: Dimensions.get('window').width * 0.18,
-
-borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
-              position: "absolute",
-
-              right: "8%",
-             
-              backgroundColor: Colors.float_btn,
-              
-              transform: [{ translateY: translation }],
-              bottom: (height + 180)*0.22,
-              elevation: 5,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => navigation.navigate(ScreenNames.NEW_LEADS)}
-              // onPress={() => navigation.navigate("demo")}
-              // style={styles.floating_btn}
-            >
-              <Image
-                source={Images.addLeads}
-                style={{ height: 60, width: 60, resizeMode: "contain" }}
-              />
-            </TouchableOpacity>
-          </Animated.View>
-        ) : null}
       </View>
     </SafeAreaView>
     // </ScrollView>
@@ -604,30 +759,35 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
 }
 
 const styles = StyleSheet.create({
-  update_txt: { color: "white", fontSize: 17 ,fontFamily:"Inter-Black4"},
-  note3: { color: "black", margin: "4%", fontSize: 14,fontFamily:"Inter-Black4"},
+  update_txt: { color: "white", fontSize: 17, fontFamily: "Inter-Black4" },
+  note3: {
+    color: "black",
+    margin: "4%",
+    fontSize: 14,
+    fontFamily: "Inter-Black4",
+  },
   date: {
     color: "black",
     marginLeft: "4%",
     marginVertical: "1%",
-    fontSize: 15,fontFamily:"Inter-Black4"
+    fontSize: 15,
+    fontFamily: "Inter-Black4",
   },
   set: {
     flexDirection: "row",
     padding: "2%",
     alignItems: "center",
-   
   },
   circle_box: {
     flexDirection: "row",
     // paddingVertical: "2%",
     alignItems: "center",
-    
   },
   flat_view: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    paddingVertical: "3%",
   },
   pin2: {
     flexDirection: "row",
@@ -642,7 +802,7 @@ const styles = StyleSheet.create({
     marginHorizontal: "10%",
     marginVertical: "4%",
   },
-  modal_btn_txt: { color: "white", fontSize: 17,fontFamily:"Inter-Black4" },
+  modal_btn_txt: { color: "white", fontSize: 17, fontFamily: "Inter-Black4" },
   modal_btn: {
     height: height * 0.05,
     width: "45%",
@@ -668,7 +828,7 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
-    marginTop: height*0.22,
+    marginTop: height * 0.22,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
@@ -687,7 +847,7 @@ const styles = StyleSheet.create({
   },
   tag_box: {
     width: "100%",
-    height: height * 0.065,
+    height: height * 0.068,
     backgroundColor: Colors.MAIN_COLOR,
     justifyContent: "center",
     alignItems: "center",
@@ -700,12 +860,9 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   note2: {
-    width: Dimensions.get('window').width * 0.15,
-    height: Dimensions.get('window').width * 0.15,
+    width: Dimensions.get("window").width * 0.11,
+    height: Dimensions.get("window").width * 0.12,
     resizeMode: "contain",
-
-
-    
   },
   tag_view: {
     flexDirection: "row",
@@ -713,8 +870,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tag_touch: { alignItems: "center" },
-  tag: { color: "white", fontSize: 18,fontFamily:"Inter-Black4" },
-  flat: { backgroundColor: "#f2f2f2", padding: 10, marginBottom: 40 },
+  tag: { color: "white", fontSize: 18, fontFamily: "Inter-Black4" },
+  flat: { backgroundColor: "#f2f2f2" },
   input: {
     height: height * 0.25,
     margin: 12,
@@ -725,11 +882,12 @@ const styles = StyleSheet.create({
   },
   modalText: {
     fontSize: 20,
-    fontFamily:"Inter-Black2"
+    fontFamily: "Inter-Black2",
   },
   modalText1: {
     fontSize: 20,
-    marginHorizontal: "30%",fontFamily:"Inter-Black4"
+    marginHorizontal: "30%",
+    fontFamily: "Inter-Black4",
   },
   centeredView: {
     flex: 1,
@@ -798,11 +956,11 @@ const styles = StyleSheet.create({
 
     borderRadius: 20,
   },
-  phone_icon: {  flex:0.17,marginStart: "5%" },
-  circle_icon: {  marginStart: "5%",marginEnd:"3%" },
+  phone_icon: { flex: 0.17, marginStart: "5%" },
+  circle_icon: { marginStart: "5%", marginEnd: "3%" },
   sms: {
-    width: Dimensions.get('window').width * 0.11,
-    height: Dimensions.get('window').width * 0.11,
+    width: Dimensions.get("window").width * 0.11,
+    height: Dimensions.get("window").width * 0.11,
     resizeMode: "contain",
     marginTop: 6,
   },
@@ -811,53 +969,60 @@ const styles = StyleSheet.create({
   icon: {},
   icon1: { marginTop: "5%" },
   name: {
-    fontSize: 20,
+    fontSize: 19,
 
     color: "#666666",
     fontWeight: "normal",
-    flex: 1,fontFamily: 'Inter-Black',
+    flex: 0.97,
+    fontFamily: "Inter-Black",
   },
   number: {
     fontSize: 15,
-   
 
     // fontWeight: "700",
-    color: "#808080",flex:0.8,fontFamily: 'Inter-Black2',
+    color: "#808080",
+    flex: 0.8,
+    fontFamily: "Inter-Black2",
   },
   email: {
     fontSize: 15,
     flex: 0.9,
 
     // fontWeight: "700",
-    color: "#808080",fontFamily: 'Inter-Black2',
+    color: "#808080",
+    fontFamily: "Inter-Black2",
   },
   voicemail: {
     fontSize: 15,
     flex: 0.9,
 
     // fontWeight: "700",
-    color: "#808080",fontFamily: 'Inter-Black2',
+    color: "#808080",
+    fontFamily: "Inter-Black2",
   },
 
-  circleview: {   alignItems: "center" },
+  circleview: { alignItems: "center" },
   circle: {
-    width: Dimensions.get('window').width * 0.17,
-    height: Dimensions.get('window').width * 0.17,
-backgroundColor: "#f2f2f2",
-borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
-justifyContent: "center",
+    width: Dimensions.get("window").width * 0.17,
+    height: Dimensions.get("window").width * 0.17,
+    backgroundColor: "#f2f2f2",
+    borderRadius:
+      Math.round(
+        Dimensions.get("window").width + Dimensions.get("window").height
+      ) / 2,
+    justifyContent: "center",
   },
   circle_text: {
-    fontSize: 30,
+    fontSize: 28,
     // fontWeight: "700",
     color: "#bfbfbf",
-    textAlign: "center",fontFamily: 'Inter-Black3',
+    textAlign: "center",
+    fontFamily: "Inter-Black3",
   },
   bouncy: { marginStart: "10%", marginRight: "-4%" },
   line: {
     backgroundColor: "#cccccc",
     height: 0.5,
-    marginVertical: "3%",
 
     width: "100%",
   },

@@ -43,6 +43,13 @@ tags:require('./../Images/tags.png'),
 tasks_navigation:require('./../Images/tasks.png'),
 close_white:require('./../Images/close_white.png'),
 home_search:require('../../assets/image/home_search.jpg'),
+Task_circle:require('./../Images/Task_circle.png'),
+Task_Complete:require('./../Images/Task_Complete.png'),
+close_icon:require('./../Images/close-icon.png'),
+call_icon:require('./../Images/call-icon.png'),
+mail_icon:require('./../Images/mail-icon.png'),
+Voice_icon:require('./../Images/icons-voicemail.png'),
+email_icon:require('./../Images/icons-email.png'),
 
 
 }

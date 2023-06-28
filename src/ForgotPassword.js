@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Alert,Modal,Pressable
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -17,14 +17,31 @@ import { STYLES } from "./constant/styles";
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
+import { useFonts } from 'expo-font';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { Colors } from "./constant/colors";
+import Header from "./components/header";
+import { Images } from "./constant/images";
+
 
 function Forgot_pasword() {
   const navigation = useNavigation();
   const [loading, setLoading] = React.useState(false);
   const [email, setEmail] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [fontsLoaded] = useFonts({
+    'Inter-Black': require('../assets/fonts/Mulish-SemiBold.ttf'),
+    'Inter-Black2': require('../assets/fonts/Mulish-Bold.ttf'),
+    'Inter-Black3': require('../assets/fonts/Mulish-ExtraBold.ttf'),
+    'Inter-Black4': require('../assets/fonts/Mulish-Regular.ttf'),
+   
+  });
   const forgot_method = async () => {
     if (email == "") {
-      alert("Please enter email");
+      setModalVisible(true);
     } else {
       try {
         setLoading(true);
@@ -49,31 +66,15 @@ function Forgot_pasword() {
   return (
     <SafeAreaView style={styles.container}>
       <View>
-        <View style={STYLES.header_box}>
-          <TouchableOpacity
-            style={STYLES.back_button}
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialCommunityIcons
-              name="keyboard-backspace"
-              size={30}
-              color="white"
-            />
-          </TouchableOpacity>
-          <Text style={STYLES.header}>Forgot Password</Text>
-        </View>
-        {/* <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <View style={{margin:"5%"}}>
-              <MaterialCommunityIcons
-                name="keyboard-backspace"
-                size={24}
-                color="white"
-              />
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.login}>Forgot Password</Text>
-        </View> */}
+      
+         <Header
+        label="Forgot Password"
+        leftIcon={Images.backArrow}
+        
+        onLeftPress={() => navigation.goBack()}
+       
+      />
+      
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -87,7 +88,41 @@ function Forgot_pasword() {
         <TouchableOpacity onPress={forgot_method} style={styles.button}>
           <Text style={styles.login}>Reset my Password</Text>
         </TouchableOpacity>
+        <View style={styles.centeredView}>
+          <Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.textStyle1}>Lead Booker</Text>
+                <Text style={styles.textStyle2}>Could you please enter a valid email address?</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                    
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <Text style={styles.textStyle3}>Ok</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+        </View>
       </View>
+     
     </SafeAreaView>
   );
 }
@@ -97,26 +132,45 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   input: {
-    height: height * 0.075,
+    height: height * 0.08,
     width: width * 0.9,
     marginTop: 30,
 
     padding: 10,
     alignSelf: "center",
     backgroundColor: "white",
-    elevation: 1,
-    borderRadius: 6,
-    color: "#808080",
-    fontSize: 20,
+    
+    borderRadius: 10,
+    color: Colors.txt,
+    fontSize: wp("5.41%"), fontFamily:"Inter-Black4",
+  },
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"8%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"8%",marginTop:"1%",color:"#262626",},
+  textStyle3: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
+
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 0,
+    backgroundColor: "rgba(52, 52, 52, 0.3)",
+  },
+  modalView: {
+    width: "80%",
+    backgroundColor: "#ececee",
+    borderRadius: 10,
+
+    elevation: 5,
+    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    elevation: 20,
   },
   button: {
-    height: height * 0.085,
+    height: height * 0.095,
     width: width * 0.9,
-    marginTop: 50,
-
+    marginTop: 30,
     padding: 10,
     alignSelf: "center",
-    backgroundColor: "#003366",
+    backgroundColor: Colors.MAIN_COLOR,
     elevation: 1,
     borderRadius: 8,
     justifyContent: "center",
@@ -125,8 +179,8 @@ const styles = StyleSheet.create({
   login: {
     textAlign: "center",
     color: "white",
-    fontSize: 18,
-    fontWeight: "normal",
+    fontSize: wp("6.2%"),
+    fontFamily:"Inter-Black",
   },
   //   header: {
   //     height: height * 0.1,

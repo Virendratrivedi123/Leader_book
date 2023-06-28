@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useFonts } from 'expo-font';
 import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import {
   StyleSheet,
   Text,
   View,
@@ -140,7 +144,7 @@ function Basic_detail({ data }) {
 
   // console.log(selected)
 
-  // console.log(note);
+  console.log(DATA);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -293,9 +297,9 @@ function Basic_detail({ data }) {
                     renderItem={({ item, index }) => (
                       <View style={styles.box}>
                         <Text style={styles.tag}>{item.label}</Text>
-                        <TouchableOpacity>
-                          <Entypo name="cross" size={28} color="white" />
-                        </TouchableOpacity>
+                        <Image style={{height: hp("4.5%"),
+                                    width: wp("4.5%"),
+                                    resizeMode: "contain",marginStart:5}} source={Images.close_white}></Image>
                       </View>
                     )}
                   />
@@ -586,11 +590,12 @@ function Basic_detail({ data }) {
                   <View style={styles.line}></View>
                   <KeyboardAvoidingView enabled>
                     <View style={styles.tag_input2}>
+                      
                       <TextInput
                         // onChangeText={onChangeNumber}
                         // value={number}
                         placeholder="Search Tags"
-                        style={{fontFamily:"Inter-Black4",fontSize:16}}
+                        style={{padding:"2%", fontSize: wp("5.13%"),}}
                         placeholderTextColor={"#cccccc"}
                       />
                     </View>
@@ -598,12 +603,13 @@ function Basic_detail({ data }) {
                   <View style={styles.line}></View>
 
                   <SectionList
+                  stickySectionHeadersEnabled={false}
                     renderSectionHeader={({ section: { title } }) => (
                       <Text
                         style={{
-                          fontWeight: "400",
-                          fontSize: 20,
-                          margin: "3%",fontFamily:"Inter-Black"
+                          
+                          fontSize: wp("6.13%"),
+                          marginTop: "3%",fontFamily:"Inter-Black",marginStart:"3%"
                         }}
                       >
                         {title}
@@ -623,29 +629,30 @@ function Basic_detail({ data }) {
                               paddingHorizontal: "6%",
                               flexDirection: "row",
                               justifyContent: "space-between",
-                              alignItems: "center",
+                              alignItems: "center",marginTop:"3%"
                             }}
                             onPress={() => {}}
                           >
                             <Text
                               style={{
-                                fontSize: 16,
+                                fontSize: wp("4.9%"),
                                 fontWeight: "normal",
-                                marginBottom: "5%",fontFamily:"Inter-Black"
+                                fontFamily:"Inter-Black4"
                               }}
                             >
                               {item.label}
                             </Text>
                             <Pressable onPress={() => handleChange(item.value)}>
-                              <MaterialCommunityIcons
-                                name={
-                                  item.isChecked
-                                    ? "checkbox-marked"
-                                    : "checkbox-blank-outline"
-                                }
-                                size={24}
-                                color="#000"
-                              />
+                            
+                             
+                                 { item.isChecked
+                                    ? <Image style={{height: hp("4%"),
+                                    width: wp("6%"),
+                                    resizeMode: "contain",}} source={Images.Task_Complete}></Image>
+                                    : <Image style={{height: hp("4%"),
+                                    width: wp("6%"),
+                                    resizeMode: "contain",}} source={Images.Task_circle}></Image>}
+                               
                             </Pressable>
                           </TouchableOpacity>
                         ),
@@ -663,14 +670,14 @@ function Basic_detail({ data }) {
                               paddingHorizontal: "6%",
                               flexDirection: "row",
                               justifyContent: "space-between",
-                              alignItems: "center",
+                              alignItems: "center",marginTop:"3%"
                             }}
                           >
                             <Text
                               style={{
                                 fontSize: 16,
                                 fontWeight: "normal",
-                                marginBottom: "5%",
+                                
                               }}
                             >
                               {item.label}
@@ -678,15 +685,13 @@ function Basic_detail({ data }) {
                             <Pressable
                               onPress={() => handleChange1(item.value)}
                             >
-                              <MaterialCommunityIcons
-                                name={
-                                  item.isChecked
-                                    ? "checkbox-marked"
-                                    : "checkbox-blank-outline"
-                                }
-                                size={24}
-                                color="#000"
-                              />
+                              { item.isChecked
+                                    ? <Image style={{height: hp("4%"),
+                                    width: wp("6%"),
+                                    resizeMode: "contain",}} source={Images.Task_Complete}></Image>
+                                    : <Image style={{height: hp("4%"),
+                                    width: wp("6%"),
+                                    resizeMode: "contain",}} source={Images.Task_circle}></Image>}
                             </Pressable>
                           </View>
                         ),
@@ -711,27 +716,27 @@ function Basic_detail({ data }) {
             {icon_note == "Yes" ? (
               <Image
                 style={{
-                  width: Dimensions.get('window').width * 0.18,
-                  height: Dimensions.get('window').width * 0.18,
+                  width: Dimensions.get('window').width * 0.13,
+                  height: Dimensions.get('window').width * 0.13,
                   resizeMode: "contain",
                 }}
-                source={Images.pencil_box}
+                source={Images.pencil_note}
               ></Image>
             ) : (
               <Image
                 style={{
-                  width: Dimensions.get('window').width * 0.18,
-    height: Dimensions.get('window').width * 0.18,
+                  width: Dimensions.get('window').width * 0.13,
+    height: Dimensions.get('window').width * 0.13,
     resizeMode: "contain",
                 }}
-                source={Images.plus_box}
+                source={Images.plus_note}
               ></Image>
             )}
           </TouchableOpacity>
           <View
             style={{
               width: "100%",
-              height: height * 0.065,
+              height: height * 0.068,
               backgroundColor: Colors.MAIN_COLOR,
               justifyContent: "center",
               alignItems: "center",
@@ -742,10 +747,10 @@ function Basic_detail({ data }) {
             <Text
               onPress={() => {
                 navigation.navigate(ScreenNames.LEAD_ACTIVITY, {
-                  name: User_data.name,
-                  logo1: User_data.name_initials,
+                  name: User_data?.name,
+                  logo1: User_data?.name_initials,
 
-                  id: User_data.id,
+                  id: User_data?.id,
                 });
               }}
               style={{ color: "white", fontSize: 20,fontFamily:"Inter-Black" }}
@@ -880,7 +885,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tag_touch: { alignItems: "center" },
-  tag: { color: "white", fontSize: 18,fontFamily:"Inter-Black" },
+  tag: { color: "white", fontSize: wp("4.63%"),fontFamily:"Inter-Black4" },
   flat: { backgroundColor: "#f2f2f2", padding: 10, marginBottom: 40 },
   input: {
     height: height * 0.25,
@@ -944,10 +949,10 @@ const styles = StyleSheet.create({
   pad: { paddingVertical: "3%", paddingHorizontal: "5%" },
   
   tag_input2: {
-    height: height * 0.05,
+    
     margin: "2%",
 
-    padding: 10,
+    
     borderWidth: 1,
     borderRadius: 20,
   },
@@ -961,8 +966,8 @@ const styles = StyleSheet.create({
     color: "#666666",fontFamily:"Inter-Black"
   },
   modal_tagText2: {
-    fontSize: 18,
-    fontWeight: "normal",
+    fontSize: wp("5.13%"),
+    
     flex: 0.95,
     marginStart: "25%",
     color: Colors.blue_txt,fontFamily:"Inter-Black"
@@ -991,13 +996,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
 
     position: "absolute",
-    bottom: "10%",
-    right: "1%",
+    bottom: "12%",
+    right: "5%",shadowColor: '#000',
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.95,
+    shadowRadius: 2.84,
+    elevation: 5,
   },
-  tag: { fontSize: 18, marginLeft: 5, color: "white", fontWeight: "300" },
+  
   box: {
     flexDirection: "row",
-    height: height * 0.04,
+    
 
     backgroundColor: "grey",
     alignItems: "center",
@@ -1005,7 +1014,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
     borderRadius: 6,
     marginEnd: "2%",
-    marginTop: "2%",
+    marginTop: "2%",paddingHorizontal:5
   },
   row: {
     flexDirection: "row",
@@ -1031,7 +1040,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#cccccc",
     height: 1,
 
-    width: "100%",
+    width: "100%",alignSelf:"center"
   },
 
   container: { flex: 1, backgroundColor: "white" },

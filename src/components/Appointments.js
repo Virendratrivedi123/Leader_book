@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { Entypo, SimpleLineIcons, Ionicons } from "@expo/vector-icons";
 import {
@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  Animated,
+  Easing,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -16,8 +19,7 @@ import { ScreenNames } from "../constant/ScreenNames";
 import { STYLES } from "../constant/styles";
 import Header from "./header";
 import { Images } from "../constant/images";
-import { useFonts } from 'expo-font';
-
+import { useFonts } from "expo-font";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -90,22 +92,30 @@ const DATA = [
 
 function Appointments() {
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../assets/fonts/Mulish-Regular.ttf'),
-    
-   
+    "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black4": require("../../assets/fonts/Mulish-Regular.ttf"),
   });
   const navigation = useNavigation();
+  const translation = useRef(new Animated.Value(0)).current;
+  const h = (18 / 100) * height;
+  useEffect(() => {
+    Animated.timing(translation, {
+      toValue: h,
+      delay: 0,
+      easing: Easing.elastic(4),
+      useNativeDriver: true,
+    }).start();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
-<Header
-label="Appointments"
-leftIcon={Images.menu}
-rightIcon={Images.time}
-onLeftPress={() => navigation.toggleDrawer()}
-/>
+      <Header
+        label="Appointments"
+        leftIcon={Images.menu}
+        rightIcon={Images.time}
+        onLeftPress={() => navigation.toggleDrawer()}
+      />
       <FlatList
         style={{}}
         data={DATA}
@@ -147,13 +157,38 @@ onLeftPress={() => navigation.toggleDrawer()}
           </View>
         )}
       />
-      <TouchableOpacity
-        onPress={() => navigation.navigate(ScreenNames.ADD_APPOINTMENT)}
-        style={styles.floating_btn}
+      <Animated.View
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+
+          position: "absolute",
+
+          right: "6%",
+
+          borderRadius:
+            Math.round(
+              Dimensions.get("window").width + Dimensions.get("window").height
+            ) / 2,
+
+          transform: [{ translateY: translation }],
+          bottom: height * 0.28,
+          elevation: 5,
+        }}
       >
-        {/* <Ionicons name="ios-add" size={60} color="white" /> */}
-        <Ionicons name="ios-add" size={60} color="white" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(ScreenNames.ADD_APPOINTMENT)}
+        >
+          <Image
+            source={Images.addNote}
+            style={{
+              width: Dimensions.get("window").width * 0.18,
+              height: Dimensions.get("window").width * 0.18,
+              resizeMode: "contain",
+            }}
+          />
+        </TouchableOpacity>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -187,7 +222,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: "0%",
     // color: "#808080",
-    fontFamily:"Inter-Black2",
+    fontFamily: "Inter-Black2",
     marginStart: "5%",
     color: "black",
   },
@@ -195,7 +230,7 @@ const styles = StyleSheet.create({
     fontSize: 19,
     marginTop: "2%",
     // color: "#808080",
-    fontFamily:"Inter-Black2",
+    fontFamily: "Inter-Black2",
     marginStart: "5%",
     color: "grey",
   },
@@ -205,14 +240,15 @@ const styles = StyleSheet.create({
     // color: "#808080",
     marginStart: "5%",
     color: "#8c8c8c",
-    fontFamily:"Inter-Black",
+    fontFamily: "Inter-Black",
   },
   text4: {
     fontSize: 14,
     marginTop: "2%",
     // color: "#808080",
     marginStart: "5%",
-    color: "#666666",fontFamily:"Inter-Black4",
+    color: "#666666",
+    fontFamily: "Inter-Black4",
   },
   text5: {
     fontSize: 18,
@@ -220,13 +256,18 @@ const styles = StyleSheet.create({
     // color: "#808080",
     marginStart: "3%",
     color: "#8c8c8c",
-    fontFamily:"Inter-Black",
+    fontFamily: "Inter-Black",
   },
 
   circle: {
-    height: height * 0.08,
-    width: width * 0.17,
+    width: Dimensions.get("window").width * 0.18,
+    height: Dimensions.get("window").width * 0.18,
     backgroundColor: "#f2f2f2",
+    borderRadius:
+      Math.round(
+        Dimensions.get("window").width + Dimensions.get("window").height
+      ) / 2,
+
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -234,7 +275,7 @@ const styles = StyleSheet.create({
   },
   circle_text: {
     fontSize: 30,
-    fontWeight: "600",
+    fontFamily: "Inter-Black2",
     color: "#bfbfbf",
   },
 

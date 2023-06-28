@@ -1,22 +1,26 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   SafeAreaView,
   Dimensions,
   Text,
   View,
   StyleSheet,
-  TouchableOpacity,Image
+  TouchableOpacity,
+  Animated,
+  Easing,
+  Image,
 } from "react-native";
 import {
   MaterialCommunityIcons,
   FontAwesome,
-  EvilIcons,Ionicons
+  EvilIcons,
+  Ionicons,
 } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { STYLES } from "../../../constant/styles";
 import { Colors } from "../../../constant/colors";
 import { Images } from "../../../constant/images";
-import Header from "../../../components/header";
+import Header2 from "../../../components/header2";
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -24,9 +28,19 @@ const width = Dimensions.get("window").width;
 function Page() {
   const navigation = useNavigation();
   const route = useRoute();
+  const translation = useRef(new Animated.Value(0)).current;
+  const h = (18 / 100) * height;
+  useEffect(() => {
+    Animated.timing(translation, {
+      toValue: h,
+      delay: 0,
+      easing: Easing.elastic(4),
+      useNativeDriver: true,
+    }).start();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <Header
+      <Header2
         label={route.params.name}
         leftIcon={Images.backArrow}
         rightIcon={{}}
@@ -34,36 +48,62 @@ function Page() {
         onRightPress={() => {}}
         // customRight={true}
       />
-      <TouchableOpacity
-        onPress={() => navigation.navigate(route.params.n,{name:route.params.name})}
-        style={styles.floating_btn}
+
+      <Animated.View
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+
+          position: "absolute",
+
+          right: "12%",
+          width: Dimensions.get("window").width * 0.18,
+          height: Dimensions.get("window").width * 0.18,
+
+          borderRadius:
+            Math.round(
+              Dimensions.get("window").width + Dimensions.get("window").height
+            ) / 2,
+
+          transform: [{ translateY: translation }],
+          bottom: height * 0.28,
+          elevation: 5,
+        }}
       >
-        {/* <Ionicons name="ios-add" size={60} color="white" /> */}
-        <Ionicons name="ios-add" size={60} color="white" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(route.params.n, { name: route.params.name })
+          }
+        >
+          <Image
+            source={Images.addNote}
+            style={{ height: 60, width: 60, resizeMode: "contain" }}
+          />
+        </TouchableOpacity>
+      </Animated.View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-    floating_btn: {
-        borderWidth: 1,
-        borderColor: "rgba(0,0,0,0.2)",
-        alignItems: "center",
-        justifyContent: "center",
-        alignContent: "center",
-        width: 60,
-        position: "absolute",
-        bottom: "10%",
-        alignSelf: "flex-end",
-        right: "8%",
-        height: 60,
-        backgroundColor: Colors.MAIN_COLOR,
-        borderRadius: 30,
-        elevation: 5,
-        shadowColor: "black",
-        resizeMode: "contain",
-      },
+  floating_btn: {
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    alignContent: "center",
+    width: 60,
+    position: "absolute",
+    bottom: "10%",
+    alignSelf: "flex-end",
+    right: "8%",
+    height: 60,
+    backgroundColor: Colors.MAIN_COLOR,
+    borderRadius: 30,
+    elevation: 5,
+    shadowColor: "black",
+    resizeMode: "contain",
+  },
   container: {
     flex: 1,
   },

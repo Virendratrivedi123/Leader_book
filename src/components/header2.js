@@ -57,9 +57,9 @@ export default function Header2({
           />
         </TouchableOpacity>
       ) : customRight ? (
-        <TouchableOpacity style={{...STYLES.save_touch}} onPress={onRightPress}>
-          <Text style={STYLES.add_text}> Add </Text>
-        </TouchableOpacity>
+        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"yellow",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
+        <Text style={{fontSize:15,color:"yellow",fontFamily:"Inter-Black2",paddingHorizontal:"3%"}}> Add </Text>
+      </TouchableOpacity>
       ) : (
         <View />
       )}
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: wp("100%"),
-    height: hp("8%"),
+    height: hp("10%"),
     backgroundColor: Colors.MAIN_COLOR,
     paddingHorizontal: wp("4%"),
   },

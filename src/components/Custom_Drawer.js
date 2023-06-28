@@ -4,6 +4,10 @@ import {
   DrawerItemList,
   DrawerItem,
 } from "@react-navigation/drawer";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { useNavigation, useRoute } from "@react-navigation/native";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -69,9 +73,9 @@ function Customdrawer(props) {
 
   // console.log(company)
   return (
-    <DrawerContentScrollView style={{marginTop:"-1.5%",backgroundColor:"#f5f5f5",}} {...props}onLayout={onLayoutRootView}>
+    <DrawerContentScrollView style={{marginTop:"-1.7%",backgroundColor:"#f5f5f5",}} {...props}onLayout={onLayoutRootView}>
       <View style={styles.up}>
-        <View style={{ marginTop: "8%", marginStart: "6%" }}>
+        <View style={{ marginTop: "8%", marginStart: "8%" }}>
           <View style={styles.circle}>
             <Text style={styles.circle_text}>
               {First_name[0]}
@@ -188,22 +192,22 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
     color: "#a9a9a9",fontFamily:"Inter-Black2"
   },
   name_text: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily:"Inter-Black2",
     color: "white",
-    marginTop: "3%",
+    marginTop: "5%",
   },
   name_text2: {
-    fontSize: 16,
+    fontSize: 15,
     
     color: "white",
-    width: width * 0.5,fontFamily:"Inter-Black2"
+    width: width * 0.5,fontFamily:"Inter-Black2",marginBottom:"10%"
   },
   ICON_TEXT: {
-    fontSize: 16,
+    fontSize: wp("5.13%"),
     color: "black",
-    fontWeight: "normal",
-    marginStart: "3%",marginTop:"1%",fontFamily:"Inter-Black"
+    
+    marginStart: "1.5%",marginTop:"1%",fontFamily:"Inter-Black"
   },
   up: {
     // height: height * 0.22,
@@ -216,8 +220,8 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
   },
   icon2: {
     
-    height: 25,
-    width: 25,
+    height: hp("4.5%"),
+    width: wp("8.58%"),
     resizeMode: "contain",
    
   },

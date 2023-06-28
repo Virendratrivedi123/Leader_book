@@ -174,20 +174,20 @@ export default function Related({ data }) {
         {loading ? null : icon_note == "Yes" ? (
           <Image
             style={{
-              width: Dimensions.get('window').width * 0.18,
-                  height: Dimensions.get('window').width * 0.18,
+              width: Dimensions.get('window').width * 0.13,
+                  height: Dimensions.get('window').width * 0.13,
                   resizeMode: "contain",
             }}
-            source={Images.pencil_box}
+            source={Images.pencil_note}
           ></Image>
         ) : (
           <Image
             style={{
-              width: Dimensions.get('window').width * 0.18,
-                  height: Dimensions.get('window').width * 0.18,
+              width: Dimensions.get('window').width * 0.13,
+                  height: Dimensions.get('window').width * 0.13,
                   resizeMode: "contain",
             }}
-            source={Images.plus_box}
+            source={Images.plus_note}
           ></Image>
         )}
       </TouchableOpacity>
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
   },
   bottom_btn: {
     width: "100%",
-    height: height * 0.065,
+    height: height * 0.068,
     backgroundColor: Colors.MAIN_COLOR,
     justifyContent: "center",
     alignItems: "center",
@@ -590,8 +590,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
 
     position: "absolute",
-    bottom: "10%",
-    right: "1%",
+    bottom: "12%",
+    right: "5%",shadowColor: '#000',
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.95,
+    shadowRadius: 2.84,
+    elevation: 5,
   },
   null_txt: { flex: 1, alignItems: "center", justifyContent: "center" },
   box1: { flexDirection: "row", alignItems: "center" },

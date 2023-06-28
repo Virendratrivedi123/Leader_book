@@ -159,7 +159,8 @@ function Add_appointment() {
           <View style={styles.line2}></View>
           <Text style={styles.name_txt}>Site</Text>
           <Dropdown
-            style={[styles.dropdown2]}
+            style={{ }}
+            containerStyle={styles.drop_cnt}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
@@ -178,7 +179,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingHorizontal: "5%" }}
+                style={{ paddingEnd: "3%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -206,9 +207,10 @@ function Add_appointment() {
           <View style={styles.line2}></View>
           <Text style={styles.name_txt}>All Day Event</Text>
           <Dropdown
-            style={[styles.dropdown2]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
+             style={{ }}
+             containerStyle={styles.drop_cnt}
+             placeholderStyle={styles.placeholderStyle}
+             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             data={dt}
@@ -225,7 +227,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingHorizontal: "5%" }}
+                style={{ paddingEnd: "3%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -297,9 +299,10 @@ function Add_appointment() {
           </View>
 
           <Dropdown
-            style={[styles.dropdown]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
+             style={{ }}
+             containerStyle={styles.drop_cnt}
+             placeholderStyle={styles.placeholderStyle}
+             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             data={dt}
@@ -316,7 +319,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingHorizontal: "5%" }}
+                style={{ paddingEnd: "3%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -333,9 +336,10 @@ function Add_appointment() {
             <Text style={styles.name_txt}>Time Unit</Text>
           </View>
           <Dropdown
-            style={[styles.dropdown]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
+             style={{ }}
+             containerStyle={styles.drop_cnt}
+             placeholderStyle={styles.placeholderStyle}
+             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             data={dt}
@@ -352,7 +356,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingHorizontal: "5%" }}
+                style={{ paddingEnd: "3%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -365,9 +369,10 @@ function Add_appointment() {
             <Text style={styles.name_txt}>Show Time As</Text>
           </View>
           <Dropdown
-            style={[styles.dropdown]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
+             style={{ }}
+             containerStyle={styles.drop_cnt}
+             placeholderStyle={styles.placeholderStyle}
+             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             data={dt}
@@ -384,7 +389,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingHorizontal: "5%" }}
+                style={{ paddingEnd: "3%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -642,7 +647,7 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "100%",
   },
-  selectedTextStyle: { color: "#8c8c8c",fontFamily:"Inter-Black4" },
+  selectedTextStyle: { color: "#8c8c8c",fontFamily:"Inter-Black4",marginStart:"12%" },
   icon2: {
     marginTop: "8%",
     height: 25,
@@ -674,6 +679,8 @@ const styles = StyleSheet.create({
     marginStart: "12%",
     marginTop: "5%",
   },
+  drop_cnt:{borderRadius:6,width: "86%",
+  marginStart: "12%",marginTop:"1%",height:height*0.15},
   line: {
     backgroundColor: "grey",
     height: 1,

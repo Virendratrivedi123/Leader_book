@@ -13,11 +13,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Images } from "../../constant/images";
 import { Colors } from "../../constant/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Entypo,
  
 } from "@expo/vector-icons";
 import { ScreenNames } from "../../constant/ScreenNames";
+import { get_leads_basic_detail } from "../../Services";
+import Loader from "../../constant/Loader";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -31,7 +34,7 @@ function Profile({data}) {
    
   });
   const User_data = data
-  console.log(User_data)
+  
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   
@@ -41,63 +44,91 @@ function Profile({data}) {
   const [pin_date, setpin_date] = useState(data?.pinned_date);
   const [icon_note, seticon_note] = useState(data?.pined_note);
   const [modalTitle2, setModalTitle2] = useState(data?.pinned_by);
-  // console.log(icon_note)
+  const [profile, setprofile] = useState("");
+  const [loading, setLoading] = React.useState(true);
+
+  useEffect(() => {
+    (async () => {
+      // user_data.pined_note == "Yes" ? setd(3) : setd(0);
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      const data = {
+        email: d.email,
+        password: d.password,
+        id: User_data.id,
+      };
+      get_leads_basic_detail(data)
+        .then((response) => response.json())
+        .then((result) => {
+         
+         setprofile(result?.data?.lead_detail?.lead_profile?.is_profile_exist)
+         
+
+         
+         
+          
+        
+         
+
+          setLoading(false);
+        })
+        .catch((error) => console.log("error", error));
+    })();
+  }, []);
+
+  console.log(profile)
   return (
+    
     <View style={styles.container}>
-      <TouchableOpacity style={styles.box1}
-         onPress={() => {navigation.navigate("Saved_searches",{data:User_data})}}
+      
+      {loading ? (
+        <Loader loading={loading} />
+      ) : profile == "1" ? <><TouchableOpacity style={styles.box1}
+        onPress={() => { navigation.navigate("Saved_searches", { data: User_data }); } }
       >
         <Image
           source={Images.search}
-          style={styles.img}
-        />
+          style={styles.img} />
         <Text style={styles.txt}>View Saved Searches</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.box}
-         onPress={() => {navigation.navigate("Edit_searches",{data:User_data})}}
+      </TouchableOpacity><TouchableOpacity style={styles.box}
+        onPress={() => { navigation.navigate("Edit_searches", { data: User_data }); } }
       >
-        <Image
-          source={Images.search}
-          style={styles.img}
-        />
-        <Text style={styles.txt}>Edit Saved Searches</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.box}
-         onPress={() => {}}
-      >
-        <Image
-          source={Images.Home}
-          style={styles.img}
-        />
-        <Text style={styles.txt}>View Favorite Properties</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.box2}
-         onPress={() => {}}
-      >
-        <Image
-         source={Images.Home}
-          style={styles.img}
-        />
-        <Text style={styles.txt}>Send Hot Listing Email</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.box2}
-         onPress={() => {}}
-      >
-        <Image
-          source={Images.people}
-          style={styles.img}
-        />
-        <Text style={styles.txt}>View Number of Visits</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.box2}
-         onPress={() => {}}
-      >
-        <Image
-          source={Images.state}
-          style={styles.img}
-        />
-        <Text style={styles.txt}>Properties Viewed</Text>
-      </TouchableOpacity>
+          <Image
+            source={Images.search}
+            style={styles.img} />
+          <Text style={styles.txt}>Edit Saved Searches</Text>
+        </TouchableOpacity><TouchableOpacity style={styles.box}
+          onPress={() => { } }
+        >
+          <Image
+            source={Images.Home}
+            style={styles.img} />
+          <Text style={styles.txt}>View Favorite Properties</Text>
+        </TouchableOpacity><TouchableOpacity style={styles.box2}
+          onPress={() => { } }
+        >
+          <Image
+            source={Images.Home}
+            style={styles.img} />
+          <Text style={styles.txt}>Send Hot Listing Email</Text>
+        </TouchableOpacity><TouchableOpacity style={styles.box2}
+          onPress={() => { } }
+        >
+          <Image
+            source={Images.people}
+            style={styles.img} />
+          <Text style={styles.txt}>View Number of Visits</Text>
+        </TouchableOpacity><TouchableOpacity style={styles.box2}
+          onPress={() => { } }
+        >
+          <Image
+            source={Images.state}
+            style={styles.img} />
+          <Text style={styles.txt}>Properties Viewed</Text>
+        </TouchableOpacity></>:null}
+      
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         style={styles.floating_btn}
@@ -105,20 +136,20 @@ function Profile({data}) {
         { icon_note == "Yes" ? (
           <Image
             style={{
-              width: Dimensions.get('window').width * 0.18,
-              height: Dimensions.get('window').width * 0.18,
+              width: Dimensions.get('window').width * 0.13,
+              height: Dimensions.get('window').width * 0.13,
               resizeMode: "contain",
             }}
-            source={Images.pencil_box}
+            source={Images.pencil_note}
           ></Image>
         ) : (
           <Image
             style={{
-              width: Dimensions.get('window').width * 0.18,
-                  height: Dimensions.get('window').width * 0.18,
+              width: Dimensions.get('window').width * 0.13,
+                  height: Dimensions.get('window').width * 0.13,
                   resizeMode: "contain",
             }}
-            source={Images.plus_box}
+            source={Images.plus_note}
           ></Image>
         )}
       </TouchableOpacity>
@@ -510,7 +541,7 @@ const styles = StyleSheet.create({
   },
   bottom_btn: {
     width: "100%",
-    height: height * 0.065,
+    height: height * 0.068,
     backgroundColor: Colors.MAIN_COLOR,
     justifyContent: "center",
     alignItems: "center",
@@ -523,8 +554,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
 
     position: "absolute",
-    bottom: "10%",
-    right: "1%",
+    bottom: "12%",
+    right: "5%",shadowColor: '#000',
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.95,
+    shadowRadius: 2.84,
+    elevation: 5,
   },
   txt: { fontSize: 17, color: "white", fontFamily:"Inter-Black3" },
   img:{

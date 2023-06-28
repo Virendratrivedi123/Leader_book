@@ -166,7 +166,7 @@ function InComplete() {
              
               position: "absolute",
 
-              right: "12%",
+              right: "6%",
               width: Dimensions.get('window').width * 0.18,
     height: Dimensions.get('window').width * 0.18,
 
@@ -174,7 +174,7 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
              
               
               transform: [{ translateY: translation }],
-              bottom: (height + 180)*0.22,
+              bottom: height * 0.24,
               elevation: 5,
             }}
           >
@@ -182,7 +182,9 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
         onPress={() => navigation.navigate(ScreenNames.ADD_TASKS)}
 
       >
-<Image source={Images.addNote} style={{height:60, width:60, resizeMode:'contain'}}/>
+<Image source={Images.addNote} style={{ width: Dimensions.get("window").width * 0.18,
+              height: Dimensions.get("window").width * 0.18,
+              resizeMode: "contain",}}/>
       </TouchableOpacity>
           </Animated.View>
       

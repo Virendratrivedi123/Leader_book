@@ -1,5 +1,5 @@
 export const Colors={
-MAIN_COLOR:"#1c4269",
+MAIN_COLOR:"#1d426a",
 ORANGE:"orange",
 WHITE:"white",
 LINE:"#ffcc00",

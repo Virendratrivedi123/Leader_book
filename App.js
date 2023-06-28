@@ -38,6 +38,8 @@ import Change_pass from "./src/Main/Detail_folder/Profile_page/Edit_searc_pages/
 import Cancel_account from "./src/Main/Detail_folder/Profile_page/Edit_searc_pages/Cancel_account";
 import Modal_data from "./src/Main/Detail_folder/Profile_page/Edit_searc_pages/Modal_data";
 import Data_next from "./src/Main/Detail_folder/Profile_page/Edit_searc_pages/Data_next";
+import Search from "./src/Main/Search";
+import Calender from "./src/Main/Calender";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -108,6 +110,8 @@ export default function App() {
         <Stack.Screen name={"Cancel_account"} component={Cancel_account}  />
         <Stack.Screen name={"Modal_data"} component={Modal_data}  />
         <Stack.Screen name={"Data_next"} component={Data_next}  />
+        <Stack.Screen name={"Search"} component={Search}  />
+        <Stack.Screen name={"Calender"} component={Calender}  />
 
       </Stack.Navigator>
     </NavigationContainer>

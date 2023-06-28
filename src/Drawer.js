@@ -2,9 +2,7 @@ import React from "react";
 
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Customdrawer from "./components/Custom_Drawer";
-import {
-  Dimensions,
-} from "react-native";
+import { Dimensions } from "react-native";
 import Tag from "./components/Tag";
 import Tasks from "./components/Tasks";
 import Appointments from "./components/Appointments";
@@ -26,9 +24,12 @@ const width = Dimensions.get("window").width;
 function Drawer_screen() {
   return (
     <Drawer.Navigator
-      screenOptions={{ headerShown: false , drawerStyle: {
-        width: width*0.63,
-      }, }}
+      screenOptions={{
+        headerShown: false,
+        drawerStyle: {
+          width: width * 0.65,
+        },drawerType:"front",overlayColor: '00FFFFF',
+      }}
       drawerContent={(props) => <Customdrawer {...props} />}
     >
       <Drawer.Screen name={ScreenNames.MAIN_SCREEN} component={Main_Screen} />
@@ -37,12 +38,21 @@ function Drawer_screen() {
       <Drawer.Screen name={ScreenNames.TASKS} component={Tasks} />
       <Drawer.Screen name={ScreenNames.APPOINTMENTS} component={Appointments} />
       <Drawer.Screen name={ScreenNames.PHONE} component={Phone} />
-      <Drawer.Screen name={ScreenNames.LAST_LOGGED_USERS} component={Last_logged_users} />
-      <Drawer.Screen name={ScreenNames.MOST_ACTIVE_USERS} component={Most_active_users} />
+      <Drawer.Screen
+        name={ScreenNames.LAST_LOGGED_USERS}
+        component={Last_logged_users}
+      />
+      <Drawer.Screen
+        name={ScreenNames.MOST_ACTIVE_USERS}
+        component={Most_active_users}
+      />
       <Drawer.Screen name={ScreenNames.EDIT_PROFILE} component={Edit_profile} />
-      <Drawer.Screen name={ScreenNames.ADD_APPOINTMENT} component={Add_appointment} />
+      <Drawer.Screen
+        name={ScreenNames.ADD_APPOINTMENT}
+        component={Add_appointment}
+      />
       <Drawer.Screen name={ScreenNames.RECENT_CHATS} component={Recent_chats} />
-  
+
       <Drawer.Screen name={ScreenNames.ADD_TASKS} component={Add_task} />
     </Drawer.Navigator>
   );

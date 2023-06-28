@@ -351,3 +351,50 @@ export const Related_page_counter = (data) => {
 
   return fetch(`${BASE_URI}/related_page_counters`, requestOptions);
 };
+
+export const Search_page = (data) => {
+  // console.log(data)
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=1bb554c648be2c018111aee2f9ad3803");
+
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/getsearchfilters`, requestOptions);
+};
+
+export const Pin_note = (data) => {
+  // console.log(data)
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+
+
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("lead_id", data.id);
+formdata.append("page_type", "");
+formdata.append("pined_note_text", data.pin_text);
+  
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/save_pinned_note`, requestOptions);
+};

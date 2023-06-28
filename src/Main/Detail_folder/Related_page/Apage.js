@@ -35,7 +35,7 @@ import { ScreenNames } from "../../../constant/ScreenNames";
 import { Colors } from "../../../constant/colors";
 import { STYLES } from "../../../constant/styles";
 import { Images } from "../../../constant/images";
-import Header2 from "../../../components/header";
+import Header2 from "../../../components/header2";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;

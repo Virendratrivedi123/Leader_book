@@ -39,9 +39,10 @@ export default function User_tag({ navigation }) {
   const [d, setd] = useState();
   const [modalVisible, setModalVisible] = useState(false);
   const translation = useRef(new Animated.Value(0)).current;
+  const h = 18/100*height
   useEffect(() => {
     Animated.timing(translation, {
-      toValue: 100,
+      toValue: h,
       delay: 0,
       easing:  Easing.elastic(4),
       useNativeDriver: true,
@@ -308,15 +309,13 @@ export default function User_tag({ navigation }) {
              
               position: "absolute",
 
-              right: "12%",
-              width: Dimensions.get('window').width * 0.18,
-    height: Dimensions.get('window').width * 0.18,
-
+              right: "6%",
+              
 borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
               backgroundColor: Colors.float_btn,
               
               transform: [{ translateY: translation }],
-              bottom: (height + 180)*0.22,
+              bottom: (height )*0.28,
               elevation: 5,
             }}
           >
@@ -327,7 +326,8 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
             >
               <Image
                 source={Images.addLeads}
-                style={{ height: 60, width: 60, resizeMode: "contain" }}
+                style={{ width: Dimensions.get('window').width * 0.18,
+                height: Dimensions.get('window').width * 0.18, resizeMode: "contain" }}
               />
             </TouchableOpacity>
           </Animated.View>

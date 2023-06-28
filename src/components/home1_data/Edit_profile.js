@@ -50,6 +50,7 @@ function Edit_profile() {
   const [address, setAddress] = React.useState("");
   const [drop, setDrop] = React.useState("");
   const [id, setId] = React.useState("");
+  const [loading, setLoading] = React.useState(true);
   const [fontsLoaded] = useFonts({
     'Inter-Black': require('../../../assets/fonts/Mulish-SemiBold.ttf'),
     'Inter-Black2': require('../../../assets/fonts/Mulish-Bold.ttf'),
@@ -92,8 +93,10 @@ function Edit_profile() {
           setValue(item.country_id.value);
           // console.log(result.data.profile_data_arr.Profile.country_id)
           setCountry_id(item?.country_id);
+          setLoading(false);
           // console.log("new",First_name)
         })
+
         .catch((error) => console.log("error", error));
 
       // console.log(d);
@@ -149,8 +152,11 @@ function Edit_profile() {
         leftIcon={Images.backArrow}
         onLeftPress={() => navigation.navigate(ScreenNames.HOME)}
 customRight={true}
-        // onRightPress={() => navigation.navigate(ScreenNames.LAST_LOGGED_USERS)}
+        onRightPress={() => (postdata())}
       />
+       {loading ? (
+          <Loader loading={loading} />
+        ) : data && data.length > 0 ? (
       <ScrollView>
         <FlatList
           style={{ backgroundColor: "#f2f2f2",  }}
@@ -268,7 +274,7 @@ customRight={true}
             </View>
           )}
         />
-      </ScrollView>
+      </ScrollView>):null}
     </SafeAreaView>
   );
 }

@@ -23,6 +23,13 @@ import AppLoading from 'expo-app-loading';
 import * as SplashScreen from 'expo-splash-screen';
 import { STYLES } from "./constant/styles";
 import { Colors } from "./constant/colors";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+
+import Header_login from "./components/header_login";
+
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -43,14 +50,14 @@ function Login_screen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible3, setModalVisible3] = useState(false);
-  React.useEffect(() => {
-    (async () => {
-      const user = await AsyncStorage.getItem("userInfo");
-      if (user) {
-        navigation.navigate(ScreenNames.DRAWER);
-      }
-    })();
-  }, []);
+  // React.useEffect(() => {
+  //   (async () => {
+  //     const user = await AsyncStorage.getItem("userInfo");
+  //     if (user) {
+  //       navigation.navigate(ScreenNames.DRAWER);
+  //     }
+  //   })();
+  // }, []);
 
   const login_method = async () => {
     if (email == "") {
@@ -105,9 +112,16 @@ function Login_screen() {
   return (
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <View>
-        <View style={STYLES.login_box}>
+        {/* <View style={STYLES.login_box}>
           <Text style={styles.login}>Login</Text>
-        </View>
+        </View> */}
+        <Header_login
+        label="Login"
+        // leftIcon={Images.menu}
+        // rightIcon={Images.search}
+        // onLeftPress={() => navigation.toggleDrawer()}
+        // onRightPress={() => navigation.navigate("Search")}
+      />
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -151,17 +165,17 @@ function Login_screen() {
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
                 <Text style={styles.textStyle1}>Lead Booker</Text>
-                <Text style={styles.textStyle2}>Enter Valid Email Address</Text>
+                <Text style={styles.textStyle2}>Could you please enter a valid email address?</Text>
                 <View
                   style={{
                     height: 1,
                     backgroundColor: "#cccccc",
-                    marginVertical: "5%",
+                   
                     width: "100%",
                   }}
                 ></View>
                 <Pressable
-                  style={{ height: 20 }}
+                  style={{  }}
                   onPress={() => {
                     setModalVisible(!modalVisible);
                   }}
@@ -184,17 +198,17 @@ function Login_screen() {
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
                 <Text style={styles.textStyle1}>Lead Booker</Text>
-                <Text style={styles.textStyle2}>Enter Email Address</Text>
+                <Text style={styles.textStyle2}>Could you please enter a valid email address?</Text>
                 <View
                   style={{
                     height: 1,
                     backgroundColor: "#cccccc",
-                    marginVertical: "5%",
+                    
                     width: "100%",
                   }}
                 ></View>
                 <Pressable
-                  style={{ height: 20 }}
+                  style={{  }}
                   onPress={() => {
                     setModalVisible2(!modalVisible2);
                   }}
@@ -217,17 +231,17 @@ function Login_screen() {
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
                 <Text style={styles.textStyle1}>Lead Booker</Text>
-                <Text style={styles.textStyle2}>Enter Password</Text>
+                <Text style={styles.textStyle2}>Please enter your password</Text>
                 <View
                   style={{
                     height: 1,
                     backgroundColor: "#cccccc",
-                    marginVertical: "5%",
+                   
                     width: "100%",
                   }}
                 ></View>
                 <Pressable
-                  style={{ height: 20 }}
+                  style={{  }}
                   onPress={() => {
                     setModalVisible3(!modalVisible3);
                   }}
@@ -244,35 +258,25 @@ function Login_screen() {
 }
 
 const styles = StyleSheet.create({
-  textStyle1: { fontSize: 17, fontWeight: "bold" },
-  textStyle2: { fontSize: 14 },
-  textStyle3: { fontSize: 17, color: "blue" },
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"8%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"8%",marginTop:"1%",color:"#262626",},
+  textStyle3: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
 
   centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 0,
-    backgroundColor: "rgba(52, 52, 52, 0)",
+    backgroundColor: "rgba(52, 52, 52, 0.3)",
   },
   modalView: {
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 0,
-    backgroundColor: "white",
-    borderRadius: 6,
-    width: "85%",
-    height: "18%",
-    alignItems: "center",
-    shadowColor: "#000",
-    borderRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 20,
+    width: "80%",
+    backgroundColor: "#ececee",
+    borderRadius: 15,
+
+    elevation: 5,
+    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    // elevation: 20,
   },
   container: {
     flex: 1,backgroundColor: "#f2f2f2"
@@ -286,9 +290,9 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: "white",
     
-    borderRadius: 6,
-    color: "black",
-    fontSize: 19, fontFamily:"Inter-Black4",
+    borderRadius: 10,
+    color: Colors.txt,
+    fontSize: wp("5.41%"), fontFamily:"Inter-Black4",
   },
   button: {
     height: height * 0.095,
@@ -312,8 +316,8 @@ const styles = StyleSheet.create({
   login1: {
     textAlign: "center",
     color: "white",
-    fontSize: 24,
-    fontWeight: "normal", fontFamily:"Inter-Black",
+    fontSize: wp("7.53%"),
+    fontFamily:"Inter-Black",
   },
 
   fp_text: {

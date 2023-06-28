@@ -179,13 +179,13 @@ function Edit_searches() {
                         height: 30,
 
                         flexDirection: "row",
-                        borderRadius: 4,
+                        
                         backgroundColor:
                           com == "Your Profile" ? "white" : Colors.btn,
 
                         alignItems: "center",
                         padding: 5,
-                        marginRight: "2%",
+                        marginRight: "2%",borderTopLeftRadius:4,borderTopRightRadius:4
                       }}
                       onPress={() => {
                         setcom("Your Profile");
@@ -198,13 +198,13 @@ function Edit_searches() {
                         height: 30,
 
                         flexDirection: "row",
-                        borderRadius: 4,
+                        
                         backgroundColor:
                           com == "Favorites" ? "white" : Colors.btn,
 
                         alignItems: "center",
                         padding: 5,
-                        marginRight: "2%",
+                        marginRight: "2%",borderTopLeftRadius:4,borderTopRightRadius:4
                       }}
                       onPress={() => {
                         setcom("Favorites");
@@ -217,13 +217,13 @@ function Edit_searches() {
                         height: 30,
 
                         flexDirection: "row",
-                        borderRadius: 4,
+                        
                         backgroundColor:
                           com == "Saved Searches" ? "white" : Colors.btn,
 
                         alignItems: "center",
                         padding: 5,
-                        marginRight: "2%",
+                        marginRight: "2%",borderTopLeftRadius:4,borderTopRightRadius:4
                       }}
                       onPress={() => {
                         setcom("Saved Searches");
@@ -238,13 +238,13 @@ function Edit_searches() {
                         height: 30,
 
                         flexDirection: "row",
-                        borderRadius: 4,
+                        
                         backgroundColor:
                           com == "News Feeds" ? "white" : Colors.btn,
 
                         alignItems: "center",
                         padding: 5,
-                        marginRight: "2%",
+                        marginRight: "2%",borderTopLeftRadius:4,borderTopRightRadius:4
                       }}
                       onPress={() => {
                         setcom("News Feeds");
@@ -257,13 +257,13 @@ function Edit_searches() {
                         height: 30,
 
                         flexDirection: "row",
-                        borderRadius: 4,
+                        
                         backgroundColor:
                           com == "Change Password" ? "white" : Colors.btn,
 
                         alignItems: "center",
                         padding: 5,
-                        marginRight: "2%",
+                        marginRight: "2%",borderTopLeftRadius:4,borderTopRightRadius:4
                       }}
                       onPress={() => {
                         setcom("Change Password");
@@ -278,13 +278,13 @@ function Edit_searches() {
                         height: 30,
 
                         flexDirection: "row",
-                        borderRadius: 4,
+                        
                         backgroundColor:
                           com == "Cancel Account" ? "white" : Colors.btn,
 
                         alignItems: "center",
                         padding: 5,
-                        marginRight: "2%",
+                        marginRight: "2%",marginBottom:"1%",borderTopLeftRadius:4,borderTopRightRadius:4
                       }}
                       onPress={() => {
                         setcom("Cancel Account");
@@ -774,11 +774,13 @@ const styles = StyleSheet.create({
   },
   circle: {
     backgroundColor: "black",
-    height: height * 0.052,
-    width: width * 0.11,
+    width: Dimensions.get('window').width * 0.12,
+    height: Dimensions.get('window').width * 0.12,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 30,
+    
   },
   box1: {
     backgroundColor: "#2a6573",
@@ -873,7 +875,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   header_box: {
-    height: height * 0.08,
+    height: height * 0.10,
     backgroundColor: Colors.MAIN_COLOR,
     alignItems: "center",
 

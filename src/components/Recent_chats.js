@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     // color: "black",
   },
   text2: {
-    fontSize: 20,
+    fontSize: 19,
     marginTop: "2%",
     // color: "#808080",
     fontFamily:"Inter-Black3",
@@ -178,10 +178,12 @@ const styles = StyleSheet.create({
   },
 
   circle: {
-    height: height * 0.08,
-    width: width * 0.17,
+    width: Dimensions.get('window').width * 0.16,
+    height: Dimensions.get('window').width * 0.16,
+
+borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
     backgroundColor: Colors.MAIN_COLOR,
-    borderRadius: 50,
+   
     alignItems: "center",
     justifyContent: "center",
     marginStart: 20,
