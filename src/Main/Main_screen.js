@@ -1,5 +1,5 @@
 import React, { useState, useEffect ,useCallback} from "react";
-
+import { useRoute } from "@react-navigation/native";
 import {
   StyleSheet,
   Text,
@@ -18,7 +18,7 @@ import All from "./All";
 import { Colors } from "../constant/colors";
 import { STYLES } from "../constant/styles";
 import { BackHandler } from "react-native";
-import Header3 from "../components/header3";
+import Header from "../components/header";
 import { Images } from "../constant/images";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -36,6 +36,10 @@ export default function Main_Screen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
   const hasUnsavedChanges = Boolean(true);
+  const route = useRoute();
+ 
+ 
+ 
   
   const [fontsLoaded] = useFonts({
     'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
@@ -83,15 +87,17 @@ export default function Main_Screen({ navigation }) {
   if (!fontsLoaded) {
     return null;
   }
-
+  const a="pass"
+  console.log("msg",)
   return (
     <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <Header3
-        label="Leads"
+      <Header
+        label2="Leads"
         leftIcon={Images.menu}
         rightIcon={Images.search}
         onLeftPress={() => navigation.toggleDrawer()}
-        onRightPress={() => navigation.navigate("Search")}
+
+        // onRightPress={() => navigation.navigate("Search")}
       />
       <View>
         <View style={styles.tab}>
@@ -176,7 +182,7 @@ export default function Main_Screen({ navigation }) {
 
       <View style={{ flex: 1 }}>
         {com == "RECENT" ? (
-          <Recent />
+          <Recent data={a} />
         ) : com == "PRIORITY" ? (
           <Priority />
         ) : com == "ALL" ? (

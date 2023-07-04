@@ -251,8 +251,7 @@ export const New_lead_detail = (data) => {
 
 export const New_lead_detail_update = (data) => {
   var myHeaders = new Headers();
-  myHeaders.append("Cookie", "PHPSESSID=570b4e976a4ad49cfce7c6f83180cfe3");
-
+  myHeaders.append("Cookie", "PHPSESSID=b48e9472185e9e56bf83c7830d4d56fa");
   var formdata = new FormData();
   formdata.append("hash", hash);
   formdata.append("key", key);
@@ -264,7 +263,7 @@ export const New_lead_detail_update = (data) => {
   formdata.append("lead_email", data.lead_email);
   formdata.append("comments", data.comments);
   formdata.append("phone", data.phone);
-  formdata.append("is_grl_crea_lead", data.assigned);
+  formdata.append("is_grl_crea_lead", data.status_value);
   formdata.append("user_id", "555");
   formdata.append("lead_type_id", "");
   formdata.append("lead_day_time", "");
@@ -272,7 +271,7 @@ export const New_lead_detail_update = (data) => {
   formdata.append("city", data.city);
   formdata.append("state", data.state);
   formdata.append("company_name", data.company_name);
-  formdata.append("month", "");
+  formdata.append("month", data.follow_value);
 
   var requestOptions = {
     method: "POST",
@@ -280,7 +279,7 @@ export const New_lead_detail_update = (data) => {
     body: formdata,
     redirect: "follow",
   };
-
+  console.log(data);
   return fetch(`${BASE_URI}/save_new_lead`, requestOptions);
 };
 

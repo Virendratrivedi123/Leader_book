@@ -2,7 +2,7 @@
   "expo": {
     "name": "LeadBooker",
     "slug": "LeadBooker",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -30,7 +30,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "0bc23378-99a1-4c49-995d-8b45e79f1cb6"
+        "projectId": "9fb58a0c-91da-4f45-abe5-8e28e7b44479"
       }
     }
   }

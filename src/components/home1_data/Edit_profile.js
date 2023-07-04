@@ -10,6 +10,8 @@ import {
   StyleSheet,
   Alert,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dropdown } from "react-native-element-dropdown";
@@ -27,7 +29,7 @@ import { edit_profile, user_update } from "../../Services";
 import { ScreenNames } from "../../constant/ScreenNames";
 import { STYLES } from "../../constant/styles";
 import Header from "../header";
-import { useFonts } from 'expo-font';
+import { useFonts } from "expo-font";
 import { Images } from "../../constant/images";
 import { Colors } from "../../constant/colors";
 const height = Dimensions.get("window").height;
@@ -52,11 +54,10 @@ function Edit_profile() {
   const [id, setId] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../../assets/fonts/Mulish-Regular.ttf'),
-   
+    "Inter-Black": require("../../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black4": require("../../../assets/fonts/Mulish-Regular.ttf"),
   });
 
   useEffect(() => {
@@ -147,134 +148,155 @@ function Edit_profile() {
 
   return (
     <SafeAreaView style={styles.container}>
-<Header
+      <Header
         label="Profile"
         leftIcon={Images.backArrow}
         onLeftPress={() => navigation.navigate(ScreenNames.HOME)}
-customRight={true}
-        onRightPress={() => (postdata())}
+        customRight={true}
+        onRightPress={() =>
+          state == "text"
+            ? Alert.alert("All the fields must be filled ")
+            : postdata()
+        }
       />
-       {loading ? (
-          <Loader loading={loading} />
-        ) : data && data.length > 0 ? (
-      <ScrollView>
-        <FlatList
-          style={{ backgroundColor: "#f2f2f2",  }}
-          data={data}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => (
-            <View>
-              <View style={{ paddingHorizontal: "4%", marginBottom: "5%" }}>
-                <Text style={styles.name_txt}> {item.first_name.label}</Text>
-                <TextInput
-                  placeholder="Firstname"
-                  style={styles.input}
-                  value={First_name}
-                  onChangeText={(txt) => setFirst_name(txt)}
-                ></TextInput>
-                {/* {console.log(First_name)} */}
-                <Text style={styles.name_txt}> {item.last_name.label}</Text>
-                <TextInput
-                  placeholder="Lastname"
-                  style={styles.input}
-                  value={last_name}
-                  onChangeText={(txt) => setLast_name(txt)}
-                ></TextInput>
-                <Text style={styles.name_txt}> {item.email.label}</Text>
-                <TextInput
-                  placeholder="Email"
-                  style={styles.input}
-                  value={email}
-                  onChangeText={(txt) => setEmail(txt)}
-                ></TextInput>
-                <Text style={styles.name_txt}> {item.title.label}</Text>
-                <TextInput
-                  placeholder="Job title"
-                  style={styles.input}
-                  defaultValue={title}
-                  onChangeText={(txt) => setTitle(txt)}
-                ></TextInput>
-                <Text style={styles.name_txt}> {item.company.label}</Text>
-                <TextInput
-                  placeholder="Company name"
-                  style={styles.input}
-                  value={company}
-                  onChangeText={(txt) => setCompany(txt)}
-                ></TextInput>
-                <Text style={styles.name_txt}> {item.phone.label}</Text>
-                <TextInput
-                  placeholder="Phone"
-                  style={styles.input}
-                  value={phone}
-                  onChangeText={(txt) => setPhone(txt)}
-                ></TextInput>
-                <Text style={styles.name_txt}> Office Street Address</Text>
-                <TextInput
-                  placeholder="Address"
-                  style={styles.input}
-                  value={address}
-                  onChangeText={(txt) => setAddress(txt)}
-                ></TextInput>
-                <Text style={styles.name_txt}> {item.city.label}</Text>
-                <TextInput
-                  placeholder="City"
-                  style={styles.input}
-                  value={city}
-                  onChangeText={(txt) => setCity(txt)}
-                ></TextInput>
-                <Text style={styles.name_txt}>{item.state.label}</Text>
-                <TextInput
-                  placeholder="Province/State/Postal Code"
-                  style={styles.input}
-                  value={state}
-                  onChangeText={(txt) => setstate(txt)}
-                ></TextInput>
-                <Text style={styles.name_txt}> {item.country_id.label}</Text>
-                {/* {renderLabel()} */}
-                <Dropdown
-                  style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  // inputSearchStyle={styles.inputSearchStyle}
-                  // iconStyle={styles.iconStyle}
-                  data={item.country_id.dropdown_arr}
-                  search={false}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={drop}
-                  value={value}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={(i) => {
-                    setValue(i.value);
-                    AsyncStorage.setItem(
-                      "dropdown_data",
-                      JSON.stringify(i.label)
-                    );
-                    setIsFocus(false);
-                  }}
-                  renderRightIcon={() => (
-                    <AntDesign
-                      style={styles.icon}
-                      color="#003366"
-                      name="downsquare"
-                      size={30}
+      {loading ? (
+        <Loader loading={loading} />
+      ) : data && data.length > 0 ? (
+        <ScrollView>
+          <KeyboardAvoidingView
+            // keyboardVerticalOffset={height + 47}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            // style={{ flex: 1 }}
+            enabled
+          >
+            <FlatList
+              style={{ backgroundColor: "#f2f2f2" }}
+              data={data}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item, index }) => (
+                <View>
+                  <View style={{ paddingHorizontal: "4%", marginBottom: "5%" }}>
+                    <Text style={styles.name_txt}>
+                      {" "}
+                      {item.first_name.label}
+                    </Text>
+                    <TextInput
+                      placeholder="Firstname"
+                      style={styles.input}
+                      value={First_name}
+                      onChangeText={(txt) => setFirst_name(txt)}
+                    ></TextInput>
+                    {/* {console.log(First_name)} */}
+                    <Text style={styles.name_txt}> {item.last_name.label}</Text>
+                    <TextInput
+                      placeholder="Lastname"
+                      style={styles.input}
+                      value={last_name}
+                      onChangeText={(txt) => setLast_name(txt)}
+                    ></TextInput>
+                    <Text style={styles.name_txt}> {item.email.label}</Text>
+                    <TextInput
+                      placeholder="Email"
+                      style={styles.input}
+                      value={email}
+                      onChangeText={(txt) => setEmail(txt)}
+                    ></TextInput>
+                    <Text style={styles.name_txt}> {item.title.label}</Text>
+                    <TextInput
+                      placeholder="Job title"
+                      style={styles.input}
+                      defaultValue={title}
+                      onChangeText={(txt) => setTitle(txt)}
+                    ></TextInput>
+                    <Text style={styles.name_txt}> {item.company.label}</Text>
+                    <TextInput
+                      placeholder="Company name"
+                      style={styles.input}
+                      value={company}
+                      onChangeText={(txt) => setCompany(txt)}
+                    ></TextInput>
+                    <Text style={styles.name_txt}> {item.phone.label}</Text>
+                    <TextInput
+                      placeholder="Phone"
+                      style={styles.input}
+                      value={phone}
+                      onChangeText={(txt) => setPhone(txt)}
+                    ></TextInput>
+                    <Text style={styles.name_txt}> Office Street Address</Text>
+                    <TextInput
+                      placeholder="Address"
+                      style={styles.input}
+                      value={address}
+                      onChangeText={(txt) => setAddress(txt)}
+                    ></TextInput>
+                    <Text style={styles.name_txt}> {item.city.label}</Text>
+                    <TextInput
+                      placeholder="City"
+                      style={styles.input}
+                      value={city}
+                      onChangeText={(txt) => setCity(txt)}
+                    ></TextInput>
+                    <Text style={styles.name_txt}>{item.state.label}</Text>
+                    <TextInput
+                      placeholder="Province/State/Postal Code"
+                      style={styles.input}
+                      value={state}
+                      onChangeText={(txt) => setstate(txt)}
+                    ></TextInput>
+                    <Text style={styles.name_txt}>
+                      {" "}
+                      {item.country_id.label}
+                    </Text>
+                    {/* {renderLabel()} */}
+                    <Dropdown
+                      style={[
+                        styles.dropdown,
+                        isFocus && { borderColor: "blue" },
+                      ]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      // inputSearchStyle={styles.inputSearchStyle}
+                      // iconStyle={styles.iconStyle}
+                      data={item.country_id.dropdown_arr}
+                      search={false}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={drop}
+                      value={value}
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={(i) => {
+                        setValue(i.value);
+                        AsyncStorage.setItem(
+                          "dropdown_data",
+                          JSON.stringify(i.label)
+                        );
+                        setIsFocus(false);
+                      }}
+                      renderRightIcon={() => (
+                        <AntDesign
+                          style={styles.icon}
+                          color="#003366"
+                          name="downsquare"
+                          size={30}
+                        />
+                      )}
                     />
-                  )}
-                />
-                <Text style={styles.name_txt}> {item.text_sign.label}</Text>
-                <TextInput
-                  placeholder="name"
-                  style={styles.input}
-                  value={text_sign}
-                  onChangeText={(txt) => setText_sign(txt)}
-                ></TextInput>
-              </View>
-            </View>
-          )}
-        />
-      </ScrollView>):null}
+                    <Text style={styles.name_txt}> {item.text_sign.label}</Text>
+                    <TextInput
+                      placeholder="name"
+                      style={styles.input}
+                      value={text_sign}
+                      onChangeText={(txt) => setText_sign(txt)}
+                    ></TextInput>
+                  </View>
+                </View>
+              )}
+            />
+          </KeyboardAvoidingView>
+        </ScrollView>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -326,7 +348,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  name_txt: { fontSize: 17, marginBottom: "2%", paddingTop: "5%",color:Colors.blue_txt ,fontFamily:"Inter-Black4" },
+  name_txt: {
+    fontSize: 17,
+    marginBottom: "2%",
+    paddingTop: "5%",
+    color: Colors.blue_txt,
+    fontFamily: "Inter-Black4",
+  },
   input: {
     backgroundColor: "white",
     color: Colors.txt,

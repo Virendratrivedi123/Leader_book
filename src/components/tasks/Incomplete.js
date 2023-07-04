@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 import {
   Entypo,
@@ -167,8 +171,7 @@ function InComplete() {
               position: "absolute",
 
               right: "6%",
-              width: Dimensions.get('window').width * 0.18,
-    height: Dimensions.get('window').width * 0.18,
+             
 
 borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
              
@@ -179,11 +182,12 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
             }}
           >
             <TouchableOpacity 
+              activeOpacity={1}
         onPress={() => navigation.navigate(ScreenNames.ADD_TASKS)}
 
       >
-<Image source={Images.addNote} style={{ width: Dimensions.get("window").width * 0.18,
-              height: Dimensions.get("window").width * 0.18,
+<Image source={Images.addNote} style={{ width: Dimensions.get("window").width * 0.17,
+              height: Dimensions.get("window").width * 0.17,
               resizeMode: "contain",}}/>
       </TouchableOpacity>
           </Animated.View>
@@ -197,7 +201,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
-  img:{height:25,width:25,resizeMode:"contain",marginEnd:"1%"},
+  img:{height: hp("4.51%"),
+  width: wp("8%"),resizeMode:"contain",marginEnd:"1%"},
 
   header: {
     height: height * 0.12,

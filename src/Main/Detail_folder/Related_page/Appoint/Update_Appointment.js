@@ -31,12 +31,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 
 
-import { Colors } from "../../../constant/colors";
-import { STYLES } from "../../../constant/styles";
-import { Images } from "../../../constant/images";
-import Header from "../../../components/header";
+import { Colors } from "../../../../constant/colors";
+import { STYLES } from "../../../../constant/styles";
+import { Images } from "../../../../constant/images";
+import Header from "../../../../components/header";
 import { useFonts } from 'expo-font';
-
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp,
+  } from "react-native-responsive-screen";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
@@ -45,13 +48,12 @@ const dt = [
   { label: "okay", value: "2" },
 ];
 
-function Tpage() {
+function Update_Appointment() {
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../../../assets/fonts/Mulish-Regular.ttf'),
-   
+    'Inter-Black': require('../../../../../assets/fonts/Mulish-SemiBold.ttf'),
+    'Inter-Black2': require('../../../../../assets/fonts/Mulish-Bold.ttf'),
+    'Inter-Black3': require('../../../../../assets/fonts/Mulish-ExtraBold.ttf'),
+    'Inter-Black4': require('../../../../../assets/fonts/Mulish-Regular.ttf'),
   });
   const navigation = useNavigation();
   const [value1, setValue1] = useState();
@@ -122,12 +124,12 @@ function Tpage() {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        label="New Task"
+        label="Update Appointment"
         leftIcon={Images.backArrow}
         // rightIcon={Images.search}
         onLeftPress={() => navigation.goBack()}
         onRightPress={() => {}}
-        customRight={true}
+        customRight2={true}
       />
       <ScrollView>
         <View
@@ -146,52 +148,8 @@ function Tpage() {
             placeholderTextColor={"#cccccc"}
           ></TextInput>
 
-          <View style={styles.line2}></View>
-          <Text style={styles.name_txt}>Lead Site</Text>
-          <Dropdown
-            style={[styles.dropdown2]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            data={dt}
-            search={false}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder={""}
-            value={value1}
-            //   onFocus={() => setIsFocus(true)}
-            //   onBlur={() => setIsFocus(false)}
-            onChange={(i) => {
-              setValue1(i.value);
-            }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={{ paddingHorizontal: "5%" }}
-                color="#003366"
-                name="downsquare"
-                size={30}
-              />
-            )}
-          />
-          <View style={styles.line2}></View>
-          <Text style={styles.name_txt}>Search Lead</Text>
-          <TextInput
-            placeholder="Search Lead"
-            style={styles.input}
-            //   value={text_sign}
-            //   onChangeText={(txt) => setText_sign(txt)}
-            placeholderTextColor={"#cccccc"}
-          ></TextInput>
-          <View style={styles.line2}></View>
-          <Text style={styles.name_txt}>Selected Lead</Text>
-          <TextInput
-            // placeholder="Subject"
-            style={styles.input}
-            //   value={text_sign}
-            //   onChangeText={(txt) => setText_sign(txt)}
-          ></TextInput>
+          
+         
 
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
@@ -258,7 +216,7 @@ function Tpage() {
           </View>
 
           <Dropdown
-            style={[styles.dropdown]}
+            style={{}}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
@@ -284,42 +242,15 @@ function Tpage() {
               />
             )}
           />
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.clock_circular}></Image>
-            <Text style={styles.name_txt2}>Reminder Time</Text>
-          </View>
-
-          <View style={[styles.press]}>
-            <TouchableOpacity 
-             style={{width:"80%",}}
-            onPress={() => setModalVisible3(true)}>
-              <TextInput
-               style={{ color: "grey", fontSize: 17,fontFamily:"Inter-Black", }}
-                placeholder={"Reminder Date and Time"}
-                showSoftInputOnFocus={false}
-                // editable={false}
-                value={date_time}
-                onPressIn={() => setModalVisible3(true)}
-                placeholderTextColor={"#cccccc"}
-              ></TextInput>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setdate_time("");
-              }}
-              style={{ marginEnd: "5%" }}
-            >
-              <Image style={styles.cancel} source={Images.cancel}></Image>
-            </TouchableOpacity>
-          </View>
+         
+         
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.graph}></Image>
             <Text style={styles.name_txt2}>Status</Text>
           </View>
           <Dropdown
-            style={[styles.dropdown]}
+            style={{}}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
@@ -351,7 +282,7 @@ function Tpage() {
             <Text style={styles.name_txt2}>Priority</Text>
           </View>
           <Dropdown
-            style={[styles.dropdown]}
+            style={{}}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
@@ -641,8 +572,8 @@ const styles = StyleSheet.create({
   selectedTextStyle: { color: "#8c8c8c",fontFamily:"Inter-Black4" },
   icon2: {
     marginTop: "8%",
-    height: 25,
-    width: 25,
+    height: hp("3.5%"),
+    width: wp("7%"),
     resizeMode: "contain",
     marginHorizontal: "3%",
   },
@@ -706,8 +637,8 @@ const styles = StyleSheet.create({
     color: "#8c8c8c",
 
     fontSize: 16,
-    marginTop: "3%",
-    marginStart: "12%",fontFamily:"Inter-Black4"
+    marginTop: "5%",
+    marginStart: "12%",fontFamily:"Inter-Black4",marginBottom:"2%"
   },
   press: {
     color: "#8c8c8c",
@@ -746,4 +677,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Tpage;
+export default Update_Appointment;

@@ -156,9 +156,7 @@ function Complete() {
               position: "absolute",
 
               right: "6%",
-              width: Dimensions.get('window').width * 0.18,
-    height: Dimensions.get('window').width * 0.18,
-
+            
 borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
              
               
@@ -168,11 +166,12 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
             }}
           >
             <TouchableOpacity 
+              activeOpacity={1}
         onPress={() => navigation.navigate(ScreenNames.ADD_TASKS)}
 
       >
-<Image source={Images.addNote} style={{ width: Dimensions.get("window").width * 0.18,
-              height: Dimensions.get("window").width * 0.18,
+<Image source={Images.addNote} style={{ width: Dimensions.get("window").width * 0.17,
+              height: Dimensions.get("window").width * 0.17,
               resizeMode: "contain",}}/>
       </TouchableOpacity>
           </Animated.View>

@@ -32,7 +32,7 @@ import {
   Zocial,
   FontAwesome5,
 } from "@expo/vector-icons";
-import { get_leads_basic_detail } from "../../Services";
+import { Pin_note, get_leads, get_leads_basic_detail } from "../../Services";
 import Loader from "../../constant/Loader";
 import { Colors } from "../../constant/colors";
 import { ScreenNames } from "../../constant/ScreenNames";
@@ -56,14 +56,15 @@ function Basic_detail({ data }) {
   const [loading, setLoading] = React.useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
-  const [d, setd] = useState(data?.pined_note == "Yes" ? 3 : 0);
+  
   const [note, setnote] = useState(data?.pined_note_text);
   const [n, setn] = useState("");
-  const [pin_date, setpin_date] = useState(data?.pinned_date);
-  const [icon_note, seticon_note] = useState(data?.pined_note);
+  const [pin_date, setpin_date] = useState("");
+  
   const [modalTitle2, setModalTitle2] = useState(data?.pinned_by);
-
-  // console.log(height)
+  const [loading2, setLoading2] = React.useState(true);
+  const [d, setd] = useState(icon_note == "Yes" ? 3:0);
+  
 
   useEffect(() => {
     (async () => {
@@ -80,13 +81,19 @@ function Basic_detail({ data }) {
       get_leads_basic_detail(data)
         .then((response) => response.json())
         .then((result) => {
+          setModalTitle2(result?.data?.lead_detail?.Lead.pinned_by?.value)
+          setnote(result?.data?.lead_detail.Lead?.pinned_note_text?.value)
+          seticon_note(result?.data?.lead_detail?.Lead.pined_note)
+          setpin_date(result?.data?.lead_detail?.Lead.pinned_date?.value)
+          setd(result?.data?.lead_detail?.Lead.pined_note=="Yes"?3:0)
           var k = [];
 
           k.push(result?.data?.lead_detail);
           var t = result?.data?.lead_detail?.Lead?.lead_tags;
           var a = result?.data?.tags?.user_tags;
           var b = result?.data?.tags?.system_tags;
-          var note = result?.data?.lead_detail.Lead.pined_note;
+         
+         
           var a = [];
           result?.data?.tags?.user_tags.map((i) => {
             a.push({
@@ -117,6 +124,91 @@ function Basic_detail({ data }) {
         .catch((error) => console.log("error", error));
     })();
   }, []);
+  const [icon_note, seticon_note] = useState("");
+
+  
+  
+  const postdata = async () => {
+    try {
+     
+
+      const user_data = await AsyncStorage.getItem("user_data");
+      // const drop_data = await AsyncStorage.getItem("dropdown_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+        pin_text: note,
+        id: User_data.id,
+        password: d.password,
+      };
+      Pin_note(data).then((response) => {
+        response.json().then((data) => {
+          // console.log(data);
+        
+          call_api(),note.length > 0 ? setd(3):setd(0);
+          setModalTitle2(result?.data?.lead_detail?.Lead.pinned_by?.value)
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const call_api = async () => {
+    try {
+      setLoading(true)
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      const data = {
+        email: d.email,
+        password: d.password,
+        id: User_data.id,
+      };
+      get_leads_basic_detail(data)
+        .then((response) => response.json())
+        .then((result) => {
+          var k = [];
+
+          k.push(result?.data?.lead_detail);
+          var t = result?.data?.lead_detail?.Lead?.lead_tags;
+          var a = result?.data?.tags?.user_tags;
+          var b = result?.data?.tags?.system_tags;
+          setnote(result?.data?.lead_detail?.Lead?.pinned_note_text?.value)
+          seticon_note(result?.data?.lead_detail?.Lead.pined_note)
+          setpin_date(result?.data?.lead_detail?.Lead.pinned_date?.value)
+          var a = [];
+          result?.data?.tags?.user_tags.map((i) => {
+            a.push({
+              ...i,
+
+              isChecked: false,
+            });
+          });
+          var b = [];
+          result?.data?.tags?.system_tags.map((i) => {
+            b.push({
+              ...i,
+
+              isChecked: false,
+            });
+          });
+
+          setDATA(k);
+          setDATA1(a);
+          setDATA2(b);
+         
+          
+          setLoading(false);
+          settag(t);
+
+          // setLoading(false);
+        })
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleChange = (value) => {
     let temp = DATA1.map((product) => {
@@ -144,7 +236,7 @@ function Basic_detail({ data }) {
 
   // console.log(selected)
 
-  console.log(DATA);
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -159,10 +251,16 @@ function Basic_detail({ data }) {
             renderItem={({ item, index }) => (
               <>
                 <View style={styles.pad}>
-                  <Text style={styles.number}>{item.Lead.email.label}</Text>
+                  <Text style={styles.number}>
+                    {item.Lead.email.label}
+                    {/* {icon_note}{d} */}
+                    </Text>
 
                   <View style={styles.row}>
-                    <Text style={styles.name}>{item.Lead.email.value}</Text>
+                    <Text style={styles.name}>
+                      {item.Lead.email.value}
+                      {/* {pin_date} */}
+                      </Text>
                     <Text
                       onPress={() => {
                         Linking.openURL(`mailto:${item.Lead.email.value}`);
@@ -171,7 +269,7 @@ function Basic_detail({ data }) {
                       <Zocial
                         name="email"
                         size={22}
-                        color={Colors.MAIN_COLOR}
+                        color={Colors.MAIN_icon}
                       />
                     </Text>
                   </View>
@@ -194,7 +292,7 @@ function Basic_detail({ data }) {
                       style={{}}
                       name="voicemail"
                       size={28}
-                      color={Colors.MAIN_COLOR}
+                      color={Colors.MAIN_icon}
                     />
                     <Text
                       style={{ marginLeft: 10 }}
@@ -205,7 +303,7 @@ function Basic_detail({ data }) {
                       <FontAwesome5
                         name="phone-alt"
                         size={25}
-                        color={Colors.MAIN_COLOR}
+                        color={Colors.MAIN_icon}
                       />
                     </Text>
 
@@ -280,12 +378,12 @@ function Basic_detail({ data }) {
                       <AntDesign
                         name="plus"
                         size={17}
-                        color={Colors.MAIN_COLOR}
+                        color={Colors.MAIN_icon}
                       />
                       <FontAwesome
                         name="tags"
                         size={20}
-                        color={Colors.MAIN_COLOR}
+                        color={Colors.MAIN_icon}
                       />
                     </TouchableOpacity>
                   </View>
@@ -359,7 +457,7 @@ function Basic_detail({ data }) {
                   transparent={true}
                   visible={modalVisible}
                   onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
+                   
                     setModalVisible(!modalVisible);
                   }}
                 >
@@ -380,6 +478,8 @@ function Basic_detail({ data }) {
                       <KeyboardAvoidingView enabled>
                         <View style={styles.input}>
                           <TextInput
+                        style={{padding:10,textAlignVertical: 'top',height:"100%"}}
+
                             //  value={""}
                             onChangeText={(txt) => (setnote(txt), setn(txt))}
                           />
@@ -389,7 +489,7 @@ function Basic_detail({ data }) {
                         {n.length > 0 ? (
                           <TouchableOpacity
                             onPress={() => {
-                              setd(3);
+                            postdata(),  setModalVisible(!modalVisible)
                             }}
                             style={styles.modal_btn}
                           >
@@ -425,7 +525,7 @@ function Basic_detail({ data }) {
                   transparent={true}
                   visible={modalVisible}
                   onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
+                    
                     setModalVisible(!modalVisible);
                   }}
                 >
@@ -437,11 +537,13 @@ function Basic_detail({ data }) {
                           <Entypo name="cross" size={30} color="black" />
                         </Pressable>
                       </View>
-                      <View style={styles.line2}></View>
+                      <View style={styles.line}></View>
 
                       <KeyboardAvoidingView enabled>
                         <View style={styles.input}>
                           <TextInput
+                        style={{padding:10,textAlignVertical: 'top',height:"100%"}}
+
                             value={note}
                             onChangeText={(txt) => setnote(txt)}
                           />
@@ -450,7 +552,7 @@ function Basic_detail({ data }) {
                       <View style={styles.modal_btn_box}>
                         <TouchableOpacity
                           onPress={() => {
-                            setd(3);
+                          postdata(),  setModalVisible(!modalVisible)
                           }}
                           style={styles.modal_btn}
                         >
@@ -476,7 +578,7 @@ function Basic_detail({ data }) {
                   transparent={true}
                   visible={modalVisible}
                   onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
+                   
                     setModalVisible(!modalVisible);
                   }}
                 >
@@ -507,7 +609,7 @@ function Basic_detail({ data }) {
                         }}
                         style={styles.add_note}
                       >
-                        <Text style={{ color: "white" }}>Add Note</Text>
+                        <Text style={{ color: "white",fontSize: wp("6%"),fontFamily: "Inter-Black4" }}>Add Note</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -518,7 +620,7 @@ function Basic_detail({ data }) {
                   transparent={true}
                   visible={modalVisible}
                   onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
+                    
                     setModalVisible(!modalVisible);
                   }}
                 >
@@ -710,7 +812,7 @@ function Basic_detail({ data }) {
             </Modal>
           </View>
           <TouchableOpacity
-            onPress={() => setModalVisible(true)}
+            onPress={() => {setModalVisible(true)}}
             style={styles.floating_btn}
           >
             {icon_note == "Yes" ? (
@@ -777,7 +879,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 3,
   },
-  update_txt: { color: "white", fontSize: 17,fontFamily:"Inter-Black" },
+  update_txt: { color: "white",fontSize: wp("6%"),fontFamily: "Inter-Black4" },
   note3: { color: "black", margin: "4%", fontSize: 14,fontFamily:"Inter-Black" },
   date: {
     color: "black",
@@ -829,7 +931,7 @@ const styles = StyleSheet.create({
   modal_page: {
     flex: 1,
     backgroundColor: "rgba(52, 52, 52, 0.7)",
-    marginTop: height*0.12,
+   
   },
   pin: {
     flexDirection: "row",
@@ -837,8 +939,8 @@ const styles = StyleSheet.create({
     margin: "4%",
   },
   add_note: {
-    height: height * 0.05,
-    width: width * 0.3,
+    height: height * 0.065,
+    width: width * 0.36,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
     marginTop: height*0.22,
@@ -848,8 +950,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   update_note: {
-    height: height * 0.05,
-    width: width * 0.3,
+    height: height * 0.065,
+    width: width * 0.36,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
     marginTop: "48%",
@@ -891,7 +993,7 @@ const styles = StyleSheet.create({
     height: height * 0.25,
     margin: 12,
 
-    padding: 10,
+  
     backgroundColor: "#f2f2f2",
     borderRadius: 8,fontFamily:"Inter-Black"
   },
@@ -913,7 +1015,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 5,
-    alignSelf: "center",
+    alignSelf: "center", marginTop: height*0.12,
   },
   modalView2: {
     // height: height * 0.44,
@@ -922,7 +1024,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 5,
-    alignSelf: "center",
+    alignSelf: "center", marginTop: height*0.12,
   },
   modalView1: {
     // height: height * 0.44,
@@ -931,7 +1033,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 20,
-    alignSelf: "center",
+    alignSelf: "center", marginTop: height*0.12,
   },
   
   item: {

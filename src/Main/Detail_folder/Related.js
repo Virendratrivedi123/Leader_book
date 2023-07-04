@@ -19,10 +19,14 @@ const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 import { Entypo } from "@expo/vector-icons";
 import Loader from "../../constant/Loader";
-import { Related_page_counter } from "../../Services";
+import { Pin_note, Related_page_counter, get_leads_basic_detail } from "../../Services";
 import { Colors } from "../../constant/colors";
 import { ScreenNames } from "../../constant/ScreenNames";
 import { Images } from "../../constant/images";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function Related({ data }) {
   const [fontsLoaded] = useFonts({
@@ -32,36 +36,122 @@ export default function Related({ data }) {
     'Inter-Black4': require('../../../assets/fonts/Mulish-Regular.ttf'),
    
   });
+
+  // console.log(data.d)
   const User_data = data;
-  const Id = data.id;
+  const Id = data.data.id;
+  // console.log(Id)
   const [DATA, setDATA] = useState([]);
-  const [t, sett] = useState("");
-  const [tc, settc] = useState("");
-  const [a, seta] = useState("");
-  const [ac, setac] = useState("");
-  const [notes, setnotes] = useState("");
-  const [nc, setnc] = useState("");
+  
 
   const [loading, setLoading] = React.useState(true);
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const [d, setd] = useState(data?.pined_note == "Yes" ? 3 : 0);
-  const [note, setnote] = useState(data?.pined_note_text);
+  
+  const [note, setnote] = useState(data.data?.pined_note_text);
   const [n, setn] = useState("");
-  const [pin_date] = useState(data?.pinned_date);
-  const [icon_note] = useState(data?.pined_note);
-  const [modalTitle2] = useState(data?.pinned_by);
+  const [pin_date, setpin_date] = useState("");
+  
+  const [modalTitle2, setModalTitle2] = useState(data?.data?.pinned_by);
+  const [d, setd] = useState(icon_note == "Yes" ? 3:0);
 
   // console.log(note)
 
+  useEffect(() => {
+    (async () => {
+      // user_data.pined_note == "Yes" ? setd(3) : setd(0);
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      const data = {
+        email: d.email,
+        password: d.password,
+        id: Id,
+      };
+      get_leads_basic_detail(data)
+        .then((response) => response.json())
+        .then((result) => {
+        
+          setModalTitle2(result?.data?.lead_detail?.Lead.pinned_by?.value)
+         
+          setnote(result?.data?.lead_detail.Lead?.pinned_note_text?.value)
+           seticon_note(result?.data?.lead_detail?.Lead.pined_note)
+           setpin_date(result?.data?.lead_detail?.Lead.pinned_date?.value)
+           setd(result?.data?.lead_detail?.Lead.pined_note=="Yes"?3:0)
+          // setLoading(false);
+        })
+        .catch((error) => console.log("error", error));
+    })();
+  }, []);
+  const [icon_note, seticon_note] = useState("");
+  
+  const postdata = async () => {
+    try {
+     
+
+      const user_data = await AsyncStorage.getItem("user_data");
+      // const drop_data = await AsyncStorage.getItem("dropdown_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+        pin_text: note,
+        id: Id,
+        password: d.password,
+      };
+      Pin_note(data).then((response) => {
+        response.json().then((data) => {
+          // console.log(data);
+         
+          call_api(),note.length > 0 ? setd(3):setd(0);
+          setModalTitle2(result?.data?.lead_detail?.Lead.pinned_by?.value)
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const call_api = async () => {
+    try {
+      setLoading(true)
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      const data = {
+        email: d.email,
+        password: d.password,
+        id: Id,
+      };
+      get_leads_basic_detail(data)
+        .then((response) => response.json())
+        .then((result) => {
+         
+
+          
+          setnote(result?.data?.lead_detail?.Lead?.pinned_note_text?.value)
+          seticon_note(result?.data?.lead_detail?.Lead.pined_note)
+          setpin_date(result?.data?.lead_detail?.Lead.pinned_date?.value)
+         
+          
+          setLoading(false);
+        
+
+          // setLoading(false);
+        })
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
     (async () => {
       const user_data = await AsyncStorage.getItem("user_data");
 
       const d = JSON.parse(user_data);
 
-      // console.log(dr)
+      
       const data = {
         email: d.email,
         password: d.password,
@@ -70,14 +160,10 @@ export default function Related({ data }) {
       Related_page_counter(data)
         .then((response) => response.json())
         .then((result) => {
-          // console.log(result.data.related_page_counts)
+          
           setDATA(result?.data?.related_page_counts);
-          sett(result?.data?.related_page_counts.tasks.label);
-          settc(result?.data?.related_page_counts.tasks.count);
-          seta(result?.data?.related_page_counts.appointments.label);
-          setac(result?.data?.related_page_counts.appointments.count);
-          setnotes(result?.data?.related_page_counts.notes.label);
-          setnc(result?.data?.related_page_counts.notes.count);
+         
+       
 
           setLoading(false);
         })
@@ -85,30 +171,32 @@ export default function Related({ data }) {
         .catch((error) => console.log("error", error));
     })();
   }, []);
-  // console.log(t.length)
+
+  
+ 
+  
   return (
     <View style={styles.container}>
       {loading ? (
         <Loader loading={loading} />
-      ) : t && t.length > 0 ? (
+      ) : DATA != null ? (
         <View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate(ScreenNames.Page, {
-                name: notes,
-                n: ScreenNames.NPage,
-              });
+              navigation.navigate(ScreenNames.Page)
             }}
           >
             <View style={styles.box}>
               <View style={styles.box1}>
                 <Image style={styles.circle} source={Images.notes}></Image>
 
-                <Text style={styles.txt}>{notes}</Text>
+                <Text style={styles.txt}>
+                  {DATA?.notes?.label}
+                  </Text>
               </View>
 
               <View style={styles.count}>
-                <Text style={styles.count_txt}>{nc}</Text>
+                <Text style={styles.count_txt}>{DATA?.notes?.count}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -116,21 +204,28 @@ export default function Related({ data }) {
           <View style={styles.line}></View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate(ScreenNames.Page, {
-                name: t,
-                n: ScreenNames.TPage,
-              });
+              navigation.navigate(
+              
+                "Task_page",{ user: {
+                  name: User_data.data.name,
+              logo: User_data.data.name_initials,
+
+              id: User_data.data.id,
+                },
+                index: data?.in,
+                DATA: data?.d,})
+             
             }}
           >
             <View style={styles.box}>
               <View style={styles.box1}>
                 <Image style={styles.circle} source={Images.Tasks}></Image>
 
-                <Text style={styles.txt}>{t}</Text>
+                <Text style={styles.txt}>{DATA?.tasks?.label}</Text>
               </View>
 
               <View style={styles.count}>
-                <Text style={styles.count_txt}>{tc}</Text>
+                <Text style={styles.count_txt}>{DATA?.tasks?.count}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -138,10 +233,7 @@ export default function Related({ data }) {
           <View style={styles.line}></View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate(ScreenNames.Page, {
-                name: a,
-                n: ScreenNames.APage,
-              });
+              navigation.navigate("Appoint_page")
             }}
           >
             <View style={styles.box}>
@@ -151,11 +243,11 @@ export default function Related({ data }) {
                   source={Images.Appointment}
                 ></Image>
 
-                <Text style={styles.txt}>{a}</Text>
+                <Text style={styles.txt}>{DATA?.appointments?.label}</Text>
               </View>
 
               <View style={styles.count}>
-                <Text style={styles.count_txt}>{ac}</Text>
+                <Text style={styles.count_txt}>{DATA.appointments?.count}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -164,14 +256,15 @@ export default function Related({ data }) {
         </View>
       ) : (
         <View style={styles.null_txt}>
-          <Text>"There is no related exist for this lead"</Text>
-        </View>
+        <Text style={{fontSize: wp("6%"),width:"70%",fontFamily: "Inter-Black2",color:"#6c6c6c",textAlign:"center"}}>"There is no Related exist for this lead"</Text>
+      </View>
       )}
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         style={styles.floating_btn}
       >
-        {loading ? null : icon_note == "Yes" ? (
+       
+        { loading ? null : icon_note == "Yes" ? (
           <Image
             style={{
               width: Dimensions.get('window').width * 0.13,
@@ -195,10 +288,10 @@ export default function Related({ data }) {
         <Text
           onPress={() => {
             navigation.navigate(ScreenNames.LEAD_ACTIVITY, {
-              name: User_data.name,
-              logo1: User_data.name_initials,
+              name: User_data.data.name,
+              logo1: User_data.data.name_initials,
 
-              id: User_data.id,
+              id: User_data.data.id,
             });
           }}
           style={{ color: "white", fontSize: 20,fontFamily:"Inter-Black" }}
@@ -207,207 +300,215 @@ export default function Related({ data }) {
         </Text>
       </View>
       {d == 1 ? (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.modal_page}>
-            <View style={styles.modalView1}>
-              <View style={styles.pin2}>
-                <Text style={styles.modalText1}>Pin Note</Text>
-                <Pressable
-                  onPress={() => (setModalVisible(!modalVisible), setd(0))}
-                >
-                  <Entypo name="cross" size={30} color="black" />
-                </Pressable>
-              </View>
-              <View style={styles.line2}></View>
-
-              <KeyboardAvoidingView enabled>
-                <View style={styles.input}>
-                  <TextInput
-                    //  value={""}
-                    onChangeText={(txt) => (setnote(txt), setn(txt))}
-                  />
-                </View>
-              </KeyboardAvoidingView>
-              <View style={styles.modal_btn_box}>
-                {n.length > 0 ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setd(3);
-                    }}
-                    style={styles.modal_btn}
-                  >
-                    <Text style={styles.modal_btn_txt}>Save</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {}}
-                    activeOpacity={1}
-                    style={styles.modal_btn}
-                  >
-                    <Text style={styles.modal_btn_txt}>Save</Text>
-                  </TouchableOpacity>
-                )}
-
-                <TouchableOpacity
-                  onPress={() => {
-                    {
-                      setd(0);
-                    }
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={modalVisible}
+                  onRequestClose={() => {
+                   
+                    setModalVisible(!modalVisible);
                   }}
-                  style={styles.modal_btn}
                 >
-                  <Text style={styles.modal_btn_txt}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      ) : d == 4 ? (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.modal_page}>
-            <View style={styles.modalView1}>
-              <View style={styles.pin2}>
-                <Text style={styles.modalText1}>Pin Note</Text>
-                <Pressable onPress={() => setd(3)}>
-                  <Entypo name="cross" size={30} color="black" />
-                </Pressable>
-              </View>
-              <View style={styles.line2}></View>
+                  <View style={styles.modal_page}>
+                    <View style={styles.modalView1}>
+                      <View style={styles.pin2}>
+                        <Text style={styles.modalText1}>Pin Note</Text>
+                        <Pressable
+                          onPress={() => (
+                            setModalVisible(!modalVisible), setd(0)
+                          )}
+                        >
+                          <Entypo name="cross" size={30} color="black" />
+                        </Pressable>
+                      </View>
+                      <View style={styles.line2}></View>
 
-              <KeyboardAvoidingView enabled>
-                <View style={styles.input}>
-                  <TextInput
-                    value={note}
-                    onChangeText={(txt) => setnote(txt)}
-                  />
-                </View>
-              </KeyboardAvoidingView>
-              <View style={styles.modal_btn_box}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setd(3);
-                  }}
-                  style={styles.modal_btn}
-                >
-                  <Text style={styles.modal_btn_txt}>Save</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    {
-                      setd(3);
-                    }
-                  }}
-                  style={styles.modal_btn}
-                >
-                  <Text style={styles.modal_btn_txt}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      ) : d == 0 ? (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.modal_page}>
-            <View style={styles.modalView}>
-              <View style={styles.pin}>
-                <Text style={styles.modalText}>Pin Note</Text>
-                <Pressable
-                  style={{}}
-                  onPress={() => setModalVisible(!modalVisible)}
-                >
-                  <Entypo name="cross" size={30} color="black" />
-                </Pressable>
-              </View>
+                      <KeyboardAvoidingView enabled>
+                        <View style={styles.input}>
+                          <TextInput
+                        style={{padding:10,textAlignVertical: 'top',height:"100%"}}
 
-              <Text
-                style={{
-                  color: "black",
-                  marginLeft: "4%",
-                  marginTop: "12%",
-                }}
-              >
-                No note added yet.
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setd(1);
-                }}
-                style={styles.add_note}
-              >
-                <Text style={{ color: "white" }}>Add Note</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-      ) : d == 3 ? (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.modal_page}>
-            <View style={styles.modalView2}>
-              <View style={styles.pin}>
-                <Text style={styles.modalText}>{modalTitle2}</Text>
-                <Pressable
-                  style={{}}
-                  onPress={() => (
-                    setModalVisible(!modalVisible)
-                    // , setd(0), setn("")
-                  )}
+                            //  value={""}
+                            onChangeText={(txt) => (setnote(txt), setn(txt))}
+                          />
+                        </View>
+                      </KeyboardAvoidingView>
+                      <View style={styles.modal_btn_box}>
+                        {n.length > 0 ? (
+                          <TouchableOpacity
+                            onPress={() => {
+                            postdata(),  setModalVisible(!modalVisible)
+                            }}
+                            style={styles.modal_btn}
+                          >
+                            <Text style={styles.modal_btn_txt}>Save</Text>
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() => {}}
+                            activeOpacity={1}
+                            style={styles.modal_btn}
+                          >
+                            <Text style={styles.modal_btn_txt}>Save</Text>
+                          </TouchableOpacity>
+                        )}
+
+                        <TouchableOpacity
+                          onPress={() => {
+                            {
+                              setd(0);
+                            }
+                          }}
+                          style={styles.modal_btn}
+                        >
+                          <Text style={styles.modal_btn_txt}>Close</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                </Modal>
+              ) : d == 4 ? (
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={modalVisible}
+                  onRequestClose={() => {
+                    
+                    setModalVisible(!modalVisible);
+                  }}
                 >
-                  <Entypo name="cross" size={30} color="black" />
-                </Pressable>
-              </View>
-              <Text style={styles.date}>{pin_date}</Text>
-              <Text style={styles.note4}>{note}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setd(4);
-                }}
-                style={styles.update_note}
-              >
-                <Text style={styles.update_txt}>Update</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-      ) : null}
+                  <View style={styles.modal_page}>
+                    <View style={styles.modalView1}>
+                      <View style={styles.pin2}>
+                        <Text style={styles.modalText1}>Pin Note</Text>
+                        <Pressable onPress={() => setd(3)}>
+                          <Entypo name="cross" size={30} color="black" />
+                        </Pressable>
+                      </View>
+                      <View style={styles.line2}></View>
+
+                      <KeyboardAvoidingView enabled>
+                        <View style={styles.input}>
+                          <TextInput
+                        style={{padding:10,textAlignVertical: 'top',height:"100%"}}
+
+                            value={note}
+                            onChangeText={(txt) => setnote(txt)}
+                          />
+                        </View>
+                      </KeyboardAvoidingView>
+                      <View style={styles.modal_btn_box}>
+                        <TouchableOpacity
+                          onPress={() => {
+                          postdata(),  setModalVisible(!modalVisible)
+                          }}
+                          style={styles.modal_btn}
+                        >
+                          <Text style={styles.modal_btn_txt}>Save</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            {
+                              setd(3);
+                            }
+                          }}
+                          style={styles.modal_btn}
+                        >
+                          <Text style={styles.modal_btn_txt}>Close</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                </Modal>
+              ) : d == 0 ? (
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={modalVisible}
+                  onRequestClose={() => {
+                   
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <View style={styles.modal_page}>
+                    <View style={styles.modalView}>
+                      <View style={styles.pin}>
+                        <Text style={styles.modalText}>Pin Note</Text>
+                        <Pressable
+                          style={{}}
+                          onPress={() => setModalVisible(!modalVisible)}
+                        >
+                          <Entypo name="cross" size={30} color="black" />
+                        </Pressable>
+                      </View>
+
+                      <Text
+                        style={{
+                          color: "black",
+                          marginLeft: "4%",
+                          marginTop: "12%",
+                        }}
+                      >
+                        No note added yet.
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setd(1);
+                        }}
+                        style={styles.add_note}
+                      >
+                        <Text style={{ color: "white",fontSize: wp("6%"),fontFamily: "Inter-Black4" }}>Add Note</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+              ) : d == 3 ? (
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={modalVisible}
+                  onRequestClose={() => {
+                    
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <View style={styles.modal_page}>
+                    <View style={styles.modalView2}>
+                      <View style={styles.pin}>
+                        <Text style={styles.modalText}>{modalTitle2}</Text>
+                        <Pressable
+                          style={{}}
+                          onPress={() => (
+                            setModalVisible(!modalVisible)
+                            // , 
+                            // setd(0), setn("")
+                          )}
+                        >
+                          <Entypo name="cross" size={30} color="black" />
+                        </Pressable>
+                      </View>
+                      <Text style={styles.date}>{pin_date}</Text>
+                      <Text style={styles.note3}>{note}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setd(4);
+                        }}
+                        style={styles.update_note}
+                      >
+                        <Text style={styles.update_txt}>Update</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+              ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  update_txt: { color: "white", fontSize: 17,fontFamily:"Inter-Black" },
-  note4: { color: "black", margin: "4%", fontSize: 14 ,fontFamily:"Inter-Black"},
+  null_txt: { flex: 1, alignItems: "center", justifyContent: "center", },
+  update_txt: { color: "white",fontSize: wp("6%"),fontFamily: "Inter-Black4"},
+  note3: { color: "black", margin: "4%", fontSize: 14 ,fontFamily:"Inter-Black"},
   date: {
     color: "black",
     marginLeft: "4%",
@@ -431,12 +532,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end",
   },
-  line2: {
-    backgroundColor: "#f2f2f2",
-    height: 1.5,
-
-    width: "100%",
-  },
   pin2: {
     flexDirection: "row",
 
@@ -449,6 +544,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginHorizontal: "10%",
     marginVertical: "4%",
+  },
+  line2: {
+    backgroundColor: "#f2f2f2",
+    height: 1.5,
+
+    width: "100%",
   },
   modal_btn_txt: { color: "white", fontSize: 17,fontFamily:"Inter-Black" },
   modal_btn: {
@@ -464,7 +565,7 @@ const styles = StyleSheet.create({
   modal_page: {
     flex: 1,
     backgroundColor: "rgba(52, 52, 52, 0.7)",
-    marginTop: height*0.12,
+   
   },
   pin: {
     flexDirection: "row",
@@ -472,8 +573,8 @@ const styles = StyleSheet.create({
     margin: "4%",
   },
   add_note: {
-    height: height * 0.05,
-    width: width * 0.3,
+    height: height * 0.065,
+    width: width * 0.36,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
     marginTop: height*0.22,
@@ -483,11 +584,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   update_note: {
-    height: height * 0.05,
-    width: width * 0.3,
+    height: height * 0.065,
+    width: width * 0.36,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
-    marginTop: "48%",
+    marginTop: "40%",
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
@@ -518,19 +619,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tag_touch: { alignItems: "center" },
-  tag: { color: "white", fontSize: 18 ,fontFamily:"Inter-Black"},
+  tag: { color: "white", fontSize: 18 },
   flat: { backgroundColor: "#f2f2f2", padding: 10, marginBottom: 40 },
   input: {
     height: height * 0.25,
     margin: 12,
 
-    padding: 10,
+   
     backgroundColor: "#f2f2f2",
     borderRadius: 8,
   },
   modalText: {
     fontSize: 20,
-    fontWeight: "500",fontFamily:"Inter-Black"
+    fontFamily:"Inter-Black2"
   },
   modalText1: {
     fontSize: 20,
@@ -546,7 +647,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 5,
-    alignSelf: "center",
+    alignSelf: "center",marginTop: height*0.12,
   },
   modalView2: {
     // height: height * 0.44,
@@ -555,7 +656,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 5,
-    alignSelf: "center",
+    alignSelf: "center",marginTop: height*0.12,
   },
   modalView1: {
     // height: height * 0.44,
@@ -564,7 +665,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 20,
-    alignSelf: "center",
+    alignSelf: "center",marginTop: height*0.12,
+  },
+  container: {
+    flex: 1,
+    backgroundColor:"white"
   },
   bottom_btn: {
     width: "100%",
@@ -583,7 +688,7 @@ const styles = StyleSheet.create({
   note3: {
     height: height * 0.085,
     width: width * 0.2,
-    resizeMode: "contain",
+    resizeMode: "contain",  marginLeft: "4%",marginTop:"4%"
   },
   floating_btn: {
     alignItems: "center",
@@ -603,17 +708,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    margin: "2%",
+    margin: "3%",
   },
   txt: { fontSize: 16, color: "#666666", fontFamily:"Inter-Black" },
   count_txt: {
     color: "white",
-    fontSize: 12,
+    fontSize: 12,paddingHorizontal:"0.5%",paddingVertical:"0.2%"
     
     
   },
   count: {
-    backgroundColor: Colors.MAIN_COLOR,
+    backgroundColor: Colors.MAIN_icon,
     // height: height * 0.02,
     // width: width * 0.085,
     borderRadius: 10,paddingHorizontal:"3%"
@@ -655,6 +760,13 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
     marginVertical: "0.5%",
     width: "100%",
     marginStart: "19%",
+  },
+  line2: {
+    backgroundColor: "#e6e6e6",
+    height: 2,
+    marginVertical: "0.5%",
+    width: "100%",
+   
   },
 
   container: { flex: 1, backgroundColor: "white" },

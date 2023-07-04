@@ -1,5 +1,6 @@
 export const Colors={
-MAIN_COLOR:"#1d426a",
+MAIN_COLOR:"#5fdcfc",
+MAIN_icon:"#1d426a",
 ORANGE:"orange",
 WHITE:"white",
 LINE:"#ffcc00",

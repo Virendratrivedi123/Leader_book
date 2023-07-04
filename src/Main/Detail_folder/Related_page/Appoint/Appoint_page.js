@@ -1,103 +1,82 @@
 import React, { useState, useEffect, useRef } from "react";
-
-import { Entypo, SimpleLineIcons, Ionicons } from "@expo/vector-icons";
 import {
+  SafeAreaView,
   Dimensions,
   Text,
   View,
-  TouchableOpacity,
   StyleSheet,
-  FlatList,
+  TouchableOpacity,
   Animated,
   Easing,
-  Image,
+  Image,FlatList
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { Colors } from "../constant/colors";
-import { ScreenNames } from "../constant/ScreenNames";
-import { STYLES } from "../constant/styles";
-import Header from "./header";
-import { Images } from "../constant/images";
-import { useFonts } from "expo-font";
+import {
+  MaterialCommunityIcons,
+  FontAwesome,
+  EvilIcons,
+  Ionicons,SimpleLineIcons
+} from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { STYLES } from "../../../../constant/styles";
+import { Colors } from "../../../../constant/colors";
+import { Images } from "../../../../constant/images";
 
+
+import { ScreenNames } from "../../../../constant/ScreenNames";
+import Header from "../../../../components/header";
+// import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
 const DATA = [
-  {
-    id: "0",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "1",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "2",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "3",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "4",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "5",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "6",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "7",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "8",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-];
+    {
+      id: "0",
+      msg: "test4",
+      Number: "Test 3 Test",
+      voicemail: "5 May 2022 14:02 PM",
+      email: "praful.mishra121@gmail.com",
+    },
+    {
+      id: "1",
+      msg: "test4",
+      Number: "Test 3 Test",
+      voicemail: "5 May 2022 14:02 PM",
+      email: "praful.mishra121@gmail.com",
+    },
+    {
+      id: "2",
+      msg: "test4",
+      Number: "Test 3 Test",
+      voicemail: "5 May 2022 14:02 PM",
+      email: "praful.mishra121@gmail.com",
+    },
+    {
+      id: "3",
+      msg: "test4",
+      Number: "Test 3 Test",
+      voicemail: "5 May 2022 14:02 PM",
+      email: "praful.mishra121@gmail.com",
+    },
+    {
+      id: "4",
+      msg: "test4",
+      Number: "Test 3 Test",
+      voicemail: "5 May 2022 14:02 PM",
+      email: "praful.mishra121@gmail.com",
+    },
+    {
+      id: "5",
+      msg: "test4",
+      Number: "Test 3 Test",
+      voicemail: "5 May 2022 14:02 PM",
+      email: "praful.mishra121@gmail.com",
+    },
+   
+  ];
 
-function Appointments() {
-  const [fontsLoaded] = useFonts({
-    "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
-    "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
-    "Inter-Black3": require("../../assets/fonts/Mulish-ExtraBold.ttf"),
-    "Inter-Black4": require("../../assets/fonts/Mulish-Regular.ttf"),
-  });
+function Appoint_page() {
   const navigation = useNavigation();
+  const route = useRoute();
   const translation = useRef(new Animated.Value(0)).current;
   const h = (18 / 100) * height;
   useEffect(() => {
@@ -111,18 +90,23 @@ function Appointments() {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        label="Appointments"
-        leftIcon={Images.menu}
-        // rightIcon={Images.time}
-        onLeftPress={() => navigation.toggleDrawer()}
+        label={"Appointments"}
+        leftIcon={Images.backArrow}
+        rightIcon={{}}
+        onLeftPress={() => navigation.goBack()}
+        onRightPress={() => {}}
+        // customRight={true}
       />
+      
       <FlatList
         style={{}}
         data={DATA}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
           <View>
-            <View
+            <TouchableOpacity
+             onPress={() => navigation.navigate("Appoint_Detail",{"msg":item.msg})}
+             
               style={{
                 flexDirection: "row",
                 marginBottom: "15%",
@@ -133,7 +117,7 @@ function Appointments() {
                 <Text style={styles.circle_text}>T</Text>
               </View>
               <View>
-                <Text style={styles.text1}>{item.name}</Text>
+                <Text style={styles.text1}>{item.msg}</Text>
                 <Text style={styles.text2}>{item.Number}</Text>
                 <Text style={styles.text3}>{item.voicemail}</Text>
                 <Text style={styles.text3}>{item.voicemail}</Text>
@@ -151,7 +135,7 @@ function Appointments() {
                   <Text style={styles.text5}>{item.voicemail}</Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
 
             <View style={styles.line}></View>
           </View>
@@ -159,34 +143,36 @@ function Appointments() {
       />
       <Animated.View
         style={{
-          alignItems: "center",
-          justifyContent: "center",
-
-          position: "absolute",
-
-          right: "6%",
-
-          borderRadius:
-            Math.round(
-              Dimensions.get("window").width + Dimensions.get("window").height
-            ) / 2,
-
-          transform: [{ translateY: translation }],
-          bottom: height * 0.28,
-          elevation: 5,
+            alignItems: "center",
+            justifyContent: "center",
+  
+            position: "absolute",
+  
+            right: "6%",
+            // width: Dimensions.get("window").width * 0.16,
+            // height: Dimensions.get("window").width * 0.16,
+  
+            borderRadius:
+              Math.round(
+                Dimensions.get("window").width + Dimensions.get("window").height
+              ) / 2,
+  
+            transform: [{ translateY: translation }],
+            bottom: height * 0.28,
+            elevation: 5,
         }}
       >
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => navigation.navigate(ScreenNames.ADD_APPOINTMENT)}
+          onPress={() =>
+            navigation.navigate(ScreenNames.APage)
+          }
         >
           <Image
             source={Images.addNote}
-            style={{
-              width: Dimensions.get("window").width * 0.18,
-              height: Dimensions.get("window").width * 0.18,
-              resizeMode: "contain",
-            }}
+            style={{  width: Dimensions.get("window").width * 0.17,
+            height: Dimensions.get("window").width * 0.17,
+            resizeMode: "contain", }}
           />
         </TouchableOpacity>
       </Animated.View>
@@ -195,11 +181,6 @@ function Appointments() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-  },
-
   floating_btn: {
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.2)",
@@ -214,11 +195,13 @@ const styles = StyleSheet.create({
     height: 60,
     backgroundColor: Colors.MAIN_COLOR,
     borderRadius: 30,
-    elevation: 10,
+    elevation: 5,
     shadowColor: "black",
     resizeMode: "contain",
   },
-
+  container: {
+    flex: 1,backgroundColor:"white"
+  },
   text1: {
     fontSize: 18,
     marginTop: "0%",
@@ -288,4 +271,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Appointments;
+export default Appoint_page;

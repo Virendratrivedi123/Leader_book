@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { useFonts } from 'expo-font';
+import { useRoute } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import {
   StyleSheet,
   Text,
@@ -10,21 +10,14 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Entypo,
-  Ionicons,
-  MaterialCommunityIcons,
-  FontAwesome5,
-  FontAwesome,
-} from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { Colors } from "../constant/colors";
-import { STYLES } from "../constant/styles";
+
 import Basic_detail from "./Detail_folder/Basic_detail";
 import Profile from "./Detail_folder/Profile";
 import Related from "./Detail_folder/Related";
 import { ScreenNames } from "../constant/ScreenNames";
-import { get_leads_basic_detail } from "../Services";
+
 import { Images } from "../constant/images";
 
 const height = Dimensions.get("window").height;
@@ -32,10 +25,9 @@ const width = Dimensions.get("window").width;
 
 export default function Detail({ navigation }) {
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../assets/fonts/Mulish-ExtraBold.ttf'),
-   
+    "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../assets/fonts/Mulish-ExtraBold.ttf"),
   });
   const route = useRoute();
   const [com, setcom] = useState(false);
@@ -44,28 +36,28 @@ export default function Detail({ navigation }) {
   const [DATA, setDATA] = useState(route?.params?.DATA);
   const [key, setKey] = useState(Math.random());
   const [loading, setLoading] = React.useState(true);
-
+  console.log(route?.params?.index)
   const [User_data, setUserData] = useState(route.params.DATA[ind]);
   React.useEffect(() => {
     (async () => {
       seti(route.params.user.id);
-      setLoading(false);
-    })();
-  }, []);
-  useEffect(() => {
-    (async () => {
-      console.log(route?.params?.DATA.length);
+      // setLoading(false);
     })();
   }, []);
 
+ 
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      
+      <View>
+   
       <View style={styles.box}>
         <TouchableOpacity
           style={styles.back}
           onPress={() => navigation.goBack()}
         >
-          <Image source={Images.backArrow} style={styles.icon}/>
+          <Image source={Images.backArrow} style={styles.icon} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -81,12 +73,19 @@ export default function Detail({ navigation }) {
               setUserData(route.params.DATA[ind - 1]);
               setInd(ind - 1);
               setKey(Math.random());
+              setcom("RECENT");
             }
           }}
         >
           <Image
             source={Images.backArrow}
-            style={{ height: 15, width: 15, resizeMode: "contain",marginStart:5,marginEnd:10 }}
+            style={{
+              height: 15,
+              width: 15,
+              resizeMode: "contain",
+              marginStart: 5,
+              marginEnd: 10,
+            }}
           />
           <Text style={styles.nxt_txt}> Previous Lead</Text>
         </TouchableOpacity>
@@ -100,22 +99,24 @@ export default function Detail({ navigation }) {
           // onPress={() => {seti(DATA)}}
           onPress={() => {
             if (DATA.length > ind + 1) {
-console.log(DATA[ind])
+              // console.log(DATA[ind])
               setUserData(route.params.DATA[ind + 1]);
               setInd(ind + 1);
               setKey(Math.random());
+              setcom("RECENT");
             }
           }}
         >
           <Text style={styles.nxt_txt}>Next Lead</Text>
           <Image
             source={Images.nextArrow}
-            style={{ height: 15, width: 15, resizeMode: "contain",marginStart:7 }}
+            style={{
+              height: 15,
+              width: 15,
+              resizeMode: "contain",
+              marginStart: 7,
+            }}
           />
-
-          {/* <Text style={styles.arrow}>
-            <FontAwesome name="long-arrow-right" size={15} color="white" />
-          </Text> */}
         </TouchableOpacity>
       </View>
       <View style={styles.in_box}>
@@ -131,10 +132,7 @@ console.log(DATA[ind])
             })
           }
         >
-          <Image
-            style={styles.pencil}
-            source={Images.editYellow}
-          />
+          <Image style={styles.pencil} source={Images.editYellow} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() =>
@@ -143,10 +141,7 @@ console.log(DATA[ind])
             })
           }
         >
-          <Image
-            style={styles.delete}
-            source={Images.delete}
-          />
+          <Image style={styles.delete} source={Images.delete} />
         </TouchableOpacity>
       </View>
 
@@ -157,11 +152,18 @@ console.log(DATA[ind])
             setcom("RECENT");
           }}
         >
-          <Text style={{ fontSize: 14,
-    fontFamily:com == "RECENT" ? "Inter-Black3" : "Inter-Black2",
-    color: "white",
-    marginBottom: "2%",marginStart:"5%",
-    marginTop: "4%",}}>BASIC DETAIL</Text>
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: com == "RECENT" ? "Inter-Black3" : "Inter-Black2",
+              color: "white",
+              marginBottom: "2%",
+              marginStart: "5%",
+              marginTop: "4%",
+            }}
+          >
+            BASIC DETAIL
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -170,11 +172,17 @@ console.log(DATA[ind])
             setcom("PRIORITY");
           }}
         >
-          <Text style={{ fontSize: 14,
-    fontFamily:com == "PRIORITY" ? "Inter-Black3" : "Inter-Black2",
-    color: "white",
-    marginBottom: "2%",
-    marginTop: "4%",}}>PROFILE</Text>
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: com == "PRIORITY" ? "Inter-Black3" : "Inter-Black2",
+              color: "white",
+              marginBottom: "2%",
+              marginTop: "4%",
+            }}
+          >
+            PROFILE
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.setting}
@@ -182,11 +190,17 @@ console.log(DATA[ind])
             setcom("ALL");
           }}
         >
-          <Text style={{ fontSize: 14,
-    fontFamily:com == "ALL" ? "Inter-Black3" : "Inter-Black2",
-    color: "white",
-    marginBottom: "2%",
-    marginTop: "4%",}}>RELATED</Text>
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: com == "ALL" ? "Inter-Black3" : "Inter-Black2",
+              color: "white",
+              marginBottom: "2%",
+              marginTop: "4%",
+            }}
+          >
+            RELATED
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.line_box}>
@@ -219,14 +233,21 @@ console.log(DATA[ind])
           }}
         ></View>
       </View>
-
+      </View>
       <View style={{ flex: 1 }}>
         {com == "RECENT" ? (
           <Basic_detail data={User_data} key={key} />
         ) : com == "PRIORITY" ? (
-          <Profile  data={User_data} key={key} />
-        ) : com == "ALL"  ? (
-          <Related data={User_data} key={key} />
+          <Profile data={User_data} key={key} />
+        ) : com == "ALL" ? (
+          <Related
+            data={{
+              data: User_data,
+              d: DATA,
+              in: ind,
+            }}
+            key={key}
+          />
         ) : (
           setcom("RECENT")
         )}
@@ -247,7 +268,7 @@ const styles = StyleSheet.create({
     width: width * 0.12,
     resizeMode: "contain",
   },
- icon: {
+  icon: {
     height: 25,
     width: 25,
     resizeMode: "contain",
@@ -258,7 +279,7 @@ const styles = StyleSheet.create({
     color: "white",
 
     fontWeight: "normal",
-    fontFamily:"Inter-Black",
+    fontFamily: "Inter-Black",
   },
   nxt_view: {
     flexDirection: "row",
@@ -289,31 +310,36 @@ const styles = StyleSheet.create({
 
     // marginTop: 25,
     flexDirection: "row",
-paddingBottom:8
+    paddingBottom: 8,
   },
   circle: {
-    width: Dimensions.get('window').width * 0.17,
-    height: Dimensions.get('window').width * 0.17,
+    width: Dimensions.get("window").width * 0.17,
+    height: Dimensions.get("window").width * 0.17,
 
-borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
+    borderRadius:
+      Math.round(
+        Dimensions.get("window").width + Dimensions.get("window").height
+      ) / 2,
     alignItems: "center",
     justifyContent: "center",
     marginStart: "5%",
     backgroundColor: "#666699",
     marginBottom: "3%",
   },
-  circle_text: { fontSize: 28,  color: "white",fontFamily:"Inter-Black3" },
+  circle_text: { fontSize: 28, color: "white", fontFamily: "Inter-Black3" },
   name: {
     fontSize: 20,
     marginStart: "3%",
     // fontWeight: "bold",
-    color: "white",fontFamily:"Inter-Black2"
+    color: "white",
+    fontFamily: "Inter-Black2",
   },
   text: {
     fontSize: 14,
     // fontWeight: "500",
     color: "white",
-    marginStart: "3%",fontFamily:"Inter-Black2"
+    marginStart: "3%",
+    fontFamily: "Inter-Black2",
     // textAlign: "center",
   },
 

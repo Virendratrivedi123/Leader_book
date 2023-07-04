@@ -50,7 +50,13 @@ call_icon:require('./../Images/call-icon.png'),
 mail_icon:require('./../Images/mail-icon.png'),
 Voice_icon:require('./../Images/icons-voicemail.png'),
 email_icon:require('./../Images/icons-email.png'),
-
+chat_icon:require('./../Images/chat.png'),
+pencil:require('./../Images/pencil_white.png'),
+user_icon:require('./../Images/user-icon.png'),
+link_button:require('./../Images/link-button.png'),
+add_tag:require('./../Images/add_tags.png'),
+call_blue:require('./../Images/call-blue.png'),
+not_mail:require('./../Images/not_mail.png'),
 
 }
 

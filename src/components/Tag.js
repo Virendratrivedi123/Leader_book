@@ -14,7 +14,7 @@ import User_tag from "./taglist/User_tag";
 import System_tag from "./taglist/System_tag";
 import { STYLES } from "../constant/styles";
 import { Colors } from "../constant/colors";
-import Header3 from "./header3";
+import Header from "./header";
 import { Images } from "../constant/images";
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
@@ -34,8 +34,8 @@ function Tag() {
   const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.container}>
-      <Header3
-        label="Tags"
+      <Header
+        label2="Tags"
         leftIcon={Images.menu}
         rightIcon={Images.time}
         onLeftPress={() => navigation.toggleDrawer()}

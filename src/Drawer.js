@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect ,useCallback} from "react";
+import { useRoute } from "@react-navigation/native";
 
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Customdrawer from "./components/Custom_Drawer";
@@ -15,13 +16,14 @@ import Home from "./components/Home";
 import { ScreenNames } from "./constant/ScreenNames";
 import Add_appointment from "./components/Appointment/Add_appointment";
 import Recent_chats from "./components/Recent_chats";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Add_task from "./components/tasks/Add_tasks";
 
 const Drawer = createDrawerNavigator();
 
 const width = Dimensions.get("window").width;
 function Drawer_screen() {
+  
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -32,7 +34,7 @@ function Drawer_screen() {
       }}
       drawerContent={(props) => <Customdrawer {...props} />}
     >
-      <Drawer.Screen name={ScreenNames.MAIN_SCREEN} component={Main_Screen} />
+      <Drawer.Screen name={ScreenNames.MAIN_SCREEN} component={Main_Screen}  />
       <Drawer.Screen name={ScreenNames.HOME} component={Home} />
       <Drawer.Screen name={ScreenNames.TAG} component={Tag} />
       <Drawer.Screen name={ScreenNames.TASKS} component={Tasks} />

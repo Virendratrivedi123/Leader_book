@@ -140,12 +140,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: "white",
     
-    borderRadius: 10,
+    borderRadius: 20,
     color: Colors.txt,
     fontSize: wp("5.41%"), fontFamily:"Inter-Black4",
   },
-  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"8%" },
-  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"8%",marginTop:"1%",color:"#262626",},
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
   textStyle3: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
 
   centeredView: {

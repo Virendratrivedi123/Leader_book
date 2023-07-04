@@ -11,7 +11,6 @@ import {
   MaterialIcons,
   Octicons,
 } from "@expo/vector-icons";
-import { useFonts } from 'expo-font';
 import {
   Dimensions,
   Image,
@@ -30,12 +29,13 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import { ScreenNames } from "../../../constant/ScreenNames";
 
-import { Colors } from "../../../constant/colors";
-import { STYLES } from "../../../constant/styles";
-import { Images } from "../../../constant/images";
-import Header2 from "../../../components/header2";
+
+import { Colors } from "../../../../constant/colors";
+import { STYLES } from "../../../../constant/styles";
+import { Images } from "../../../../constant/images";
+import Header from "../../../../components/header";
+import { useFonts } from 'expo-font';
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -45,13 +45,12 @@ const dt = [
   { label: "okay", value: "2" },
 ];
 
-function Apage() {
+function Tpage() {
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../../../assets/fonts/Mulish-Regular.ttf'),
-   
+    'Inter-Black': require('../../../../../assets/fonts/Mulish-SemiBold.ttf'),
+    'Inter-Black2': require('../../../../../assets/fonts/Mulish-Bold.ttf'),
+    'Inter-Black3': require('../../../../../assets/fonts/Mulish-ExtraBold.ttf'),
+    'Inter-Black4': require('../../../../../assets/fonts/Mulish-Regular.ttf'),
   });
   const navigation = useNavigation();
   const [value1, setValue1] = useState();
@@ -121,8 +120,8 @@ function Apage() {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Header2
-        label="Add Appointment"
+      <Header
+        label="New Task"
         leftIcon={Images.backArrow}
         // rightIcon={Images.search}
         onLeftPress={() => navigation.goBack()}
@@ -139,7 +138,7 @@ function Apage() {
         >
           <Text style={styles.name_txt}>Subject</Text>
           <TextInput
-            placeholder="Subject"
+            placeholder="Enter Subject"
             style={styles.input}
             //   value={text_sign}
             //   onChangeText={(txt) => setText_sign(txt)}
@@ -147,17 +146,7 @@ function Apage() {
           ></TextInput>
 
           <View style={styles.line2}></View>
-          <Text style={styles.name_txt}>Location</Text>
-          <TextInput
-            placeholder="Location"
-            style={styles.input}
-            //   value={text_sign}
-            //   onChangeText={(txt) => setText_sign(txt)}
-            placeholderTextColor={"#cccccc"}
-          ></TextInput>
-
-          <View style={styles.line2}></View>
-          <Text style={styles.name_txt}>Site</Text>
+          <Text style={styles.name_txt}>Lead Site</Text>
           <Dropdown
             style={[styles.dropdown2]}
             placeholderStyle={styles.placeholderStyle}
@@ -204,45 +193,16 @@ function Apage() {
           ></TextInput>
 
           <View style={styles.line2}></View>
-          <Text style={styles.name_txt}>All Day Event</Text>
-          <Dropdown
-            style={[styles.dropdown2]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            data={dt}
-            search={false}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder={""}
-            value={value1}
-            //   onFocus={() => setIsFocus(true)}
-            //   onBlur={() => setIsFocus(false)}
-            onChange={(i) => {
-              setValue1(i.value);
-            }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={{ paddingHorizontal: "5%" }}
-                color="#003366"
-                name="downsquare"
-                size={30}
-              />
-            )}
-          />
-          <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.calender}></Image>
-            <Text style={styles.name_txt2}>Start Time</Text>
+            <Text style={styles.name_txt2}>Start Date</Text>
           </View>
           <View style={[styles.press]}>
             <TouchableOpacity
             style={{width:"60%",}}
             onPress={() => setModalVisible(true)}>
               <TextInput
-                style={{ color: "grey", fontSize: 16,fontFamily:"Inter-Black4", }}
+                style={{ color: "grey", fontSize: 16,fontFamily:"Inter-Black", }}
                 placeholder={"Start Date"}
                 showSoftInputOnFocus={false}
                 // editable={false}
@@ -264,7 +224,7 @@ function Apage() {
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.calender}></Image>
-            <Text style={styles.name_txt2}>End Time</Text>
+            <Text style={styles.name_txt2}>Due Date</Text>
           </View>
 
           <View style={[styles.press]}>
@@ -272,7 +232,7 @@ function Apage() {
             style={{width:"60%",}}
             onPress={() => setModalVisible2(true)}>
               <TextInput
-                style={{ color: "grey", fontSize: 16,fontFamily:"Inter-Black4", }}
+                style={{ color: "grey", fontSize: 17,fontFamily:"Inter-Black", }}
                 placeholder={"Due Date"}
                 showSoftInputOnFocus={false}
                 // editable={false}
@@ -293,7 +253,7 @@ function Apage() {
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.set_alarm}></Image>
-            <Text style={styles.name_txt2}>Reminder</Text>
+            <Text style={styles.name_txt2}>Enable Reminder</Text>
           </View>
 
           <Dropdown
@@ -323,14 +283,39 @@ function Apage() {
               />
             )}
           />
-          
-          
-
-         
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
-            {/* <Image style={styles.icon2} source={Images.graph}></Image> */}
-            <Text style={styles.name_txt}>Time Unit</Text>
+            <Image style={styles.icon2} source={Images.clock_circular}></Image>
+            <Text style={styles.name_txt2}>Reminder Time</Text>
+          </View>
+
+          <View style={[styles.press]}>
+            <TouchableOpacity 
+             style={{width:"80%",}}
+            onPress={() => setModalVisible3(true)}>
+              <TextInput
+               style={{ color: "grey", fontSize: 17,fontFamily:"Inter-Black", }}
+                placeholder={"Reminder Date and Time"}
+                showSoftInputOnFocus={false}
+                // editable={false}
+                value={date_time}
+                onPressIn={() => setModalVisible3(true)}
+                placeholderTextColor={"#cccccc"}
+              ></TextInput>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setdate_time("");
+              }}
+              style={{ marginEnd: "5%" }}
+            >
+              <Image style={styles.cancel} source={Images.cancel}></Image>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.line2}></View>
+          <View style={{ flexDirection: "row" }}>
+            <Image style={styles.icon2} source={Images.graph}></Image>
+            <Text style={styles.name_txt2}>Status</Text>
           </View>
           <Dropdown
             style={[styles.dropdown]}
@@ -361,8 +346,8 @@ function Apage() {
           />
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
-            {/* <Image style={styles.icon2} source={Images.warning}></Image> */}
-            <Text style={styles.name_txt}>Show Time As</Text>
+            <Image style={styles.icon2} source={Images.warning}></Image>
+            <Text style={styles.name_txt2}>Priority</Text>
           </View>
           <Dropdown
             style={[styles.dropdown]}
@@ -392,7 +377,17 @@ function Apage() {
             )}
           />
 
-          
+          <View style={styles.line2}></View>
+          <View style={{ flexDirection: "row" }}>
+            <Image style={styles.icon2} source={Images.percentage}></Image>
+            <Text style={styles.name_txt2}>Complete(%)</Text>
+          </View>
+          <TextInput
+            // placeholder="Reminder"
+            style={styles.input2}
+            //   value={text_sign}
+            //   onChangeText={(txt) => setText_sign(txt)}
+          ></TextInput>
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.task_note}></Image>
@@ -648,7 +643,7 @@ const styles = StyleSheet.create({
     height: 25,
     width: 25,
     resizeMode: "contain",
-    marginHorizontal: "2.5%",
+    marginHorizontal: "3%",
   },
   cancel: {
     height: 25,
@@ -714,14 +709,14 @@ const styles = StyleSheet.create({
     marginStart: "12%",fontFamily:"Inter-Black4"
   },
   press: {
-    
+    color: "#8c8c8c",
 
-    
+    fontSize: 17,
 
-    marginStart: "12.5%",
+    marginStart: "13.5%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between",fontFamily:"Inter-Black4"
   },
   input3: {
     color: "#8c8c8c",
@@ -750,4 +745,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Apage;
+export default Tpage;

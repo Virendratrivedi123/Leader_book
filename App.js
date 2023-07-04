@@ -18,11 +18,10 @@ import Related from "./src/Main/Detail_folder/Related";
 import Lead_activity from "./src/Main/Detail_folder/Lead_activity";
 import Edit_lead_detail from "./src/Main/Detail_folder/Edit_lead_detail";
 import Comments from "./src/Main/Detail_folder/Comments";
-import Appi from "./src/Services/Modal";
-import Page from "./src/Main/Detail_folder/Related_page/Page";
-import tpage from "./src/Main/Detail_folder/Related_page/Tpage";
-import Npage from "./src/Main/Detail_folder/Related_page/Npage";
-import Apage from "./src/Main/Detail_folder/Related_page/Apage";
+
+import tpage from "./src/Main/Detail_folder/Related_page/task/Tpage";
+import Npage from "./src/Main/Detail_folder/Related_page/Note/Npage";
+import Apage from "./src/Main/Detail_folder/Related_page/Appoint/Apage";
 
 import ChatScreen from "./src/components/recent_chats/Chat";
 import Demo from "./src/components/Demo";
@@ -40,6 +39,14 @@ import Modal_data from "./src/Main/Detail_folder/Profile_page/Edit_searc_pages/M
 import Data_next from "./src/Main/Detail_folder/Profile_page/Edit_searc_pages/Data_next";
 import Search from "./src/Main/Search";
 import Calender from "./src/Main/Calender";
+import Task_page from "./src/Main/Detail_folder/Related_page/task/Task_page";
+import Appoint_page from "./src/Main/Detail_folder/Related_page/Appoint/Appoint_page";
+import Note_Page from "./src/Main/Detail_folder/Related_page/Note/Note_Page";
+
+import Task_Detail from "./src/Main/Detail_folder/Related_page/task/Task_Detail";
+import Edit_Task_Detail from "./src/Main/Detail_folder/Related_page/task/Edit_task_Detail";
+import Appoint_Detail from "./src/Main/Detail_folder/Related_page/Appoint/Appoint_detail";
+import Update_Appointment from "./src/Main/Detail_folder/Related_page/Appoint/Update_Appointment";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -95,7 +102,7 @@ export default function App() {
         <Stack.Screen name={ScreenNames.LEAD_ACTIVITY} component={Lead_activity} />
         <Stack.Screen name={ScreenNames.EDIT_LEAD_DETAIL} component={Edit_lead_detail} />
         <Stack.Screen name={ScreenNames.Comments} component={Comments} />
-        <Stack.Screen name={ScreenNames.Page} component={Page} />
+        <Stack.Screen name={ScreenNames.Page} component={Note_Page} />
         <Stack.Screen name={ScreenNames.TPage} component={tpage} />
         <Stack.Screen name={ScreenNames.NPage} component={Npage} />
         <Stack.Screen name={ScreenNames.APage} component={Apage} />
@@ -112,6 +119,13 @@ export default function App() {
         <Stack.Screen name={"Data_next"} component={Data_next}  />
         <Stack.Screen name={"Search"} component={Search}  />
         <Stack.Screen name={"Calender"} component={Calender}  />
+        <Stack.Screen name={"Task_page"} component={Task_page}  />
+        <Stack.Screen name={"Appoint_page"} component={Appoint_page}  />
+        <Stack.Screen name={"Task_Detail"} component={Task_Detail}  />
+        <Stack.Screen name={"Edit_Task_Detail"} component={Edit_Task_Detail}  />
+        <Stack.Screen name={"Appoint_Detail"} component={Appoint_Detail}  />
+        <Stack.Screen name={"Update_Appointment"} component={Update_Appointment}  />
+
 
       </Stack.Navigator>
     </NavigationContainer>

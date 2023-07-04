@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, ScrollView } from "react-native-gesture-handler";
 
 import {
   Dimensions,
@@ -11,21 +11,19 @@ import {
   StyleSheet,
   Alert,
   Image,
-  ScrollView,
+  
   Pressable,
-  Modal,
+  Modal,SectionList
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Dropdown } from "react-native-element-dropdown";
+
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { STYLES } from "../constant/styles";
-import { ScreenNames } from "../constant/ScreenNames";
 import Loader from "../constant/Loader";
 import {
   New_lead_detail,
@@ -43,56 +41,7 @@ import {
 } from "react-native-responsive-screen";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
-const DATA = [
-  {
-    id: "1",
-    title: "Data Structures",
-  },
-  {
-    id: "2",
-    title: "STL",
-  },
-  {
-    id: "3",
-    title: "C++",
-  },
-  {
-    id: "4",
-    title: "Java",
-  },
-  {
-    id: "5",
-    title: "Python",
-  },
-  {
-    id: "6",
-    title: "CP",
-  },
-  {
-    id: "7",
-    title: "ReactJs",
-  },
-  {
-    id: "8",
-    title: "NodeJs",
-  },
-  {
-    id: "9",
-    title: "MongoDb",
-  },
-  {
-    id: "10",
-    title: "ExpressJs",
-  },
-  {
-    id: "11",
-    title: "PHP",
-  },
-  {
-    id: "12",
-    title: "MySql",
-  },
-];
+
 function Search() {
   const [modalVisible, setModalVisible] = useState(false);
   const [fontsLoaded] = useFonts({
@@ -104,6 +53,9 @@ function Search() {
   const navigation = useNavigation();
   const route = useRoute();
   const [data, setdata] = useState([]);
+  const [DATA1,setDATA1]= useState([]);
+  const [DATA2,setDATA2]= useState([]);
+ const[bg,setbg]=useState("white")
 
   const [Lead_type, setLead_type] = useState([]);
   const [Lead_site, setLead_site] = useState([]);
@@ -120,11 +72,10 @@ function Search() {
   const [site_txt, setsite_txt] = useState("");
   const [status_txt, setstatus_txt] = useState("");
   const [range_txt, setrange_txt] = React.useState("");
-  const [last_name, setLast_name] = React.useState("");
+  
   const [email_txt, setEmail_txt] = React.useState("");
   const [Modal_date, setmodal_date] = React.useState("");
-  const [Modal_date2, setmodal_date2] = React.useState("");
-  const modal_date_time=`${startDate} To ${EndDate}`;
+ 
 
   const [loading, setLoading] = React.useState(true);
   const [selected, setSelected] = useState("");
@@ -160,7 +111,8 @@ function Search() {
         .then((response) => response.json())
         .then((result) => {
           //  console.log(result?.data?.searchfilters)
-
+          setDATA1(result?.data?.searchfilters?.tags.user_tags)
+          setDATA2(result?.data?.searchfilters?.tags.system_tags)
           setLead_type(result?.data?.searchfilters?.lead_type);
           setLead_site(result?.data?.searchfilters?.lead_site);
           setAgent_data(result?.data?.searchfilters?.agent_name);
@@ -170,7 +122,7 @@ function Search() {
           setdaytime_range(result?.data?.searchfilters?.daytime_range);
           setdata(result?.data?.searchfilters?.lead_type);
           
-          // console.log(Lead_type)
+         
 
           var item = result?.data?.searchfilters?.lead_site.map((i)=>{
             return(i.label)
@@ -211,7 +163,7 @@ function Search() {
             customRight={true}
             onRightPress={() => {}}
           />
-          <ScrollView>
+          <ScrollView >
             <View style={styles.input}>
               <TextInput
                 style={{ fontSize: 16 }}
@@ -223,7 +175,7 @@ function Search() {
             </View>
             <View style={{ paddingHorizontal: "5%" }}>
               <View style={{}}>
-                <Text style={styles.name_txt}>{site_txt}</Text>
+                <Text style={styles.name_txt}>Tags</Text>
                 <View
                   style={{
                     backgroundColor: "white",
@@ -233,9 +185,11 @@ function Search() {
                     padding: "2%",
                   }}
                 >
+                  <ScrollView>
+                  <Text style={styles.title_txt}>User Tags</Text>
                   <FlatList
                     style={{}}
-                    data={DATA}
+                    data={DATA1}
                     numColumns={4}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item, index }) => (
@@ -254,15 +208,47 @@ function Search() {
                         <Text
                           style={{
                             textAlign: "center",
-                            fontSize: 12,
-                            color: "#6c6c6c",
+                            fontSize: wp("4.13%"),
+                            color: "#6c6c6c",width:"90%",fontFamily:"Inter-Black4"
                           }}
                         >
-                          {item.title}
+                          {item.label}
                         </Text>
                       </View>
                     )}
                   />
+                   <Text style={styles.title_txt2}>System Tags</Text>
+                  <FlatList
+                    style={{}}
+                    data={DATA2}
+                    numColumns={4}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item, index }) => (
+                      <View
+                        style={{
+                          backgroundColor: "#cccccc",
+                          marginEnd: "3%",
+                          marginBottom: "2%",
+                          height: height * 0.067,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 6,
+                          width: width * 0.195,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            fontSize: wp("4.13%"),
+                            color: "#6c6c6c",width:"98%",fontFamily:"Inter-Black4"
+                          }}
+                        >
+                          {item.label}
+                        </Text>
+                      </View>
+                    )}
+                  />
+                  </ScrollView>
                 </View>
                 {/* {console.log(First_name)} */}
                 <Text style={styles.name_txt}>Agent Name</Text>
@@ -314,7 +300,7 @@ function Search() {
                     setd(!d);
                   }}
                 >
-                  <Text style={styles.dropdown_txt}>All</Text>
+                  <Text style={styles.dropdown_txt}>{site_txt}</Text>
                   <AntDesign name="caretdown" size={24} color="#bfbfbf" />
                 </TouchableOpacity>
 
@@ -340,7 +326,14 @@ function Search() {
                             paddingStart: "5%",
                           }}
                         >
+                          <TouchableOpacity
+                          onPress={() => {
+                            setsite_txt(item.label),setd(!d),setbg(item.label)
+                          }}
+                          style={{backgroundColor : item.label == bg ? '#cccccc' : 'white'}}
+                          >
                           <Text
+                          
                             style={{
                               fontSize: 17,
                               color: "black",
@@ -349,6 +342,8 @@ function Search() {
                           >
                             {item.label}
                           </Text>
+                          </TouchableOpacity>
+
                           <View
                             style={{ backgroundColor: "#cccccc", height: 1 }}
                           ></View>
@@ -721,6 +716,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  title_txt:{ 
+  fontSize: wp("4.23%"),marginBottom:"4%",
+  color: "black",fontFamily:"Inter-Black"},
+  title_txt2:{ 
+    fontSize: wp("4.23%"),marginTop:"2%",marginBottom:"4%",
+    color: "black",fontFamily:"Inter-Black"},
   start_end_date: {
     fontSize: 15,
     color: "#cccccc",
@@ -889,7 +890,7 @@ const styles = StyleSheet.create({
     marginBottom: "5%",
   },
   name_txt: {
-    fontSize: 14,
+    fontSize: wp("4.43%"),
     color: Colors.blue_txt,
     fontFamily: "Inter-Black2",
     marginBottom: "1%",

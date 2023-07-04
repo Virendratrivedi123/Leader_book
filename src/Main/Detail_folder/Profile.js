@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useFonts } from 'expo-font';
 import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import {
   Dimensions,
   Text,
   View,
@@ -19,7 +23,7 @@ import {
  
 } from "@expo/vector-icons";
 import { ScreenNames } from "../../constant/ScreenNames";
-import { get_leads_basic_detail } from "../../Services";
+import { Pin_note, get_leads_basic_detail } from "../../Services";
 import Loader from "../../constant/Loader";
 
 const height = Dimensions.get("window").height;
@@ -38,14 +42,16 @@ function Profile({data}) {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   
-  const [d, setd] = useState(data?.pined_note == "Yes" ? 3 : 0);
+  
   const [note, setnote] = useState(data?.pined_note_text);
   const [n, setn] = useState("");
-  const [pin_date, setpin_date] = useState(data?.pinned_date);
-  const [icon_note, seticon_note] = useState(data?.pined_note);
-  const [modalTitle2, setModalTitle2] = useState(data?.pinned_by);
+  const [pin_date, setpin_date] = useState("");
+  
+  const [modalTitle2, setModalTitle2] = useState(data?.pinned_by)
   const [profile, setprofile] = useState("");
   const [loading, setLoading] = React.useState(true);
+  const [d, setd] = useState(icon_note == "Yes" ? 3:0);
+  
 
   useEffect(() => {
     (async () => {
@@ -62,9 +68,12 @@ function Profile({data}) {
       get_leads_basic_detail(data)
         .then((response) => response.json())
         .then((result) => {
-         
+          setModalTitle2(result?.data?.lead_detail?.Lead.pinned_by?.value)
          setprofile(result?.data?.lead_detail?.lead_profile?.is_profile_exist)
-         
+         setnote(result?.data?.lead_detail.Lead?.pinned_note_text?.value)
+          seticon_note(result?.data?.lead_detail?.Lead.pined_note)
+          setpin_date(result?.data?.lead_detail?.Lead.pinned_date?.value)
+          setd(result?.data?.lead_detail?.Lead.pined_note=="Yes"?3:0)
 
          
          
@@ -78,7 +87,69 @@ function Profile({data}) {
     })();
   }, []);
 
-  console.log(profile)
+  const [icon_note, seticon_note] = useState("");
+
+  
+  
+  const postdata = async () => {
+    try {
+     
+
+      const user_data = await AsyncStorage.getItem("user_data");
+      // const drop_data = await AsyncStorage.getItem("dropdown_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+        pin_text: note,
+        id: User_data.id,
+        password: d.password,
+      };
+      Pin_note(data).then((response) => {
+        response.json().then((data) => {
+          // console.log(data);
+         
+          call_api(),note.length > 0 ? setd(3):setd(0);
+          setModalTitle2(result?.data?.lead_detail?.Lead.pinned_by?.value)
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const call_api = async () => {
+    try {
+      setLoading(true)
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      const data = {
+        email: d.email,
+        password: d.password,
+        id: User_data.id,
+      };
+      get_leads_basic_detail(data)
+        .then((response) => response.json())
+        .then((result) => {
+         
+
+          
+          setnote(result?.data?.lead_detail?.Lead?.pinned_note_text?.value)
+          seticon_note(result?.data?.lead_detail?.Lead.pined_note)
+          setpin_date(result?.data?.lead_detail?.Lead.pinned_date?.value)
+         
+          
+          setLoading(false);
+        
+
+          // setLoading(false);
+        })
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  // console.log(profile)
   return (
     
     <View style={styles.container}>
@@ -127,13 +198,15 @@ function Profile({data}) {
             source={Images.state}
             style={styles.img} />
           <Text style={styles.txt}>Properties Viewed</Text>
-        </TouchableOpacity></>:null}
+        </TouchableOpacity></>:<View style={styles.null_txt}>
+          <Text style={{fontSize: wp("6%"),width:"70%",fontFamily: "Inter-Black2",color:"#6c6c6c",textAlign:"center"}}>"There is no Profile exist for this lead"</Text>
+        </View>}
       
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         style={styles.floating_btn}
       >
-        { icon_note == "Yes" ? (
+        { loading ? null: icon_note == "Yes" ? (
           <Image
             style={{
               width: Dimensions.get('window').width * 0.13,
@@ -158,10 +231,10 @@ function Profile({data}) {
         <Text
           onPress={() => {
             navigation.navigate(ScreenNames.LEAD_ACTIVITY, {
-              name: User_data.name,
-              logo1: User_data.name_initials,
+              name: User_data?.name,
+              logo1: User_data?.name_initials,
 
-              id: User_data.id,
+              id: User_data?.id,
             });
           }}
           style={{ color: "white", fontSize: 20 ,fontFamily:"Inter-Black"}}
@@ -170,13 +243,14 @@ function Profile({data}) {
         </Text>
       </View>
       
-      {d == 1 ? (
+     
+          {d == 1 ? (
                 <Modal
                   animationType="slide"
                   transparent={true}
                   visible={modalVisible}
                   onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
+                   
                     setModalVisible(!modalVisible);
                   }}
                 >
@@ -197,6 +271,8 @@ function Profile({data}) {
                       <KeyboardAvoidingView enabled>
                         <View style={styles.input}>
                           <TextInput
+                        style={{padding:10,textAlignVertical: 'top',height:"100%"}}
+
                             //  value={""}
                             onChangeText={(txt) => (setnote(txt), setn(txt))}
                           />
@@ -206,7 +282,7 @@ function Profile({data}) {
                         {n.length > 0 ? (
                           <TouchableOpacity
                             onPress={() => {
-                              setd(3);
+                            postdata(),  setModalVisible(!modalVisible)
                             }}
                             style={styles.modal_btn}
                           >
@@ -242,7 +318,7 @@ function Profile({data}) {
                   transparent={true}
                   visible={modalVisible}
                   onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
+                    
                     setModalVisible(!modalVisible);
                   }}
                 >
@@ -254,11 +330,13 @@ function Profile({data}) {
                           <Entypo name="cross" size={30} color="black" />
                         </Pressable>
                       </View>
-                      <View style={styles.line2}></View>
+                      <View style={styles.line}></View>
 
                       <KeyboardAvoidingView enabled>
                         <View style={styles.input}>
                           <TextInput
+                        style={{padding:10,textAlignVertical: 'top',height:"100%"}}
+
                             value={note}
                             onChangeText={(txt) => setnote(txt)}
                           />
@@ -267,7 +345,7 @@ function Profile({data}) {
                       <View style={styles.modal_btn_box}>
                         <TouchableOpacity
                           onPress={() => {
-                            setd(3);
+                          postdata(),  setModalVisible(!modalVisible)
                           }}
                           style={styles.modal_btn}
                         >
@@ -293,14 +371,14 @@ function Profile({data}) {
                   transparent={true}
                   visible={modalVisible}
                   onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
+                   
                     setModalVisible(!modalVisible);
                   }}
                 >
                   <View style={styles.modal_page}>
                     <View style={styles.modalView}>
                       <View style={styles.pin}>
-                        <Text style={styles.modalText}>Pin note</Text>
+                        <Text style={styles.modalText}>Pin Note</Text>
                         <Pressable
                           style={{}}
                           onPress={() => setModalVisible(!modalVisible)}
@@ -324,7 +402,7 @@ function Profile({data}) {
                         }}
                         style={styles.add_note}
                       >
-                        <Text style={{ color: "white" }}>Add Note</Text>
+                        <Text style={{ color: "white",fontSize: wp("6%"),fontFamily: "Inter-Black4" }}>Add Note</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -335,7 +413,7 @@ function Profile({data}) {
                   transparent={true}
                   visible={modalVisible}
                   onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
+                    
                     setModalVisible(!modalVisible);
                   }}
                 >
@@ -347,7 +425,8 @@ function Profile({data}) {
                           style={{}}
                           onPress={() => (
                             setModalVisible(!modalVisible)
-                            // , setd(0), setn("")
+                            // , 
+                            // setd(0), setn("")
                           )}
                         >
                           <Entypo name="cross" size={30} color="black" />
@@ -367,6 +446,7 @@ function Profile({data}) {
                   </View>
                 </Modal>
               ) : null}
+        
           
       
     </View>
@@ -374,8 +454,8 @@ function Profile({data}) {
 }
 
 const styles = StyleSheet.create({
- 
-  update_txt: { color: "white", fontSize: 17 ,fontFamily:"Inter-Black"},
+  null_txt: { flex: 1, alignItems: "center", justifyContent: "center", },
+  update_txt: { color: "white",fontSize: wp("6%"),fontFamily: "Inter-Black4"},
   note3: { color: "black", margin: "4%", fontSize: 14 ,fontFamily:"Inter-Black"},
   date: {
     color: "black",
@@ -433,7 +513,7 @@ const styles = StyleSheet.create({
   modal_page: {
     flex: 1,
     backgroundColor: "rgba(52, 52, 52, 0.7)",
-    marginTop: height*0.12,
+   
   },
   pin: {
     flexDirection: "row",
@@ -441,8 +521,8 @@ const styles = StyleSheet.create({
     margin: "4%",
   },
   add_note: {
-    height: height * 0.05,
-    width: width * 0.3,
+    height: height * 0.065,
+    width: width * 0.36,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
     marginTop: height*0.22,
@@ -452,8 +532,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   update_note: {
-    height: height * 0.05,
-    width: width * 0.3,
+    height: height * 0.065,
+    width: width * 0.36,
     backgroundColor: "#5bbfdf",
     alignSelf: "center",
     marginTop: "48%",
@@ -493,7 +573,7 @@ const styles = StyleSheet.create({
     height: height * 0.25,
     margin: 12,
 
-    padding: 10,
+  
     backgroundColor: "#f2f2f2",
     borderRadius: 8,
   },
@@ -515,7 +595,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 5,
-    alignSelf: "center",
+    alignSelf: "center",marginTop: height*0.12,
   },
   modalView2: {
     // height: height * 0.44,
@@ -524,7 +604,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 5,
-    alignSelf: "center",
+    alignSelf: "center",marginTop: height*0.12,
   },
   modalView1: {
     // height: height * 0.44,
@@ -533,7 +613,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
 
     elevation: 20,
-    alignSelf: "center",
+    alignSelf: "center",marginTop: height*0.12,
   },
   container: {
     flex: 1,

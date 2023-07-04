@@ -28,7 +28,8 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 
-import Header_login from "./components/header_login";
+import Header from "./components/header";
+import { Images } from "./constant/images";
 
 
 const height = Dimensions.get("window").height;
@@ -50,14 +51,14 @@ function Login_screen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible3, setModalVisible3] = useState(false);
-  // React.useEffect(() => {
-  //   (async () => {
-  //     const user = await AsyncStorage.getItem("userInfo");
-  //     if (user) {
-  //       navigation.navigate(ScreenNames.DRAWER);
-  //     }
-  //   })();
-  // }, []);
+  React.useEffect(() => {
+    (async () => {
+      const user = await AsyncStorage.getItem("userInfo");
+      if (user) {
+        navigation.navigate(ScreenNames.DRAWER);
+      }
+    })();
+  }, []);
 
   const login_method = async () => {
     if (email == "") {
@@ -112,11 +113,9 @@ function Login_screen() {
   return (
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <View>
-        {/* <View style={STYLES.login_box}>
-          <Text style={styles.login}>Login</Text>
-        </View> */}
-        <Header_login
-        label="Login"
+        
+        <Header
+        label3="Login"
         // leftIcon={Images.menu}
         // rightIcon={Images.search}
         // onLeftPress={() => navigation.toggleDrawer()}
@@ -258,8 +257,8 @@ function Login_screen() {
 }
 
 const styles = StyleSheet.create({
-  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"8%" },
-  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"8%",marginTop:"1%",color:"#262626",},
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
   textStyle3: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
 
   centeredView: {
@@ -272,7 +271,7 @@ const styles = StyleSheet.create({
   modalView: {
     width: "80%",
     backgroundColor: "#ececee",
-    borderRadius: 15,
+    borderRadius: 20,
 
     elevation: 5,
     alignSelf: "center",alignItems:"center",justifyContent:"center",

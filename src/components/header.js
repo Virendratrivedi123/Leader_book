@@ -19,7 +19,7 @@ export default function Header({
   onLeftPress,
   showLeftIconBorder,
   showRightIconBorder,
-  customRight,
+  customRight,customRight2,customRight3,rightIcon2,label2,label3
 }) {
   const [fontsLoaded] = useFonts({
     'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
@@ -40,8 +40,10 @@ export default function Header({
       ) : (
         <View />
       )}
-
-      <Text style={{...styles.headerTitle, marginLeft:customRight?15:0}}>{label}</Text>
+        {label ?( <Text style={{...styles.headerTitle, marginLeft:customRight?15:0}}>{label}</Text>):label2?
+        <Text style={{...styles.headerTitle2, marginLeft:customRight?15:0}}>{label2}</Text>:label3 ? <Text style={{...styles.headerTitle3, marginLeft:customRight?15:0}}>{label3}</Text>
+        :null}
+      
       {rightIcon ? (
         <TouchableOpacity
           // style={styles.penIconView}
@@ -57,10 +59,33 @@ export default function Header({
             ]}
           />
         </TouchableOpacity>
-      ) : customRight ? (
-        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"yellow",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
-          <Text style={{fontSize:15,color:"yellow",fontFamily:"Inter-Black2",}}> SAVE </Text>
+      ) : rightIcon2 ? (
+        <TouchableOpacity
+          // style={styles.penIconView}
+          style={showRightIconBorder !== false && styles.penIconView}
+          onPress={onRightPress}
+          hitSlop={{ top: 50, right: 50, left: 50, bottom: 50 }}
+        >
+          <Image
+            source={rightIcon2}
+            style={[
+              showRightIconBorder == false && { height: 30, width: 30 },
+              styles.rightIcon2,
+            ]}
+          />
         </TouchableOpacity>
+      ) : customRight ? (
+        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"#ace600",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
+          <Text style={{fontSize:15,color:"#ace600",fontFamily:"Inter-Black2",}}> SAVE </Text>
+        </TouchableOpacity>
+      ) : customRight2 ? (
+        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"#ace600",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
+          <Text style={{fontSize:15,color:"#ace600",fontFamily:"Inter-Black2",}}> Update </Text>
+        </TouchableOpacity>
+      )  :customRight3 ? (
+        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"#ace600",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
+        <Text style={{fontSize:15,color:"#ace600",fontFamily:"Inter-Black2",paddingHorizontal:"3%"}}> Add </Text>
+      </TouchableOpacity>
       ) : (
         <View />
       )}
@@ -85,6 +110,20 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "center",fontFamily:"Inter-Black"
   },
+  headerTitle2: {
+    // fontFamily: Fonts.poppinsMeduim,
+    fontSize: wp("7%"),
+    color: "white",
+    flex: 1,
+    textAlign: "center",fontFamily:"Inter-Black2"
+  },
+  headerTitle3: {
+    // fontFamily: Fonts.poppinsMeduim,
+    fontSize: wp("7.53%"),
+    color: "white",
+    flex: 1,
+    textAlign: "center",fontFamily:"Inter-Black"
+  },
   penIconView: {
     // backgroundColor: '#4E4E50',
     alignItems: "center",
@@ -103,4 +142,9 @@ const styles = StyleSheet.create({
     width: wp("7.58%"),
     resizeMode: "contain",
   },
+  rightIcon2: {
+    height: hp("4.21%"),
+     width: wp("4.58%"),
+     resizeMode: "contain",
+   },
 });

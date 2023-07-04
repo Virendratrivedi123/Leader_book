@@ -11,10 +11,7 @@ import {
   MaterialIcons,
   Octicons,
 } from "@expo/vector-icons";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { useFonts } from 'expo-font';
 import {
   Dimensions,
   Image,
@@ -33,13 +30,12 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import { ScreenNames } from "../../constant/ScreenNames";
-import { STYLES } from "../../constant/styles";
-import Header from "../header";
-import { Images } from "../../constant/images";
-import { Colors } from "../../constant/colors";
-import { useFonts } from 'expo-font';
+import { ScreenNames } from "../../../../constant/ScreenNames";
 
+import { Colors } from "../../../../constant/colors";
+import { STYLES } from "../../../../constant/styles";
+import { Images } from "../../../../constant/images";
+import Header from "../../../../components/header";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -49,12 +45,12 @@ const dt = [
   { label: "okay", value: "2" },
 ];
 
-function Add_appointment() {
+function Apage() {
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../../assets/fonts/Mulish-Regular.ttf'),
+    'Inter-Black': require('../../../../../assets/fonts/Mulish-SemiBold.ttf'),
+    'Inter-Black2': require('../../../../../assets/fonts/Mulish-Bold.ttf'),
+    'Inter-Black3': require('../../../../../assets/fonts/Mulish-ExtraBold.ttf'),
+    'Inter-Black4': require('../../../../../assets/fonts/Mulish-Regular.ttf'),
    
   });
   const navigation = useNavigation();
@@ -129,7 +125,7 @@ function Add_appointment() {
         label="Add Appointment"
         leftIcon={Images.backArrow}
         // rightIcon={Images.search}
-        onLeftPress={() => navigation.navigate(ScreenNames.APPOINTMENTS)}
+        onLeftPress={() => navigation.goBack()}
         onRightPress={() => {}}
         customRight3={true}
       />
@@ -163,8 +159,7 @@ function Add_appointment() {
           <View style={styles.line2}></View>
           <Text style={styles.name_txt}>Site</Text>
           <Dropdown
-            style={{ }}
-            containerStyle={styles.drop_cnt}
+            style={[styles.dropdown2]}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
@@ -183,7 +178,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingEnd: "3%" }}
+                style={{ paddingHorizontal: "5%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -211,10 +206,9 @@ function Add_appointment() {
           <View style={styles.line2}></View>
           <Text style={styles.name_txt}>All Day Event</Text>
           <Dropdown
-             style={{ }}
-             containerStyle={styles.drop_cnt}
-             placeholderStyle={styles.placeholderStyle}
-             selectedTextStyle={styles.selectedTextStyle}
+            style={[styles.dropdown2]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             data={dt}
@@ -231,7 +225,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingEnd: "3%" }}
+                style={{ paddingHorizontal: "5%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -303,10 +297,9 @@ function Add_appointment() {
           </View>
 
           <Dropdown
-             style={{ }}
-             containerStyle={styles.drop_cnt}
-             placeholderStyle={styles.placeholderStyle}
-             selectedTextStyle={styles.selectedTextStyle}
+            style={[styles.dropdown]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             data={dt}
@@ -323,7 +316,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingEnd: "3%" }}
+                style={{ paddingHorizontal: "5%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -340,10 +333,9 @@ function Add_appointment() {
             <Text style={styles.name_txt}>Time Unit</Text>
           </View>
           <Dropdown
-             style={{ }}
-             containerStyle={styles.drop_cnt}
-             placeholderStyle={styles.placeholderStyle}
-             selectedTextStyle={styles.selectedTextStyle}
+            style={[styles.dropdown]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             data={dt}
@@ -360,7 +352,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingEnd: "3%" }}
+                style={{ paddingHorizontal: "5%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -373,10 +365,9 @@ function Add_appointment() {
             <Text style={styles.name_txt}>Show Time As</Text>
           </View>
           <Dropdown
-             style={{ }}
-             containerStyle={styles.drop_cnt}
-             placeholderStyle={styles.placeholderStyle}
-             selectedTextStyle={styles.selectedTextStyle}
+            style={[styles.dropdown]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             data={dt}
@@ -393,7 +384,7 @@ function Add_appointment() {
             }}
             renderRightIcon={() => (
               <AntDesign
-                style={{ paddingEnd: "3%" }}
+                style={{ paddingHorizontal: "5%" }}
                 color="#003366"
                 name="downsquare"
                 size={30}
@@ -584,12 +575,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  img: {
-    height: hp("4.51%"),
-    width: wp("7%"),
-    resizeMode: "contain",
-    marginEnd: "1%",
-  },
+
   done: { flex: 0.4, fontSize: 18, fontFamily:"Inter-Black2" },
   date: { flex: 0.8, fontSize: 14, color: "#cccccc",fontFamily:"Inter-Black4" },
   datePickerStyle: {
@@ -656,17 +642,17 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "100%",
   },
-  selectedTextStyle: { color: "#8c8c8c",fontFamily:"Inter-Black4",marginStart:"12%" },
+  selectedTextStyle: { color: "#8c8c8c",fontFamily:"Inter-Black4" },
   icon2: {
     marginTop: "8%",
-    height: hp("4.51%"),
-    width: wp("7%"),
+    height: 25,
+    width: 25,
     resizeMode: "contain",
     marginHorizontal: "2.5%",
   },
   cancel: {
-    height: hp("4.51%"),
-    width: wp("7%"),
+    height: 25,
+    width: 25,
     resizeMode: "contain",
   },
   icon4: { marginTop: "8%", flex: 0.15, fontSize: 28, marginStart: "-1%" },
@@ -688,8 +674,6 @@ const styles = StyleSheet.create({
     marginStart: "12%",
     marginTop: "5%",
   },
-  drop_cnt:{borderRadius:6,width: "86%",
-  marginStart: "12%",marginTop:"1%",height:height*0.15},
   line: {
     backgroundColor: "grey",
     height: 1,
@@ -703,7 +687,7 @@ const styles = StyleSheet.create({
     height: 1,
 
     width: "86%",
-    marginStart: "12%",
+    marginStart: "14%",
     marginTop: "8%",
   },
   line2: {
@@ -766,4 +750,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Add_appointment;
+export default Apage;

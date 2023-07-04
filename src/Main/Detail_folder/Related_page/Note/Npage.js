@@ -14,9 +14,10 @@ import {
   Ionicons,
 } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Colors } from "../../../constant/colors";
-import { STYLES } from "../../../constant/styles";
-import { Images } from "../../../constant/images";
+import { Colors } from "../../../../constant/colors";
+import { STYLES } from "../../../../constant/styles";
+import { Images } from "../../../../constant/images";
+import Header from "../../../../components/header";
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -27,48 +28,14 @@ function Npage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{height: height * 0.1,
-    backgroundColor: Colors.MAIN_COLOR,
-    alignItems: "center",
-
-    // marginTop: 25,
-    flexDirection: "row",justifyContent:"space-between"}}>
-      <TouchableOpacity
-            style={{ marginStart: "4%",   }}
-            onPress={() =>  navigation.goBack()}
-          >
-           <Image
-            source={Images.backArrow}
-            style={{ height: height*0.032, width: 30, resizeMode: "contain" }}
-          />
-          </TouchableOpacity>
-        <Text
-            style={{
-              color: "white",
-              fontWeight: "400",
-              fontSize: 20,
-              
-            }}
-          >
-           
-          </Text>
-        <TouchableOpacity
-            style={{
-              
-              
-              alignItems:"center",marginEnd:"3%",justifyContent:"center",borderColor:"yellow",borderWidth:1.3,borderRadius:15,height:25
-            }}
-            onPress={() => {}}
-          >
-            <Text
-              style={{
-                fontSize:15,color:"yellow",fontFamily:"Inter-Black2",paddingHorizontal:2
-              }}
-            >
-              SAVE
-            </Text>
-          </TouchableOpacity>
-      </View>
+      <Header
+        // label="Add Appointment"
+        leftIcon={Images.backArrow}
+        // rightIcon={Images.search}
+        onLeftPress={() => navigation.goBack()}
+        onRightPress={() => {}}
+        customRight={true}
+      />
 
       <View style={{}}>
       <TextInput
@@ -76,6 +43,7 @@ function Npage() {
         placeholder="Note"
         // onChangeText={onChangeText}
         // value={text}
+        placeholderTextColor={"#6c6c6c"}
       />
       </View>
     </SafeAreaView>
@@ -89,11 +57,11 @@ const styles = StyleSheet.create({
   input: {
     
     
-    padding: 20,
+    padding: 15,
     
     
     color: "#6c6c6c",
-    fontSize: 17,fontWeight:"500"
+    fontSize: 14,fontWeight:"500"
   },
   button: {
     height: height * 0.085,
