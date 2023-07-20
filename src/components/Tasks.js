@@ -29,7 +29,7 @@ function Tasks() {
       <Header
         label="Tasks"
         leftIcon={Images.menu}
-        rightIcon={Images.time}
+        // rightIcon={Images.time}
         onLeftPress={() => navigation.toggleDrawer()}
       />
       <View style={{}}>

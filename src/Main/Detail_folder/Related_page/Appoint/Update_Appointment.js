@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
+import { FlatList, ScrollView } from "react-native-gesture-handler";
+import SelectDropdown from 'react-native-select-dropdown';
 import {
   Entypo,
   Ionicons,
@@ -28,7 +30,7 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
+
 
 
 import { Colors } from "../../../../constant/colors";
@@ -40,13 +42,11 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
+import { Edit_Appointment_detail, Update_lead_appointment } from "../../../../Services";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
-const dt = [
-  { label: "ok", value: "1" },
-  { label: "okay", value: "2" },
-];
+
 
 function Update_Appointment() {
   const [fontsLoaded] = useFonts({
@@ -69,7 +69,26 @@ function Update_Appointment() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible3, setModalVisible3] = useState(false);
+  const [modalVisible5, setModalVisible5] = useState(false);
   const [com, setcom] = useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const route = useRoute();
+  const [subject, setsubject] = useState("");
+  const [notes, setnotes] = useState("");
+  const[reminder_data,setreminder_data]=useState([])
+  const[st_data,setst_data]=useState([])
+  const[pr_data,setpr_data]=useState([])
+  const [location, setlocation] = useState("");
+  const [reminder, setreminder] = useState("");
+  const [reminder_time, setreminder_time] = useState("");
+  const [reminder_time_unit, setreminder_time_unit] = useState("");
+  const [day_event, setday_event] = useState("No");
+  const [time_as, settime_as] = useState("");
+  const [d, setd] = useState(false);
+  const [d1, setd1] = useState(false);
+  const [d2, setd2] = useState(false);
+
+
 
   const showDatePicker2 = () => {
     setDatePickerVisibility(true);
@@ -121,6 +140,91 @@ function Update_Appointment() {
     // console.warn("A date has been picked: ", date);
     hidetimePicker();
   };
+
+  useEffect(() => {
+    (async () => {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        id:route?.params.id
+      };
+
+      Edit_Appointment_detail(data)
+        .then((response) => response.json())
+        .then((result) => {
+          
+          // console.log(result)
+        var data= result?.data?.appointment_fields_arr
+        
+        
+         setsubject(data?.subject?.value)
+         setnotes(data?.notes?.value)
+         setlocation(data?.location?.value)
+        settime_as(data?.show_time_as?.value)
+        setreminder_time_unit(data?.reminder_time_unit?.value)
+       
+         setdate_time(data?.reminder_time?.value)
+         setdate(data?.start_time?.value)
+         setdate1(data?.end_time?.value)
+         setreminder_data(data?.reminder?.dropdown_arr)
+         setst_data(data?.show_time_as?.dropdown_arr)
+         setpr_data(data?.reminder_time_unit?.dropdown_arr)
+         setValue1(data?.reminder?.value)
+        //  setValue3(data?.enable_reminder?.value)
+        //  setValue4(data?.status?.value)
+        //  setValue5(data?.priority?.value)
+         
+         
+          
+          setLoading(false);
+        })
+
+        .catch((error) => console.log("error", error));
+    })();
+  }, []);
+
+
+
+  const postdata = async () => {
+    try {
+      const user_data = await AsyncStorage.getItem("user_data");
+      // const drop_data = await AsyncStorage.getItem("dropdown_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+        password: d.password,
+        appointment_id: route?.params?.id,
+        reminder_time_unit: reminder_time_unit,
+        notes: notes,
+        subject: subject,
+        reminder_time: reminder_time,
+        reminder: value4,
+        end_date: date1,
+        day_event: day_event,
+        start_date: date,
+         lead_id:route.params.lead_id,
+        location: location,
+        time_as: time_as,
+      };
+     Update_lead_appointment(data).then((response) => {
+        response.json().then((data) => {
+          console.log(data)
+          // Alert.alert(data.msg);
+          setModalVisible5(true)
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -128,7 +232,7 @@ function Update_Appointment() {
         leftIcon={Images.backArrow}
         // rightIcon={Images.search}
         onLeftPress={() => navigation.goBack()}
-        onRightPress={() => {}}
+        onRightPress={() => {postdata()}}
         customRight2={true}
       />
       <ScrollView>
@@ -143,8 +247,21 @@ function Update_Appointment() {
           <TextInput
             placeholder="Enter Subject"
             style={styles.input}
-            //   value={text_sign}
-            //   onChangeText={(txt) => setText_sign(txt)}
+              value={subject}
+              onChangeText={(txt) => setsubject(txt)}
+            placeholderTextColor={"#cccccc"}
+          ></TextInput>
+
+          
+         
+
+          <View style={styles.line2}></View>
+          <Text style={styles.name_txt}>Location</Text>
+          <TextInput
+            placeholder="Enter Subject"
+            style={styles.input}
+              value={location}
+              onChangeText={(txt) => setlocation(txt)}
             placeholderTextColor={"#cccccc"}
           ></TextInput>
 
@@ -212,115 +329,184 @@ function Update_Appointment() {
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.set_alarm}></Image>
-            <Text style={styles.name_txt2}>Enable Reminder</Text>
+            <Text style={styles.name_txt2}>Reminder</Text>
           </View>
-
-          <Dropdown
-            style={{}}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            data={dt}
-            search={false}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder={""}
-            value={value3}
-            //   onFocus={() => setIsFocus(true)}
-            //   onBlur={() => setIsFocus(false)}
-            onChange={(i) => {
-              setValue3(i.value);
+          
+          <SelectDropdown
+            data={reminder_data}
+            defaultValueByIndex={value1}
+            // defaultValue={'India'}
+            onSelect={(selectedItem, index) => {
+              setreminder(selectedItem.label)
             }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={{ paddingHorizontal: "5%" }}
-                color="#003366"
-                name="downsquare"
-                size={30}
-              />
-            )}
+           
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem.label;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item.label;
+            }}
+            buttonStyle={styles.dropdown1BtnStyle}
+            buttonTextStyle={styles.dropdown1BtnTxtStyle}
+            renderDropdownIcon={isOpened => {
+              return  <AntDesign
+              style={styles.icon}
+              color="#003366"
+              name="downsquare"
+              size={30}
+            />
+            }}
+            dropdownIconPosition={"right"}
+            dropdownStyle={styles.dropdown1DropdownStyle}
+            rowStyle={styles.dropdown1RowStyle}
+            rowTextStyle={styles.dropdown1RowTxtStyle}
+            dropdownOverlayColor="rgba(52, 52, 52, 0)"
           />
+          <View style={styles.line2}></View>
          
          
-          <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.graph}></Image>
-            <Text style={styles.name_txt2}>Status</Text>
+            <Image style={styles.icon2} source={""}></Image>
+            <Text style={styles.name_txt2}>Time Unit</Text>
           </View>
-          <Dropdown
-            style={{}}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            data={dt}
-            search={false}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder={""}
-            value={value4}
-            //   onFocus={() => setIsFocus(true)}
-            //   onBlur={() => setIsFocus(false)}
-            onChange={(i) => {
-              setValue4(i.value);
-            }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={{ paddingHorizontal: "5%" }}
-                color="#003366"
-                name="downsquare"
-                size={30}
-              />
-            )}
-          />
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.warning}></Image>
-            <Text style={styles.name_txt2}>Priority</Text>
-          </View>
-          <Dropdown
-            style={{}}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            data={dt}
-            search={false}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder={""}
-            value={value5}
-            //   onFocus={() => setIsFocus(true)}
-            //   onBlur={() => setIsFocus(false)}
-            onChange={(i) => {
-              setValue5(i.value);
-            }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={{ paddingHorizontal: "5%" }}
-                color="#003366"
-                name="downsquare"
-                size={30}
-              />
-            )}
-          />
+          <TouchableOpacity
+                  style={styles.dropdown}
+                  activeOpacity={1}
+                  onPress={() => {
+                    setd1(!d1);
+                  }}
+                >
+                  <Text style={styles.dropdown_txt}>{reminder_time_unit}</Text>
+                  <AntDesign
+                        style={styles.icon}
+                        color="#003366"
+                        name="downsquare"
+                        size={30}
+                      />
+                </TouchableOpacity>
+                <View style={styles.line2}></View>
+                {d1 ? (
+                  <View
+                    style={{
+                      backgroundColor: "white",
+                      height: height * 0.13,
+                      width:"86%",marginStart:"12%",
+                      
+                      borderRadius: 6,
+                      marginTop: "1%",
+                    }}
+                  >
+                    <FlatList
+                      style={{}}
+                      data={pr_data}
+                      // numColumns={4}
+                      keyExtractor={(item) => item.id}
+                      renderItem={({ item, index }) => (
+                        <View
+                          style={{
+                            paddingStart: "5%",
+                          }}
+                        >
+                          <TouchableOpacity
+                          onPress={() => {
+                           
+                            setreminder_time_unit(item.value),setd1(!d1)
+                          }}
+                          style={{}}
+                          >
+                          <Text
+                          
+                            style={{
+                              fontSize: 17,
+                              color: "black",
+                              marginVertical: "5%",
+                            }}
+                          >
+                            {item.label}
+                          </Text>
+                          </TouchableOpacity>
 
-          <View style={styles.line2}></View>
+                          <View
+                            style={{ backgroundColor: "#cccccc", height: 1 }}
+                          ></View>
+                        </View>
+                      )}
+                    />
+                  </View>
+                ) : null}
+          
           <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.percentage}></Image>
-            <Text style={styles.name_txt2}>Complete(%)</Text>
+            <Image style={styles.icon2} source={""}></Image>
+            <Text style={styles.name_txt2}>Show Time As</Text>
           </View>
-          <TextInput
-            // placeholder="Reminder"
-            style={styles.input2}
-            //   value={text_sign}
-            //   onChangeText={(txt) => setText_sign(txt)}
-          ></TextInput>
-          <View style={styles.line2}></View>
+          <TouchableOpacity
+                  style={styles.dropdown}
+                  activeOpacity={1}
+                  onPress={() => {
+                    setd(!d);
+                  }}
+                >
+                  <Text style={styles.dropdown_txt}>{time_as}</Text>
+                  <AntDesign
+                        style={styles.icon}
+                        color="#003366"
+                        name="downsquare"
+                        size={30}
+                      />
+                </TouchableOpacity>
+                <View style={styles.line2}></View>
+                {d ? (
+                  <View
+                    style={{
+                      backgroundColor: "white",
+                      height: height * 0.13,
+                      width:"86%",marginStart:"12%",
+                      
+                      borderRadius: 6,
+                      marginTop: "1%",
+                    }}
+                  >
+                    <FlatList
+                      style={{}}
+                      data={st_data}
+                      // numColumns={4}
+                      keyExtractor={(item) => item.id}
+                      renderItem={({ item, index }) => (
+                        <View
+                          style={{
+                            paddingStart: "5%",
+                          }}
+                        >
+                          <TouchableOpacity
+                          onPress={() => {
+                           
+                            settime_as(item.value),setd(!d)
+                          }}
+                          style={{}}
+                          >
+                          <Text
+                          
+                            style={{
+                              fontSize: 17,
+                              color: "black",
+                              marginVertical: "5%",
+                            }}
+                          >
+                            {item.label}
+                          </Text>
+                          </TouchableOpacity>
+
+                          <View
+                            style={{ backgroundColor: "#cccccc", height: 1 }}
+                          ></View>
+                        </View>
+                      )}
+                    />
+                  </View>
+                ) : null}
+          
+         
+          
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.task_note}></Image>
             <Text style={styles.name_txt2}>Notes</Text>
@@ -328,8 +514,8 @@ function Update_Appointment() {
           <TextInput
             // placeholder="Reminder"
             style={styles.input2}
-            //   value={text_sign}
-            //   onChangeText={(txt) => setText_sign(txt)}
+              value={notes}
+              onChangeText={(txt) => setnotes(txt)}
           ></TextInput>
           <View style={styles.line3}></View>
         </View>
@@ -494,6 +680,39 @@ function Update_Appointment() {
           </View>
         </View>
       </Modal>
+      <View style={styles.centeredView_box}>
+          <Modal
+            transparent={true}
+            visible={modalVisible5}
+            onRequestClose={() => {
+              
+              setModalVisible5(!modalVisible5);
+            }}
+          >
+            <View style={styles.centeredView_box}>
+              <View style={styles.modalView_box}>
+                <Text style={styles.textStyle1_box}>Lead Booker</Text>
+                <Text style={styles.textStyle2_box}>Appointment has been updated successfully.</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                   
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                    setModalVisible5(!modalVisible5),navigation.pop(2)
+                  }}
+                >
+                  <Text style={styles.textStyle3_box}>OK</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+        </View>
     </SafeAreaView>
   );
 }
@@ -502,9 +721,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
-  done: { flex: 0.4, fontSize: 18, fontFamily:"Inter-Black2" },
-  date: { flex: 0.8, fontSize: 14, color: "#cccccc",fontFamily:"Inter-Black4" },
+  
+  
+  done: { flex: 0.4, fontSize: 18, fontFamily: "Inter-Black2" },
+  date: {
+    flex: 0.8,
+    fontSize: 14,
+    color: "#cccccc",
+    fontFamily: "Inter-Black4",
+  },
   datePickerStyle: {
     width: 200,
     marginTop: 20,
@@ -517,9 +742,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  textStyle1: { fontSize: 17, fontFamily:"Inter-Black2" },
-  textStyle2: { fontSize: 14 },fontFamily:"Inter-Black4",
-  textStyle3: { fontSize: 17, color: "blue",fontFamily:"Inter-Black4" },
+  textStyle1: { fontSize: 17, fontFamily: "Inter-Black2" },
+  textStyle2: { fontSize: 14 },
+  fontFamily: "Inter-Black4",
+  textStyle3: { fontSize: 17, color: "blue", fontFamily: "Inter-Black4" },
 
   centeredView: {
     flex: 1,
@@ -569,13 +795,13 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "100%",
   },
-  selectedTextStyle: { color: "#8c8c8c",fontFamily:"Inter-Black4" },
+  selectedTextStyle: { color: Colors.txt, fontFamily: "Inter-Black4",fontSize: wp("5.5%") },
   icon2: {
     marginTop: "8%",
-    height: hp("3.5%"),
-    width: wp("7%"),
-    resizeMode: "contain",
-    marginHorizontal: "3%",
+    height: hp("4.21%"),
+     width: wp("6.58%"),
+     resizeMode: "contain",
+    marginStart: "3%",marginEnd:"3.5%"
   },
   cancel: {
     height: 25,
@@ -593,9 +819,19 @@ const styles = StyleSheet.create({
   icon5: { marginTop: "8%", flex: 0.17, fontSize: 22 },
   icon_notes: {},
   dropdown: {
-    height: "2.6%",
-    marginStart: "14%",
+    
+    color: Colors.txt,
+    paddingHorizontal: "2%",
+    fontSize: wp("5%"),
+    // height: height * 0.05,
+    borderRadius: 6,
+    fontFamily: "Inter-Black",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",width:"86%",marginStart:"12%"
+   
   },
+  dropdown_txt: { fontSize: wp("5%"), color: "#6c6c6c", fontFamily: "Inter-Black4" },
   dropdown2: {
     height: "2.6%",
     marginStart: "12%",
@@ -614,7 +850,7 @@ const styles = StyleSheet.create({
     height: 1,
 
     width: "86%",
-    marginStart: "14%",
+    marginStart: "12%",
     marginTop: "8%",
   },
   line2: {
@@ -626,19 +862,28 @@ const styles = StyleSheet.create({
     marginTop: "1%",
   },
   name_txt: {
-    fontSize: 16,
+  
     paddingTop: "5%",
-    paddingStart: "12%",
+    marginStart: "13.5%",
     color: Colors.blue_txt,
-    fontFamily:"Inter-Black4"
+    fontSize: wp("5%"),
+                  fontFamily: "Inter-Black4",
   },
-  name_txt2: { fontSize: 16, marginTop: "5%", color: Colors.blue_txt,fontFamily:"Inter-Black4" },
-  input: {
-    color: "#8c8c8c",
-
-    fontSize: 16,
+  name_txt2: {
+   
     marginTop: "5%",
-    marginStart: "12%",fontFamily:"Inter-Black4",marginBottom:"2%"
+    color: Colors.blue_txt,
+    fontSize: wp("5%"),
+                  fontFamily: "Inter-Black4",
+  },
+  input: {
+    color: "#666666",
+
+    fontSize: wp("5%"),
+    fontFamily: "Inter-Black4",
+    marginTop: "3%",
+    marginStart: "13.5%",
+   
   },
   press: {
     color: "#8c8c8c",
@@ -648,19 +893,22 @@ const styles = StyleSheet.create({
     marginStart: "13.5%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",fontFamily:"Inter-Black4"
+    justifyContent: "space-between",
+    fontFamily: "Inter-Black4",
   },
   input3: {
     color: "#8c8c8c",
-
-    fontSize: 17,
-    marginStart: "14%",fontFamily:"Inter-Black4"
+    fontSize: wp("5%"),
+   
+    marginStart: "14%",
+    fontFamily: "Inter-Black4",
   },
   input2: {
     color: "#8c8c8c",
 
-    fontSize: 17,
-    marginStart: "14%",fontFamily:"Inter-Black4"
+    fontSize: wp("5%"),
+    marginStart: "14%",
+    fontFamily: "Inter-Black4",
   },
 
   modal_btn: {
@@ -675,6 +923,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginEnd: "2%",
   },
+  
+  dropdown1BtnStyle: {
+    width: '100%',
+     paddingHorizontal:"3.8%",marginBottom:"-3%",backgroundColor:"transparent"
+    
+  },
+  dropdown1BtnTxtStyle: {fontSize: wp("5%"), color: "#6c6c6c", fontFamily: "Inter-Black4", textAlign: 'left',marginStart:"11%",},
+  dropdown1DropdownStyle: { backgroundColor: "white",
+  color: Colors.txt,
+  paddingHorizontal: "2%",
+  fontSize: wp("5%"),
+  height: height * 0.13,
+  borderRadius: 6,
+  fontFamily: "Inter-Black",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",width:"80%",marginStart:"12%",marginTop:Platform.OS =="ios"?0:"-10%"},
+  dropdown1RowStyle: { borderBottomColor: '#C5C5C5'},
+  dropdown1RowTxtStyle: {color: '#444', textAlign: 'left'},
+
+  centeredView_box: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 0,
+    backgroundColor: "rgba(52, 52, 52, 0.3)",
+  },
+  modalView_box: {
+    width: "85%",
+    backgroundColor: "#ececee",
+    borderRadius: 20,
+
+    elevation: 5,
+    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    // elevation: 20,
+  },
+  textStyle1_box: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
+  textStyle2_box: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
+  textStyle3_box: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
+
 });
+
 
 export default Update_Appointment;

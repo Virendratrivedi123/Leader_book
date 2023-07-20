@@ -97,7 +97,7 @@ export default function Main_Screen({ navigation }) {
         rightIcon={Images.search}
         onLeftPress={() => navigation.toggleDrawer()}
 
-        // onRightPress={() => navigation.navigate("Search")}
+        onRightPress={() => navigation.navigate("Search")}
       />
       <View>
         <View style={styles.tab}>

@@ -47,6 +47,7 @@ import Task_Detail from "./src/Main/Detail_folder/Related_page/task/Task_Detail"
 import Edit_Task_Detail from "./src/Main/Detail_folder/Related_page/task/Edit_task_Detail";
 import Appoint_Detail from "./src/Main/Detail_folder/Related_page/Appoint/Appoint_detail";
 import Update_Appointment from "./src/Main/Detail_folder/Related_page/Appoint/Update_Appointment";
+import Update_note from "./src/Main/Detail_folder/Related_page/Note/Update_note";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -125,6 +126,7 @@ export default function App() {
         <Stack.Screen name={"Edit_Task_Detail"} component={Edit_Task_Detail}  />
         <Stack.Screen name={"Appoint_Detail"} component={Appoint_Detail}  />
         <Stack.Screen name={"Update_Appointment"} component={Update_Appointment}  />
+        <Stack.Screen name={"Update_note"} component={Update_note}  />
 
 
       </Stack.Navigator>

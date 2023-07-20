@@ -29,7 +29,7 @@ import {
   Text,
   View,
   Dimensions,
-  TouchableOpacity,Image
+  TouchableOpacity,Image, Platform
 } from "react-native";
 import { ScreenNames } from "../constant/ScreenNames";
 import { Colors } from "../constant/colors";
@@ -57,6 +57,7 @@ function Customdrawer(props) {
       setCompany(d?.userinfo?.company);
       setFirst_name(d?.userinfo?.first_name);
       setLast_name(d?.userinfo?.last_name);
+     
       //  console.log(d)
     })();
   }, []);
@@ -175,7 +176,7 @@ function Customdrawer(props) {
 }
 const styles = StyleSheet.create({
   
-  gap: { marginVertical: "9.1%" },
+  gap: { marginVertical: Platform.OS == "ios"?"8%" :"6%"},
   circle: {
     width: Dimensions.get('window').width * 0.22,
     height: Dimensions.get('window').width * 0.22,
@@ -187,27 +188,27 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
     justifyContent: "center",elevation:30,
   },
   circle_text: {
-    fontSize: 35,
+    fontSize: wp("11.13%"),
   
     color: "#a9a9a9",fontFamily:"Inter-Black2"
   },
   name_text: {
-    fontSize: 17,
+    fontSize: wp("6%"),
     fontFamily:"Inter-Black2",
     color: "white",
     marginTop: "5%",
   },
   name_text2: {
-    fontSize: 15,
+    fontSize: wp("4.7%"),
     
     color: "white",
-    width: width * 0.5,fontFamily:"Inter-Black2",marginBottom:"10%"
+   fontFamily:"Inter-Black2",marginBottom:"10%"
   },
   ICON_TEXT: {
     fontSize: wp("5.13%"),
     color: "black",
     
-    marginStart: "1.5%",marginTop:"1%",fontFamily:"Inter-Black"
+    marginStart: "1.5%",marginTop:"2%",fontFamily:"Inter-Black"
   },
   up: {
     // height: height * 0.22,

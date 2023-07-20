@@ -816,12 +816,15 @@ export default function Recent(data) {
               >
                 <View style={styles.modal_page}>
                   <View style={styles.modal_voicemail_view}>
-                    <View style={styles.pin2}>
-                      <Text style={styles.modalText1}>Voicemail</Text>
+                    <View style={styles.voice_box}>
+                      <Text style={styles.voice_modal_txt}>Voice Mail</Text>
                       <Pressable
                         onPress={() => setModalVisible2(!modalVisible2)}
                       >
-                        <Entypo name="cross" size={30} color="black" />
+                        <Image
+                              style={styles.close_icon}
+                              source={Images.close_icon}
+                            ></Image>
                       </Pressable>
                     </View>
                     <View style={styles.line2}></View>
@@ -996,6 +999,11 @@ const styles = StyleSheet.create({
     fontSize: wp("6%"),
     fontFamily: "Inter-Black4",
   },
+  voice_modal_txt: {
+    fontSize: wp("7.5%"),
+   
+    fontFamily: "Inter-Black", color: Colors.MAIN_icon,marginEnd:"17%"
+  },
   note3: {
     color: "black",
     margin: "4%",
@@ -1030,6 +1038,13 @@ const styles = StyleSheet.create({
 
     margin: "4%",
     alignSelf: "flex-end",
+    justifyContent: "center",
+  },
+  voice_box: {
+    flexDirection: "row",
+
+    margin: "4%",
+    alignSelf: "center",
     justifyContent: "center",
   },
   modal_btn_box: {
@@ -1138,8 +1153,8 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   note2: {
-    height: hp("6%"),
-    width: wp("10.38%"),
+    height: hp("5%"),
+    width: wp("9.38%"),
 
     resizeMode: "contain",
   },
@@ -1275,6 +1290,11 @@ const styles = StyleSheet.create({
   },
   voice: {
     height: hp("4%"),
+    width: wp("7.38%"),
+    resizeMode: "contain",
+  },
+  close_icon: {
+    height: hp("3.5%"),
     width: wp("7.38%"),
     resizeMode: "contain",
   },

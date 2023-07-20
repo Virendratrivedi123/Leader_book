@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
-  Image,FlatList
+  Image,FlatList,Modal,Pressable
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -20,73 +20,119 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { STYLES } from "../../../../constant/styles";
 import { Colors } from "../../../../constant/colors";
 import { Images } from "../../../../constant/images";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 import { ScreenNames } from "../../../../constant/ScreenNames";
 import Header from "../../../../components/header";
+import { Appointment } from "../../../../Services";
+import Loader from "../../../../constant/Loader";
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
-const DATA = [
-    {
-      id: "0",
-      msg: "test4",
-      Number: "Test 3 Test",
-      voicemail: "5 May 2022 14:02 PM",
-      email: "praful.mishra121@gmail.com",
-    },
-    {
-      id: "1",
-      msg: "test4",
-      Number: "Test 3 Test",
-      voicemail: "5 May 2022 14:02 PM",
-      email: "praful.mishra121@gmail.com",
-    },
-    {
-      id: "2",
-      msg: "test4",
-      Number: "Test 3 Test",
-      voicemail: "5 May 2022 14:02 PM",
-      email: "praful.mishra121@gmail.com",
-    },
-    {
-      id: "3",
-      msg: "test4",
-      Number: "Test 3 Test",
-      voicemail: "5 May 2022 14:02 PM",
-      email: "praful.mishra121@gmail.com",
-    },
-    {
-      id: "4",
-      msg: "test4",
-      Number: "Test 3 Test",
-      voicemail: "5 May 2022 14:02 PM",
-      email: "praful.mishra121@gmail.com",
-    },
-    {
-      id: "5",
-      msg: "test4",
-      Number: "Test 3 Test",
-      voicemail: "5 May 2022 14:02 PM",
-      email: "praful.mishra121@gmail.com",
-    },
-   
-  ];
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Appoint_page() {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
   const route = useRoute();
   const translation = useRef(new Animated.Value(0)).current;
   const h = (18 / 100) * height;
+  const [d2, setd2] = useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [DATA, setDATA] = useState([]);
   useEffect(() => {
-    Animated.timing(translation, {
-      toValue: h,
-      delay: 0,
-      easing: Easing.elastic(4),
-      useNativeDriver: true,
-    }).start();
+    (async () => {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        id:route.params.user.id
+      };
+
+      Appointment(data)
+        .then((response) => response.json())
+        .then((result) => {
+          // console.log(result)
+         
+          setDATA(result?.data?.appointment_arr);
+
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+          setd2(true);
+          Animated.timing(translation, {
+            toValue: h,
+            delay: 0,
+            easing: Easing.elastic(4),
+            useNativeDriver: true,
+          }).start();
+          setLoading(false);
+          if(result?.message == "No Appointment scheduled yet.")
+          {setModalVisible(true)}
+        })
+
+        .catch((error) => console.log("error", error));
+    })();
   }, []);
+
+  const call_api = async () => {
+    try {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        id:route.params.user.id
+      };
+
+      Appointment(data)
+        .then((response) => response.json())
+        .then((result) => {
+          // console.log(result.data)
+         
+          setDATA(result?.data?.appointment_arr);
+
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+          setd2(true);
+          Animated.timing(translation, {
+            toValue: h,
+            delay: 0,
+            easing: Easing.elastic(4),
+            useNativeDriver: true,
+          }).start();
+          setLoading(false);
+          
+         
+          
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // do something
+      setLoading(true)
+      call_api()
+      console.log("reload the page");
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -97,7 +143,9 @@ function Appoint_page() {
         onRightPress={() => {}}
         // customRight={true}
       />
-      
+       {loading ? (
+          <Loader loading={loading} />
+        ) :  (
       <FlatList
         style={{}}
         data={DATA}
@@ -105,26 +153,26 @@ function Appoint_page() {
         renderItem={({ item, index }) => (
           <View>
             <TouchableOpacity
-             onPress={() => navigation.navigate("Appoint_Detail",{"msg":item.msg})}
+             onPress={() => navigation.navigate("Appoint_Detail",{"msg":item.subject,"id":item.id,"lead_id":route.params.user.id})}
              
               style={{
                 flexDirection: "row",
-                marginBottom: "15%",
+                
                 marginTop: "5%",
               }}
             >
               <View style={styles.circle}>
-                <Text style={styles.circle_text}>T</Text>
+                <Text style={styles.circle_text}>{item.lead_name_initial}</Text>
               </View>
               <View>
-                <Text style={styles.text1}>{item.msg}</Text>
-                <Text style={styles.text2}>{item.Number}</Text>
-                <Text style={styles.text3}>{item.voicemail}</Text>
-                <Text style={styles.text3}>{item.voicemail}</Text>
-                <View
+                <Text style={styles.text1}>{item.subject}</Text>
+                <Text style={styles.text2}>{item.lead_name}</Text>
+                <Text style={styles.text3}>{item.start_time}</Text>
+                <Text style={styles.text3}>{item.end_time}</Text>
+                {item.reminder_time ?<View
                   style={{
                     flexDirection: "row",
-                    marginTop: "2%",
+                    marginTop: "3%",
                     marginStart: "2%",
                   }}
                 >
@@ -132,8 +180,11 @@ function Appoint_page() {
                     {" "}
                     <SimpleLineIcons name="bell" size={22} color="#b3b3b3" />
                   </Text>
-                  <Text style={styles.text5}>{item.voicemail}</Text>
-                </View>
+                  <Text style={styles.text5}>{item.reminder_time}</Text>
+                </View>:null}
+                
+
+                <Text style={styles.text4}>{item.notes}</Text>
               </View>
             </TouchableOpacity>
 
@@ -141,41 +192,75 @@ function Appoint_page() {
           </View>
         )}
       />
-      <Animated.View
+      
+    )} 
+    <Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.textStyle1}>Lead Booker</Text>
+                <Text style={styles.textStyle2}>No Appointment scheduled yet.</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                   
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible)
+                  }}
+                >
+                  <Text style={styles.textStyle3}>OK</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+     {d2?<Animated.View
         style={{
-            alignItems: "center",
-            justifyContent: "center",
-  
-            position: "absolute",
-  
-            right: "6%",
-            // width: Dimensions.get("window").width * 0.16,
-            // height: Dimensions.get("window").width * 0.16,
-  
-            borderRadius:
-              Math.round(
-                Dimensions.get("window").width + Dimensions.get("window").height
-              ) / 2,
-  
-            transform: [{ translateY: translation }],
-            bottom: height * 0.28,
-            elevation: 5,
+          alignItems: "center",
+          justifyContent: "center",
+
+          position: "absolute",
+
+          right: "6%",
+          // width: Dimensions.get("window").width * 0.16,
+          // height: Dimensions.get("window").width * 0.16,
+
+          borderRadius:
+            Math.round(
+              Dimensions.get("window").width + Dimensions.get("window").height
+            ) / 2,
+
+          transform: [{ translateY: translation }],
+          bottom: height * 0.28,
+          elevation: 5,
         }}
       >
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() =>
-            navigation.navigate(ScreenNames.APage)
-          }
+          onPress={() => navigation.navigate(ScreenNames.APage,{id:route.params.user.id})}
         >
           <Image
             source={Images.addNote}
-            style={{  width: Dimensions.get("window").width * 0.17,
-            height: Dimensions.get("window").width * 0.17,
-            resizeMode: "contain", }}
+            style={{
+              width: Dimensions.get("window").width * 0.17,
+              height: Dimensions.get("window").width * 0.17,
+              resizeMode: "contain",
+            }}
           />
         </TouchableOpacity>
-      </Animated.View>
+      </Animated.View>:null}
+      
     </SafeAreaView>
   );
 }
@@ -219,28 +304,28 @@ const styles = StyleSheet.create({
     color: "grey",
   },
   text3: {
-    fontSize: 15,
-    marginTop: "2%",
+    fontSize: wp("4.91%"),
+    marginTop: "3%",
     // color: "#808080",
     marginStart: "5%",
-    color: "#8c8c8c",
-    fontFamily: "Inter-Black",
+    color: Colors.txt,
+    fontFamily: "Inter-Black4",
   },
   text4: {
-    fontSize: 14,
-    marginTop: "2%",
+    fontSize: wp("5.11%"),
+    marginTop: "3%",
     // color: "#808080",
     marginStart: "5%",
-    color: "#666666",
+    color: Colors.txt,
     fontFamily: "Inter-Black4",
   },
   text5: {
-    fontSize: 18,
+    fontSize: wp("4.91%"),
 
     // color: "#808080",
     marginStart: "3%",
-    color: "#8c8c8c",
-    fontFamily: "Inter-Black",
+    color: Colors.txt,
+    fontFamily: "Inter-Black4",
   },
 
   circle: {
@@ -269,6 +354,25 @@ const styles = StyleSheet.create({
     marginVertical: "2%",
     width: "100%",
   },
-});
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 0,
+    backgroundColor: "rgba(52, 52, 52, 0.1)",
+  },
+  modalView: {
+    width: "85%",
+    backgroundColor: "#ececee",
+    borderRadius: 20,
 
+    elevation: 5,
+    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    // elevation: 20,
+  },
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
+  textStyle3: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
+
+});
 export default Appoint_page;

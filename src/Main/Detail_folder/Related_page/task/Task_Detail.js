@@ -11,14 +11,9 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import {
-  MaterialCommunityIcons,
-  FontAwesome,
-  EvilIcons,
-  Ionicons,
-} from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { STYLES } from "../../../../constant/styles";
+
 import { Colors } from "../../../../constant/colors";
 import { Images } from "../../../../constant/images";
 import {
@@ -26,71 +21,55 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 
-import { ScreenNames } from "../../../../constant/ScreenNames";
+
 import Header from "../../../../components/header";
 
 import { ScrollView } from "react-native-gesture-handler";
+import { Appointment_detail, Task_detail } from "../../../../Services";
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
-const DATA = [
-  {
-    id: "0",
-    name: "Task 2",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "1",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "2",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "3",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "4",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "5",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-];
 
 function Task_Detail() {
   const navigation = useNavigation();
   const route = useRoute();
   const translation = useRef(new Animated.Value(0)).current;
   const h = (18 / 100) * height;
+
+  console.log(route.params.id)
+  const [loading, setLoading] = React.useState(true);
+  const [DATA, setDATA] = useState([]);
   useEffect(() => {
-    Animated.timing(translation, {
-      toValue: h,
-      delay: 0,
-      easing: Easing.elastic(4),
-      useNativeDriver: true,
-    }).start();
+    (async () => {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        id:route.params.id
+      };
+
+      Task_detail(data)
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result)
+          result?.data?.task_detail.map((i)=>{
+            return(setDATA(i.CrmTask))
+          })
+          // setDATA(result?.data?.task_detail);
+
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+        
+          setLoading(false);
+        })
+
+        .catch((error) => console.log("error", error));
+    })();
   }, []);
   return (
     <SafeAreaView style={styles.container}>
@@ -99,7 +78,7 @@ function Task_Detail() {
         leftIcon={Images.backArrow}
         rightIcon2={Images.pencil}
         onLeftPress={() => navigation.goBack()}
-        onRightPress={() => {navigation.navigate("Edit_Task_Detail")}}
+        onRightPress={() => {navigation.navigate("Edit_Task_Detail",{"id":route.params.id})}}
         customRight={true}
       />
       <ScrollView 
@@ -114,56 +93,56 @@ function Task_Detail() {
            
           </View>
 
-          <Text style={styles.name}>Test James</Text>
-          <Text style={styles.label}>Related To</Text>
+          <Text style={styles.name}>{DATA?.lead_name}</Text>
+          <Text style={styles.label}>Owner</Text>
           <View style={styles.circle}>
             <Image style={styles.img} source={Images.user_icon}></Image>
            
           </View>
 
-          <Text style={styles.text3}>Test James</Text>
-          <Text style={styles.label}>Related To</Text>
+          <Text style={styles.text3}>{DATA?.owner}</Text>
+          <Text style={styles.label}>Priority</Text>
           <View style={styles.circle}>
             <Image style={styles.img} source={Images.warning}></Image>
             
           </View>
 
-          <Text style={styles.text3}>Test James</Text>
-          <Text style={styles.label}>Related To</Text>
+          <Text style={styles.text3}>{DATA?.priority}</Text>
+          <Text style={styles.label}>Start Date</Text>
           <View style={styles.circle}>
             <Image style={styles.img} source={Images.calender}></Image>
            
           </View>
 
-          <Text style={styles.text3}>Test James</Text>
-          <Text style={styles.label}>Related To</Text>
+          <Text style={styles.text3}>{DATA?.start_date}</Text>
+          <Text style={styles.label}>Due Date</Text>
           <View style={styles.circle}>
             <Image style={styles.img} source={Images.calender}></Image>
             {/* <Text style={styles.text2}>{item.name}</Text> */}
           </View>
 
-          <Text style={styles.text3}>Test James</Text>
-          <Text style={styles.label}>Related To</Text>
+          <Text style={styles.text3}>{DATA?.due_date}</Text>
+          <Text style={styles.label}>Status</Text>
           <View style={styles.circle}>
             <Image style={styles.img} source={Images.graph}></Image>
             {/* <Text style={styles.text2}>{item.name}</Text> */}
           </View>
 
           <Text style={styles.text3}>Test James</Text>
-          <Text style={styles.label}>Related To</Text>
+          <Text style={styles.label}>Complete(%)</Text>
           <View style={styles.circle}>
             <Image style={styles.img} source={Images.percentage}></Image>
             {/* <Text style={styles.text2}>{item.name}</Text> */}
           </View>
 
-          <Text style={styles.text3}>Test James</Text>
-          <Text style={styles.label}>Related To</Text>
+          <Text style={styles.text3}>{DATA?.complete_percenatge}</Text>
+          <Text style={styles.label}>Notes</Text>
           <View style={styles.circle}>
             <Image style={styles.img} source={Images.task_note}></Image>
             {/* <Text style={styles.text2}>{item.name}</Text> */}
           </View>
 
-          <Text style={styles.text3}>Test James</Text>
+          <Text style={styles.text3}>{DATA?.notes}</Text>
         </View>
       </ScrollView>
 
@@ -192,7 +171,8 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   container: {
-    flex: 1,backgroundColor: Colors.MAIN_COLOR,
+    flex: 1,
+    // backgroundColor: Colors.MAIN_COLOR,
   },
   header_msg: {
     fontSize: wp("6.5%"),
@@ -212,7 +192,7 @@ const styles = StyleSheet.create({
     marginEnd: "1%",
   },
   label: {
-    fontSize: 14,
+    fontSize: wp("4.2%"),
 
     // color: "#808080",
     fontFamily: "Inter-Black4",
@@ -220,25 +200,29 @@ const styles = StyleSheet.create({
     color: Colors.txt,
     marginBottom: "-4%",
   },
-  name:{ fontSize: 16,
-    marginTop: "-3%",
+  name: {
+    fontSize: wp("4.8%"),
+    marginTop: "-5%",
     // // color: "#808080",
     // marginStart: "5%",
     color: "#2b92ee",
     fontFamily: "Inter-Black4",
     paddingStart: "15%",
-    marginBottom: "7%",},
+    marginBottom: "7%",
+  },
   text2: {
-    fontSize: 13,
-    marginTop: "2%",
-    // color: "#808080",
-    marginStart: "2%",
-    color: Colors.blue_txt,
-    fontFamily: "Inter-Black",
+    fontSize: wp("4.5%"),
+    marginTop: "-2%",
+    // // color: "#808080",
+    // marginStart: "5%",
+    color: "black",
+    fontFamily: "Inter-Black4",
+    paddingStart: "15%",
+    marginBottom: "7%",
   },
   text3: {
-    fontSize: 16,
-    marginTop: "-4%",
+    fontSize: wp("4.5%"),
+    marginTop: "-5%",
     // // color: "#808080",
     // marginStart: "5%",
     color: "black",
@@ -279,5 +263,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 });
+
 
 export default Task_Detail;

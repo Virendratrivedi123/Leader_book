@@ -199,7 +199,7 @@ function Profile({data}) {
             style={styles.img} />
           <Text style={styles.txt}>Properties Viewed</Text>
         </TouchableOpacity></>:<View style={styles.null_txt}>
-          <Text style={{fontSize: wp("6%"),width:"70%",fontFamily: "Inter-Black2",color:"#6c6c6c",textAlign:"center"}}>"There is no Profile exist for this lead"</Text>
+          <Text style={{fontSize: wp("5.4%"),width:"70%",fontFamily: "Inter-Black3",color:"#737373",textAlign:"center"}}>There is no Profile exist for this lead</Text>
         </View>}
       
       <TouchableOpacity
@@ -454,7 +454,7 @@ function Profile({data}) {
 }
 
 const styles = StyleSheet.create({
-  null_txt: { flex: 1, alignItems: "center", justifyContent: "center", },
+  null_txt: { flex: 1, alignItems: "center", justifyContent: "center",marginBottom:"15%" },
   update_txt: { color: "white",fontSize: wp("6%"),fontFamily: "Inter-Black4"},
   note3: { color: "black", margin: "4%", fontSize: 14 ,fontFamily:"Inter-Black"},
   date: {

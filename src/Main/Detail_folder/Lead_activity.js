@@ -67,7 +67,7 @@ function Lead_activity() {
         .then((result) => {
           var Array = [];
           var arr = [];
-
+          // console.log(result)
           var item = result?.data?.lead_timeline_activities;
           var item2 = result?.data?.activity_search_filters;
           arr.push(item2);
@@ -80,7 +80,7 @@ function Lead_activity() {
     })();
   }, []);
   // const logo=route.params.logo
-  // console.log(route.params.logo1)
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -99,151 +99,293 @@ function Lead_activity() {
           </View>
           <Text style={styles.logo_name}>{route?.params?.name}</Text>
         </View>
+        <View
+          style={{
+            flex: 1,
+            marginVertical: "2%",
+            backgroundColor: "#e6e6e6",
+            borderRadius: 20,
+            alignItems: "center",
+          }}
+        >
+          <View style={styles.act}>
+            <Text style={styles.act_text}>Lead Activity</Text>
+          </View>
+          {com == "All" ? (
+            loading ? (
+              <Loader loading={loading} />
+            ) : data && data.length > 0 ? (
+              <FlatList
+                style={{
+                  width: "95%",
+                  elevation: 10,
+                  alignSelf: "center",
+                  paddingTop: "3%",
+                  // marginBottom: "10%",
 
-        <View style={styles.act}>
-          <Text style={styles.act_text}>Lead Activity</Text>
-        </View>
-        {com == "All" ? (
-          loading ? (
-            <Loader loading={loading} />
-          ) : data && data.length > 0 ? (
-            <FlatList
-              style={{  borderBottomLeftRadius: 8,
-                borderBottomRightRadius: 8,}}
-              data={data}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item, index }) => (
-                
-                <View style={styles.flat_data}>
-                  <View style={styles.first}>
+                  backgroundColor: "#ffffff",
+                  borderBottomLeftRadius: 8,
+                  borderBottomRightRadius: 8,
+                }}
+                data={data}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item, index }) => (
+                  <View style={styles.flat_data}>
+                    <View style={styles.first}>
+                      {item?.title == "eMail Sent" ? (
+                        <Image
+                          style={styles.img}
+                          source={Images.email_white}
+                        ></Image>
+                      ) : item?.activity_type == "notes" ? (
+                        <Image
+                          style={styles.img}
+                          source={Images.Comment}
+                        ></Image>
+                      ) : item?.activity_type == "call" ? (
+                        <Image
+                          style={styles.img}
+                          source={Images.call_green}
+                        ></Image>
+                      ) : item?.title == "Appointment Scheduled" ? (
+                        <Image
+                          style={styles.img}
+                          source={Images.apppintments}
+                        ></Image>
+                      ) : item.title == "SMS Sent" ? (
+                        <Image
+                          style={styles.img}
+                          source={Images.sms_sent}
+                        ></Image>
+                      ) : null}
+                      <Text style={styles.title}>{item?.title}</Text>
+                      <View style={{ flexDirection: "row" }}>
+                        <Image
+                          style={styles.time_img}
+                          source={Images.time}
+                        ></Image>
+                        <Text style={styles.created}>{item?.created}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.second}>
+                      <Text style={styles.txt}>User Name</Text>
+                      <Text style={styles.user_id}>: {item?.user_id}</Text>
+                    </View>
                     {item?.title == "eMail Sent" ? (
-                      <Image
-                        style={styles.img}
-                        source={Images.email_white}
-                      ></Image>
-                    ) : (
-                      <Image
-                        style={styles.img}
-                        source={Images.sms_sent}
-                      ></Image>
-                    )}
-                    <Text style={styles.title}>{item?.title}</Text>
-                    <View style={{ flexDirection: "row" }}>
-                      <Image
-                        style={styles.time_img}
-                        source={Images.time}
-                      ></Image>
-                      <Text style={styles.created}>{item?.created}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.second}>
-                    <Text style={styles.txt}>User Name</Text>
-                    <Text style={styles.user_id}>: {item?.user_id}</Text>
-                  </View>
-                  <View style={styles.second}>
-                    <Text style={styles.txt}>{item?.sent_by.label}</Text>
-                    <Text style={styles.sent_by_value} numberOfLines={1}>
-                      : {item?.sent_by.value}
-                    </Text>
-                  </View>
-                  <View style={styles.second}>
-                    <Text style={styles.txt}>{item?.recived_by.label}</Text>
-                    <Text style={styles.rec_val}>
-                      : {item?.recived_by.value}
-                    </Text>
-                  </View>
-                  {item?.title == "eMail Sent" ? (
-                    <View style={styles.second}>
-                      <Text style={styles.txt}>{item?.subject.label}: </Text>
-                      <View
-                        style={{ width: width * 0.54, height: height * 0.07 }}
-                      >
-                        <ScrollView>
-                          <Text style={styles.sub_val}>
-                            {item?.subject.value}
+                      <>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>{item?.sent_by?.label}</Text>
+                          <Text style={styles.sent_by_value} numberOfLines={1}>
+                            : {item?.sent_by?.value}
                           </Text>
-                        </ScrollView>
-                      </View>
-                    </View>
-                  ) : (
-                    <View style={styles.second}>
-                      <Text style={styles.txt}>
-                        {item?.message_text.label}:{" "}
-                      </Text>
-                      <View style={styles.sub}>
-                        <ScrollView>
-                          <Text style={styles.sub_val}>
-                            {item?.message_text.value}
+                        </View>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>
+                            {item?.recived_by?.label}
                           </Text>
-                        </ScrollView>
-                      </View>
-                    </View>
-                  )}
+                          <Text style={styles.rec_val}>
+                            : {item?.recived_by?.value}
+                          </Text>
+                        </View>
+                      </>
+                    ) : item.title == "SMS Sent" ? (
+                      <>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>{item?.sent_by?.label}</Text>
+                          <Text style={styles.sent_by_value} numberOfLines={1}>
+                            : {item?.sent_by?.value}
+                          </Text>
+                        </View>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>
+                            {item?.recived_by?.label}
+                          </Text>
+                          <Text style={styles.rec_val}>
+                            : {item?.recived_by?.value}
+                          </Text>
+                        </View>
+                      </>
+                    ) : item.activity_type == "call" ? (
+                      <>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>{item?.sent_by?.label}</Text>
+                          <Text style={styles.sent_by_value} numberOfLines={1}>
+                            : {item?.sent_by?.value}
+                          </Text>
+                        </View>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>
+                            {item?.recived_by?.label}
+                          </Text>
+                          <Text style={styles.rec_val}>
+                            : {item?.recived_by?.value}
+                          </Text>
+                        </View>
+                      </>
+                    )  : item.title == "Appointment Scheduled" ? (
+                      <>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>{item?.start_time?.label}</Text>
+                          <Text style={styles.sent_by_value} numberOfLines={1}>
+                            : {item?.start_time?.value}
+                          </Text>
+                        </View>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>
+                            {item?.end_time?.label}
+                          </Text>
+                          <Text style={styles.rec_val}>
+                            : {item?.end_time?.value}
+                          </Text>
+                        </View>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>
+                            {item?.location?.label}
+                          </Text>
+                          <Text style={styles.rec_val}>
+                            : {item?.location?.value}
+                          </Text>
+                        </View>
+                        <View style={styles.second}>
+                          <Text style={styles.txt}>
+                            {item?.reminder_time?.label}
+                          </Text>
+                          <Text style={styles.rec_val} numberOfLines={1}>
+                            : {item?.reminder_time?.value}
+                          </Text>
+                        </View>
+                       
+                      </>
+                    ) : null}
 
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate(ScreenNames.Comments, {
-                        user: {
-                          lead_activity_id: item?.id,
-                          lead_id: route?.params?.id,
-                          activity_type: item?.activity_type,
-                          title: item?.title,
-                        },
-                      });
-                    }}
-                    style={styles.btn}
-                  >
-                    <Text style={styles.comment_txt}>View Comment</Text>
-                  </TouchableOpacity>
-                  <View style={styles.line}></View>
+                    {item?.title == "eMail Sent" ? (
+                      <View style={styles.second}>
+                        <Text style={styles.txt}>{item?.subject?.label}: </Text>
+                        <View
+                          style={{ width: width * 0.54, height: height * 0.07 }}
+                        >
+                          <ScrollView>
+                            <Text style={styles.sub_val}>
+                              {item?.subject?.value}
+                            </Text>
+                          </ScrollView>
+                        </View>
+                      </View>
+                    ) : item?.activity_type == "notes" ? (
+                      <View style={styles.second}>
+                        <Text style={styles.txt}>{item?.note?.label}: </Text>
+                        <View style={styles.sub}>
+                          <ScrollView>
+                            <Text style={styles.sub_val}>
+                              {item?.note?.value}
+                            </Text>
+                          </ScrollView>
+                        </View>
+                      </View>
+                    ) : item?.activity_type == "call" ? (
+                      <View style={styles.second}>
+                        <Text style={styles.txt}>
+                          {item?.call_duration?.label}:{" "}
+                        </Text>
+                        <View style={styles.sub}>
+                          <ScrollView>
+                            <Text style={styles.sub_val}>
+                              {item?.call_duration?.value}
+                            </Text>
+                          </ScrollView>
+                        </View>
+                      </View>
+                    ) : item?.title == "Appointment Scheduled" ? (
+                      <View style={styles.second}>
+                        <Text style={styles.txt}>
+                          {item?.subject?.label}:{" "}
+                        </Text>
+                        <View style={styles.sub}>
+                          <ScrollView>
+                            <Text style={styles.sub_val}>
+                              {item?.subject?.value}
+                            </Text>
+                          </ScrollView>
+                        </View>
+                      </View>
+                    ) : item.title =="SMS Sent"?(
+                      <View style={styles.second}>
+                        <Text style={styles.txt}>
+                          {item?.message_text?.label}:{" "}
+                        </Text>
+                        <View style={styles.sub}>
+                          <ScrollView>
+                            <Text style={styles.sub_val}>
+                              {item?.message_text?.value}
+                            </Text>
+                          </ScrollView>
+                        </View>
+                      </View>
+                    ):null}
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate(ScreenNames.Comments, {
+                          user: {
+                            lead_activity_id: item?.id,
+                            lead_id: route?.params?.id,
+                            activity_type: item?.activity_type,
+                            title: item?.title,
+                          },
+                        });
+                      }}
+                      style={styles.btn}
+                    >
+                      <Text style={styles.comment_txt}>View Comment</Text>
+                    </TouchableOpacity>
+                    <View style={styles.line}></View>
                   </View>
-                
-                  
-                
-              )}
-            />
-          ) : <View style={styles.show}>
-          <Text>No Activity Found</Text>
+                )}
+              />
+            ) : (
+              <View style={styles.show}>
+                <Text>No Activity Found</Text>
+              </View>
+            )
+          ) : // loading ? (
+          //   <Loader loading={loading} />
+          // ) : data && data.length > 0 ? (
+
+          com == "Call" ? (
+            <View style={styles.show}>
+              <Text>No Activity Found</Text>
+            </View>
+          ) : com == "SMS" ? (
+            <View style={styles.show}>
+              <Text>No Activity Found</Text>
+            </View>
+          ) : com == "Tasks" ? (
+            <View style={styles.show}>
+              <Text>No Activity Found</Text>
+            </View>
+          ) : com == "Notes" ? (
+            <View style={styles.show}>
+              <Text>No Activity Found</Text>
+            </View>
+          ) : com == "Mails" ? (
+            <View style={styles.show}>
+              <Text>No Activity Found</Text>
+            </View>
+          ) : com == "SSE" ? (
+            <View style={styles.show}>
+              <Text>No Activity Found</Text>
+            </View>
+          ) : com == "Appointment" ? (
+            <View style={styles.show}>
+              <Text>No Activity Found</Text>
+            </View>
+          ) : (
+            setcom("All")
+          )}
+
+          {/* </View> */}
         </View>
-        ) : // loading ? (
-        //   <Loader loading={loading} />
-        // ) : data && data.length > 0 ? (
-
-        com == "Call" ? (
-          <View style={styles.show}>
-            <Text>No Activity Found</Text>
-          </View>
-        ) : com == "SMS" ? (
-          <View style={styles.show}>
-            <Text>No Activity Found</Text>
-          </View>
-        ) : com == "Tasks" ? (
-          <View style={styles.show}>
-            <Text>No Activity Found</Text>
-          </View>
-        ) : com == "Notes" ? (
-          <View style={styles.show}>
-            <Text>No Activity Found</Text>
-          </View>
-        ) : com == "Mails" ? (
-          <View style={styles.show}>
-            <Text>No Activity Found</Text>
-          </View>
-        ) : com == "SSE" ? (
-          <View style={styles.show}>
-            <Text>No Activity Found</Text>
-          </View>
-        ) : com == "Appointment" ? (
-          <View style={styles.show}>
-            <Text>No Activity Found</Text>
-          </View>
-        ) : (
-          setcom("All")
-        )}
-
-        {/* </View> */}
       </View>
-
       <Modal
         transparent={true}
         visible={modalVisible}
@@ -409,7 +551,7 @@ function Lead_activity() {
 
 const styles = StyleSheet.create({
   img: {
-    height: height * 0.072,
+    height: height * 0.065,
     width: width * 0.15,
     resizeMode: "contain",
   },
@@ -442,12 +584,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Black4",
   },
   txt: { fontSize: 14, color: "#284162" },
-  flat_data: {
-    width:"95%",elevation: 10,alignSelf:"center",paddingTop:"3%",
-    // marginBottom: "10%",
-   
-    elevation: 10,backgroundColor:"#ffffff"
-  },
+  flat_data: {},
   show: {
     alignItems: "center",
     justifyContent: "center",
@@ -530,7 +667,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#666699",
     marginBottom: "2%",
   },
-  logo_text: { fontSize: wp("8.53%"), color: "white", fontFamily: "Inter-Black3" },
+  logo_text: {
+    fontSize: wp("8.53%"),
+    color: "white",
+    fontFamily: "Inter-Black3",
+  },
   act_text: {
     color: "white",
     fontSize: 20,
@@ -541,11 +682,12 @@ const styles = StyleSheet.create({
     height: "6%",
     backgroundColor: "#b3b3b3",
     justifyContent: "center",
-    width:"95%",
-    marginTop: "2%",
+    width: "95%",
+
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
-    elevation: 10,alignSelf:"center"
+    elevation: 10,
+    alignSelf: "center",
   },
   btn: {
     alignSelf: "flex-end",
@@ -563,35 +705,45 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontFamily: "Inter-Black",
   },
-  rec_val: { fontSize: wp("4.13%"), color: "#878787", fontFamily: "Inter-Black" },
+  rec_val: {
+    fontSize: wp("4.13%"),
+    color: "#878787",
+    fontFamily: "Inter-Black",width:width*0.45
+  },
   sub_val: {
     fontSize: wp("4.13%"),
     color: "#878787",
     fontFamily: "Inter-Black",
   },
   sent_by_value: {
-   fontSize: wp("4.13%"),
+    fontSize: wp("4.13%"),
     width: width * 0.53,
     color: "#878787",
     fontFamily: "Inter-Black",
   },
-  user_id: { fontSize: wp("4.13%"), color: "#878787", fontFamily: "Inter-Black" },
+  user_id: {
+    fontSize: wp("4.13%"),
+    color: "#878787",
+    fontFamily: "Inter-Black",
+  },
   title: {
     fontSize: wp("4.53%"),
     flex: 0.9,
-    marginTop: "3%",
-    marginStart: "2.5%",
+    marginTop: 0,
+    marginStart: "1%",
     color: "#808080",
     fontFamily: "Inter-Black4",
   },
-  first: { flexDirection: "row",paddingLeft:"2%" },
-  second: { flexDirection: "row", marginLeft: "20%" },
+  first: { flexDirection: "row", paddingLeft: "2%" },
+  second: { flexDirection: "row", marginLeft: "19%" },
 
   line: {
     height: 0.5,
     width: "100%",
     backgroundColor: "#bfbfbf",
-    marginTop: "7%",alignSelf:"center"
+    marginTop: "7%",
+    alignSelf: "center",
+    marginBottom: "4%",
   },
   circle_email: {
     height: height * 0.055,

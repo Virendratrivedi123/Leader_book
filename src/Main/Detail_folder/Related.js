@@ -183,7 +183,7 @@ export default function Related({ data }) {
         <View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate(ScreenNames.Page)
+              navigation.navigate(ScreenNames.Page,{"id":User_data.data.id})
             }}
           >
             <View style={styles.box}>
@@ -233,7 +233,12 @@ export default function Related({ data }) {
           <View style={styles.line}></View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("Appoint_page")
+              navigation.navigate("Appoint_page",{ user: {
+               
+
+            id: User_data.data.id,
+              },
+          })
             }}
           >
             <View style={styles.box}>

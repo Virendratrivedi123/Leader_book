@@ -55,7 +55,7 @@ export default function Detail({ navigation }) {
       <View style={styles.box}>
         <TouchableOpacity
           style={styles.back}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate(ScreenNames.MAIN_SCREEN)}
         >
           <Image source={Images.backArrow} style={styles.icon} />
         </TouchableOpacity>
@@ -135,11 +135,11 @@ export default function Detail({ navigation }) {
           <Image style={styles.pencil} source={Images.editYellow} />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate(ScreenNames.EDIT_LEAD_DETAIL, {
-              id: route.params.user.id,
-            })
-          }
+          // onPress={() =>
+          //   navigation.navigate(ScreenNames.EDIT_LEAD_DETAIL, {
+          //     id: route.params.user.id,
+          //   })
+          // }
         >
           <Image style={styles.delete} source={Images.delete} />
         </TouchableOpacity>

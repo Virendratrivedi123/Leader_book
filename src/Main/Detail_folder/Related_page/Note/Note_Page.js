@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
-  Image,FlatList,Modal,Pressable
+  Image,FlatList,Modal,Pressable, Alert
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -21,72 +21,116 @@ import { Colors } from "../../../../constant/colors";
 import { Images } from "../../../../constant/images";
 import Header from "../../../../components/header";
 import { ScreenNames } from "../../../../constant/ScreenNames";
+import { Note } from "../../../../Services";
+import Loader from "../../../../constant/Loader";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
-const DATA = [
-  {
-    id: "0",
-    tasks: "Note 1",
-    name:"james osmar",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "1",
-    tasks: "Note 2",
-    name:"james osmar",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "2",
-    tasks: "Note 2",
-    name:"james osmar",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "3",
-    tasks: "Note 2",
-    name:"james osmar",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  
-];
+
 function Note_Page() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const route = useRoute();
   const translation = useRef(new Animated.Value(0)).current;
   const h = (18 / 100) * height;
+  const [d2, setd2] = useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [DATA, setDATA] = useState([]);
   useEffect(() => {
-    Animated.timing(translation, {
-      toValue: h,
-      delay: 0,
-      easing: Easing.elastic(4),
-      useNativeDriver: true,
-    }).start();
+    (async () => {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        id:route.params.id
+      };
+
+      Note(data)
+        .then((response) => response.json())
+        .then((result) => {
+          // console.log(result)
+         
+          setDATA(result?.data?.lead_notes);
+
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+          setd2(true);
+          Animated.timing(translation, {
+            toValue: h,
+            delay: 0,
+            easing: Easing.elastic(4),
+            useNativeDriver: true,
+          }).start();
+          setLoading(false);
+        })
+
+        .catch((error) => console.log("error", error));
+    })();
   }, []);
 
-  // React.useEffect(async () => {
-  //   // const user = await AsyncStorage.getItem("go_recent");
-  //   // console.log(user)
-  //   const unsubscribe = navigation.addListener("focus", () => {
-  //     // do something
-    
-      
-  //     // if (user == "1") {
-  //     //   setcom("RECENT")
-  //       AsyncStorage.removeItem('go_recent')
-  //     // console.log("setcom");
-  //     // }
-     
-  //   });
+  
+  const call_api = async () => {
+    try {
+      const user_data = await AsyncStorage.getItem("user_data");
 
-  //   return unsubscribe;
-  // }, [navigation]);
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        id:route.params.id
+      };
+
+      Note(data)
+        .then((response) => response.json())
+        .then((result) => {
+          // console.log(result)
+          
+        
+         
+          setDATA(result?.data?.lead_notes);
+
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+          setd2(true);
+          Animated.timing(translation, {
+            toValue: h,
+            delay: 0,
+            easing: Easing.elastic(4),
+            useNativeDriver: true,
+          }).start();
+          setLoading(false);
+          
+          if(result.message == "No notes has been added yet")
+          {setModalVisible(true)}
+          
+        
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+ 
+
+  React.useEffect(() => {
+    
+    const unsubscribe = navigation.addListener("focus", () => {
+      // do something
+      setLoading(true)
+      call_api()
+      console.log("reload the page");
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -97,39 +141,45 @@ function Note_Page() {
         onRightPress={() => {}}
         // customRight={true}
       />
+       {loading ? (
+        <Loader loading={loading} />
+      ) :
       <View>
+     {}
       <FlatList
-        style={{}}
+        style={{ marginTop:"3%"}}
         data={DATA}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
           <View style={{flex:1}}>
-            <View
-              style={{
-                flexDirection: "row",
-               marginTop:"5%"
-                
-              }}
-            >
+             <TouchableOpacity
+        activeOpacity={1}
+        style={{flexDirection:"row"}}
+          onPress={() =>
+            
+            navigation.navigate("Update_note",{"user":item?.LeadNote,'lead_id':route?.params?.id})
+            // setModalVisible(true)
+          }
+        >
               <View style={styles.circle}>
                 <Image style={styles.img} source={Images.chat_icon}></Image>
               </View>
               <View>
-                <Text style={styles.text2}>{item.name}</Text>
-                <Text style={styles.text1}>{item.tasks}</Text>
+                <Text style={styles.text2}>{item.LeadNote?.user_name}</Text>
+                <Text style={styles.text1}>{item.LeadNote?.note}</Text>
                 
               
                 
-                  <Text style={styles.text3}>{item.voicemail}</Text>
+                  <Text style={styles.text3}>{item.LeadNote?.created}</Text>
               
               </View>
-            </View>
+              </TouchableOpacity>
 
             <View style={styles.line}></View>
           </View>
         )}
       />
-       <View style={styles.centeredView}>
+      
           <Modal
             transparent={true}
             visible={modalVisible}
@@ -161,10 +211,10 @@ function Note_Page() {
               </View>
             </View>
           </Modal>
-        </View>
-      </View>
+        
+      </View>}
        
-      <Animated.View
+      {d2?<Animated.View
         style={{
           alignItems: "center",
           justifyContent: "center",
@@ -188,7 +238,7 @@ function Note_Page() {
         activeOpacity={1}
           onPress={() =>
             
-            navigation.navigate(ScreenNames.NPage)
+            navigation.navigate(ScreenNames.NPage,{"id":route.params.id})
             // setModalVisible(true)
           }
         >
@@ -198,7 +248,7 @@ function Note_Page() {
             height: Dimensions.get("window").width * 0.17, resizeMode: "contain" }}
           />
         </TouchableOpacity>
-      </Animated.View>
+        </Animated.View>:null}
     </SafeAreaView>
   );
 }
@@ -232,7 +282,7 @@ const styles = StyleSheet.create({
     marginEnd: "1%",
   },
   text1: {
-    fontSize: 15,
+    fontSize: wp("4.41%"),
 
     // color: "#808080",
     fontFamily: "Inter-Black2",
@@ -241,20 +291,20 @@ const styles = StyleSheet.create({
     marginTop: "10%",
   },
   text2: {
-    fontSize: 15,
-    marginTop: "2%",
+    fontSize: wp("4.41%"),
+    marginTop: "8%",
     // color: "#808080",
     marginStart: "2%",
     color: Colors.blue_txt,
     fontFamily: "Inter-Black4",
   },
   text3: {
-    fontSize: 13,
+    fontSize: wp("3.9%"),
     marginTop: "20%",
     // // color: "#808080",
     // marginStart: "5%",
     color: Colors.txt,
-    fontFamily: "Inter-Black",marginStart: "2%",
+    fontFamily: "Inter-Black4",marginStart: "2%",
   },
   text4: {
     fontSize: 15,
@@ -285,15 +335,15 @@ const styles = StyleSheet.create({
   line: {
     backgroundColor: "#cccccc",
     height: 0.5,
-    marginVertical:"5%",
-    width: "100%",
+   
+    width: "100%",marginTop:"4%",marginBottom:"1%"
   },
   centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 0,
-    backgroundColor: "rgba(52, 52, 52, 0.3)",
+    backgroundColor: "rgba(52, 52, 52, 0.1)",
   },
   modalView: {
     width: "85%",

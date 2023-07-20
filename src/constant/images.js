@@ -57,6 +57,9 @@ link_button:require('./../Images/link-button.png'),
 add_tag:require('./../Images/add_tags.png'),
 call_blue:require('./../Images/call-blue.png'),
 not_mail:require('./../Images/not_mail.png'),
-
+Comment:require('./../Images/comments.png'),
+edit_Comment:require('./../Images/edit_comment.png'),
+call_green:require('./../Images/call_green.png'),
+apppintments:require('./../Images/appointments.png'),
 }
 

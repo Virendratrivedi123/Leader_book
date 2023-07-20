@@ -9,14 +9,9 @@ import {
   Animated,
   Easing,
   Image,
-  FlatList,
+  FlatList,Modal,Pressable
 } from "react-native";
-import {
-  MaterialCommunityIcons,
-  FontAwesome,
-  EvilIcons,
-  Ionicons,
-} from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { STYLES } from "../../../../constant/styles";
 import { Colors } from "../../../../constant/colors";
@@ -28,69 +23,167 @@ import {
 
 import { ScreenNames } from "../../../../constant/ScreenNames";
 import Header from "../../../../components/header";
+import { Mark_task, tasks } from "../../../../Services";
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
-const DATA = [
-  {
-    id: "0",
-    msg: "Task 1",
-    name: "James test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "1",
-    msg: "Task 2",
-    name: "James test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "2",
-    msg: "Task 3",
-    name: "James test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "3",
-    msg: "Task 2",
-    name: "James test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "4",
-    msg: "Task 2",
-    name: "James test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "5",
-    msg: "Task 2",
-    name: "James test",
-    voicemail: "5 May 2022 14:02 PM",
-    email: "praful.mishra121@gmail.com",
-  },
-];
+
 
 function Task_page() {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
   const route = useRoute();
   const translation = useRef(new Animated.Value(0)).current;
   const h = (18 / 100) * height;
+  const [d2, setd2] = useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [DATA, setDATA] = useState([]);
+  const [task_id, settask_id] = useState("");
+  const [task_status, settask_status] = useState("");
   useEffect(() => {
-    Animated.timing(translation, {
-      toValue: h,
-      delay: 0,
-      easing: Easing.elastic(4),
-      useNativeDriver: true,
-    }).start();
+    (async () => {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        id:route.params.user.id
+      };
+
+      tasks(data)
+        .then((response) => response.json())
+        .then((result) => {
+         
+          setDATA(result?.data?.tasks);
+          
+        result?.data?.tasks.map((i)=>{
+          return(settask_id(i?.CrmTask?.id))
+        })
+        result?.data?.tasks.map((i)=>{
+          return(settask_status(i?.CrmTask?.status))
+        })
+         
+         
+          // settask_id(a[0]?.id)
+          // settask_status(a[0]?.status)
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+          setd2(true);
+          Animated.timing(translation, {
+            toValue: h,
+            delay: 0,
+            easing: Easing.elastic(4),
+            useNativeDriver: true,
+          }).start();
+          setLoading(false);
+          if(result?.message == "No task has been added yet")
+          {setModalVisible(true)}
+        })
+
+        .catch((error) => console.log("error", error));
+    })();
   }, []);
 
+  const call_api = async () => {
+    try {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        id:route.params.user.id
+      };
+
+      tasks(data)
+        .then((response) => response.json())
+        .then((result) => {
+          // console.log(result)
+         
+          setDATA(result?.data?.tasks);
+         
+         
+          // var b=  a[0].id
+         
+          // settask_id(a[0]?.id)
+          // settask_status(a[0]?.status)
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+          setd2(true);
+          Animated.timing(translation, {
+            toValue: h,
+            delay: 0,
+            easing: Easing.elastic(4),
+            useNativeDriver: true,
+          }).start();
+          setLoading(false);
+        
+          
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // do something
+      setLoading(true)
+      call_api()
+      console.log("reload the page");
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  
+
+  const postdata = async () => {
+    try {
+
+      
+    
+      const user_data = await AsyncStorage.getItem("user_data");
+      // const drop_data = await AsyncStorage.getItem("dropdown_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+        password: d.password,
+        lead_id: route.params.user.id,
+        task_status:task_status,
+        task_id: task_id,
+       
+      };
+      // var a = DATA.map((i)=>{
+      //   return(i?.CrmTask)
+      // })
+      // a.map((i)=>{
+      //   return(settask_status(i?.status))
+      // })
+      // a.map((i)=>{
+      //   return(settask_id(i?.id))
+      // })
+      Mark_task(data).then((response) => {
+        response.json().then((data) => {
+          console.log(data)
+          call_api()
+          // Alert.alert(data.msg);
+         
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  
+console.log(DATA)
   // console.log(  route.params.user.name,
   //    route.params.user.id,
   //    route.params.user.logo,route.params.index)
@@ -104,6 +197,9 @@ function Task_page() {
         onRightPress={() => {}}
         // customRight={true}
       />
+       {loading ? (
+          <Loader loading={loading} />
+        ) :  (
       <FlatList
         style={{}}
         data={DATA}
@@ -117,17 +213,20 @@ function Task_page() {
                 marginTop: "5%",
               }}
             >
-              <View style={styles.circle}>
-                <Image style={styles.img} source={Images.task_cicle}></Image>
-              </View>
-              <TouchableOpacity
-              onPress={() => navigation.navigate("Task_Detail",{"msg":item.msg})}
+              <TouchableOpacity style={styles.circle}
+              
+              onPress={() => {postdata()}}
               >
-                <Text style={styles.text1}>{item.msg}</Text>
+                <Image style={styles.img} source={Images.task_cicle}></Image>
+              </TouchableOpacity>
+              <TouchableOpacity
+              onPress={() => navigation.navigate("Task_Detail",{"msg":item.CrmTask?.subject,"id":item.CrmTask?.id})}
+              >
+                <Text style={styles.text1}>{item.CrmTask?.subject}</Text>
                 <Text style={styles.text2}>
                   Lead Name: <Text
                   onPress={() => {
-                    navigation.navigate(ScreenNames.DETAIL
+                    navigation.push(ScreenNames.DETAIL
                       , {
                       user: {
                         name: route.params.user.name,
@@ -142,30 +241,60 @@ function Task_page() {
                     
                     // AsyncStorage.setItem("user_id", item.id);
                   }}
-                  style={styles.name}>{item.name}</Text>
+                  style={styles.name}>{item.CrmTask?.lead_name}</Text>
                 </Text>
                 <Text style={styles.text2}>
-                  Status: <Text style={styles.text3}>{item.voicemail}</Text>
+                  Status: <Text style={styles.text3}>{item.CrmTask?.status}</Text>
                 </Text>
                 <Text style={styles.text2}>
-                  Priority: <Text style={styles.text3}>{item.voicemail}</Text>
+                  Priority: <Text style={styles.text3}>{item.CrmTask?.priority}</Text>
                 </Text>
                 <Text style={styles.text2}>
-                  Due Date: <Text style={styles.text3}>{item.voicemail}</Text>
+                 Start Date: <Text style={styles.text3}>{item.CrmTask?.start_date}</Text>
                 </Text>
                 <Text style={styles.text2}>
-                  Reminder Time:{" "}
-                  <Text style={styles.text3}>{item.voicemail}</Text>
+                  Due Date: <Text style={styles.text3}>{item.CrmTask?.due_date}</Text>
                 </Text>
+                
               </TouchableOpacity>
             </View>
 
             <View style={styles.line}></View>
           </View>
         )}
-      />
-
-      <Animated.View
+      />)}
+      <Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.textStyle1}>Lead Booker</Text>
+                <Text style={styles.textStyle2}>No task has been added yet</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                   
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible)
+                  }}
+                >
+                  <Text style={styles.textStyle3}>OK</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+{d2?<Animated.View
         style={{
           alignItems: "center",
           justifyContent: "center",
@@ -188,7 +317,7 @@ function Task_page() {
       >
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => navigation.navigate(ScreenNames.TPage)}
+          onPress={() => navigation.navigate(ScreenNames.TPage,{id:route.params.user.id})}
         >
           <Image
             source={Images.addNote}
@@ -199,7 +328,8 @@ function Task_page() {
             }}
           />
         </TouchableOpacity>
-      </Animated.View>
+      </Animated.View>:null}
+      
     </SafeAreaView>
   );
 }
@@ -233,32 +363,32 @@ const styles = StyleSheet.create({
     marginEnd: "1%",
   },
   text1: {
-    fontSize: 17,
+    fontSize: wp("5.5%"),
 
     // color: "#808080",
     fontFamily: "Inter-Black",
     marginStart: "2%",
     color: "black",
-    marginTop: "0%",
+    marginVertical: "4%",
   },
   text2: {
-    fontSize: 13,
-    marginTop: "2%",
+    fontSize: wp("4.1%"),
+    marginTop: "7%",
     // color: "#808080",
     marginStart: "2%",
     color: Colors.blue_txt,
     fontFamily: "Inter-Black",
   },
   text3: {
-    fontSize: 13,
+    fontSize: wp("4%"),
     // marginTop: "2%",
     // // color: "#808080",
     // marginStart: "5%",
-    color: Colors.txt,
+    color: "#666666",
     fontFamily: "Inter-Black",
   },
   name: {
-    fontSize: 13,
+    fontSize: wp("4%"),
     // marginTop: "2%",
     // // color: "#808080",
     // marginStart: "5%",
@@ -295,9 +425,28 @@ const styles = StyleSheet.create({
   line: {
     backgroundColor: "#cccccc",
     height: 0.5,
-    marginVertical: "2%",
+    marginVertical: "0%",
     width: "100%",
   },
-});
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 0,
+    backgroundColor: "rgba(52, 52, 52, 0.1)",
+  },
+  modalView: {
+    width: "85%",
+    backgroundColor: "#ececee",
+    borderRadius: 20,
 
+    elevation: 5,
+    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    // elevation: 20,
+  },
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
+  textStyle3: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
+
+});
 export default Task_page;

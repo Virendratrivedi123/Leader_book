@@ -179,7 +179,7 @@ function New_lead() {
     }
   };
   let phone2 = phone.replace(/^(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
-  console.log();
+  console.log(status_value);
 
   return (
     <SafeAreaView style={styles.container}>
