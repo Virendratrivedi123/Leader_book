@@ -9,8 +9,12 @@ import {
   Animated,
   Easing,
   SafeAreaView,
-  Image,
+  Image,Modal,Pressable
 } from "react-native";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 const height = Dimensions.get("window").height;
@@ -21,24 +25,23 @@ import Loader from "../constant/Loader";
 import { ScreenNames } from "../constant/ScreenNames";
 import { Colors } from "../constant/colors";
 import { Images } from "../constant/images";
-import { useFonts } from 'expo-font';
+import { useFonts } from "expo-font";
 
 export default function Priority() {
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../assets/fonts/Mulish-Regular.ttf'),
-    'Inter-Black5': require('../../assets/fonts/Mulish-Light.ttf'),
-   
+    "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black4": require("../../assets/fonts/Mulish-Regular.ttf"),
+    "Inter-Black5": require("../../assets/fonts/Mulish-Light.ttf"),
   });
   const [DATA, setDATA] = useState([]);
   const [loading, setLoading] = React.useState(true);
   const navigation = useNavigation();
   const translation = useRef(new Animated.Value(0)).current;
   const [d1, setd1] = useState(false);
-  const h = 18/100*height
-  
+  const h = (18 / 100) * height;
+  const [modalVisible3, setModalVisible3] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -81,7 +84,13 @@ export default function Priority() {
             renderItem={({ item, index }) => (
               <View>
                 <View style={styles.mainview}>
-                  <View style={styles.box}>
+                  {}
+                  <TouchableOpacity style={styles.box}
+                  activeOpacity={1}
+                  onPress={() => {
+                    item.totalcount == "0"? setModalVisible3(true):
+                    navigation.navigate("P1",{id:item.id,name:item.type})}}
+                  >
                     <View style={styles.name_set}>
                       <Text style={styles.name}>{item.type}</Text>
                     </View>
@@ -97,30 +106,65 @@ export default function Priority() {
                       </Text>
                     </View>
                     <View style={styles.line}></View>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               </View>
             )}
           />
         ) : null}
+         <View style={styles.centeredView}>
+          <Modal
+            transparent={true}
+            visible={modalVisible3}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+              setModalVisible3(!modalVisible3);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.textStyle1}>Lead Booker</Text>
+                <Text style={styles.textStyle2}>No leads logged yet.</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                   
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                    setModalVisible3(!modalVisible3);
+                  }}
+                >
+                  <Text style={styles.textStyle3}>OK</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+        </View>
 
         {d1 ? (
           <Animated.View
             style={{
-             
               alignItems: "center",
               justifyContent: "center",
-             
+
               position: "absolute",
 
               right: "6%",
-    
-              backgroundColor: Colors.float_btn,
-              
 
-borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
+              backgroundColor: Colors.float_btn,
+
+              borderRadius:
+                Math.round(
+                  Dimensions.get("window").width +
+                    Dimensions.get("window").height
+                ) / 2,
               transform: [{ translateY: translation }],
-              bottom: (height )*0.28,
+              bottom: height * 0.28,
             }}
           >
             <TouchableOpacity
@@ -130,8 +174,11 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
             >
               <Image
                 source={Images.addLeads}
-                style={{ width: Dimensions.get('window').width * 0.18,
-                height: Dimensions.get('window').width * 0.18, resizeMode: "contain" }}
+                style={{
+                  width: Dimensions.get("window").width * 0.18,
+                  height: Dimensions.get("window").width * 0.18,
+                  resizeMode: "contain",
+                }}
               />
 
               {/* <Ionicons name="person-add" size={40} color="white" /> */}
@@ -176,21 +223,23 @@ const styles = StyleSheet.create({
     color: "#808080",
     flex: 0.95,
     marginTop: "1%",
-    fontFamily: 'Inter-Black5',
+    fontFamily: "Inter-Black5",
   },
   name: {
     fontSize: 18,
 
     fontWeight: "400",
     color: "#737373",
-    marginLeft: "5%",fontFamily: 'Inter-Black',
+    marginLeft: "5%",
+    fontFamily: "Inter-Black",
   },
   email: {
     fontSize: 16,
     flex: 0.9,
     marginTop: "5%",
-    
-    color: "#808080",fontFamily: 'Inter-Black5',
+
+    color: "#808080",
+    fontFamily: "Inter-Black5",
   },
   voicemail: {
     fontSize: 17,
@@ -255,6 +304,25 @@ const styles = StyleSheet.create({
 
     elevation: 5,
   },
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
+  textStyle3: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
 
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 0,
+    backgroundColor: "rgba(52, 52, 52, 0.2)",
+  },
+  modalView: {
+    width: "80%",
+    backgroundColor: "#ececee",
+    borderRadius: 20,
+
+    elevation: 5,
+    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    // elevation: 20,
+  },
   container: { flex: 1, backgroundColor: "white" },
 });

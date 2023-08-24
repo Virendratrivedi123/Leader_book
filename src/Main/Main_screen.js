@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useCallback} from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRoute } from "@react-navigation/native";
 import {
   StyleSheet,
@@ -22,13 +22,14 @@ import Header from "../components/header";
 import { Images } from "../constant/images";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
-import { useFonts } from 'expo-font';
-import AppLoading from 'expo-app-loading';
-import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from "expo-font";
+import AppLoading from "expo-app-loading";
+import * as SplashScreen from "expo-splash-screen";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { ScreenNames } from "../constant/ScreenNames";
 
 export default function Main_Screen({ navigation }) {
   const [com, setcom] = useState(false);
@@ -37,31 +38,48 @@ export default function Main_Screen({ navigation }) {
   const [modalVisible1, setModalVisible1] = useState(false);
   const hasUnsavedChanges = Boolean(true);
   const route = useRoute();
- 
- 
- 
-  
+
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../assets/fonts/Mulish-Regular.ttf'),
-    'prima': require('../../assets/fonts/PrimaSansBold.otf'),
-    'prima_r': require('../../assets/fonts/PrimaSansRegular.otf'),
-    
+    "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black4": require("../../assets/fonts/Mulish-Regular.ttf"),
+    prima: require("../../assets/fonts/PrimaSansBold.otf"),
+    prima_r: require("../../assets/fonts/PrimaSansRegular.otf"),
   });
 
   React.useEffect(() => {
     (async () => {
       await AsyncStorage.setItem("o", "1");
       const user = await AsyncStorage.getItem("fm");
+
       console.log(user);
       if (user == 1) {
         // setModalVisible(true);
       }
     })();
   }, []);
-// console.log(height)
+  
+  React.useEffect(() => {
+    (async () => {
+      const user2 = await AsyncStorage.getItem("op");
+      const user3 = await AsyncStorage.getItem("search");
+      console.log(route?.params?.i,"pt");
+      if (user2 == "1") {
+        setcom("ALL");
+        // setModalVisible(true);
+      }
+      if (route?.params?.i == "1") {
+        setcom("All");
+        // setModalVisible(true);
+      }
+      if (route?.params?.i == "pt") {
+        setcom("PRIORITY");
+        // setModalVisible(true);
+      }
+    })();
+  }, []);
+  // console.log(height)
   React.useEffect(
     () =>
       navigation.addListener("beforeRemove", (e) => {
@@ -87,8 +105,8 @@ export default function Main_Screen({ navigation }) {
   if (!fontsLoaded) {
     return null;
   }
-  const a="pass"
-  console.log("msg",)
+  const a = "pass";
+ 
   return (
     <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <Header
@@ -96,8 +114,8 @@ export default function Main_Screen({ navigation }) {
         leftIcon={Images.menu}
         rightIcon={Images.search}
         onLeftPress={() => navigation.toggleDrawer()}
-
-        onRightPress={() => navigation.navigate("Search")}
+        // onRightPress={() => {AsyncStorage.removeItem("op")
+        // AsyncStorage.removeItem("set"),navigation.navigate("Search")}}
       />
       <View>
         <View style={styles.tab}>
@@ -105,14 +123,24 @@ export default function Main_Screen({ navigation }) {
             style={styles.ord}
             onPress={() => {
               setcom("RECENT");
+              AsyncStorage.removeItem("op")
+              AsyncStorage.removeItem("set")
             }}
           >
             <View style={styles.home_text}>
-            <Text style={{ fontSize: wp("4.93%"),
-    fontFamily:com == "RECENT" ? "Inter-Black3" : "Inter-Black2",
-    color: "white",
-    marginBottom: "2%",
-    marginTop: "4%",}}>RECENT</Text>
+              <Text
+              //  onPress={() => {AsyncStorage.setItem("op","2"),
+              //  navigation.push(ScreenNames.DRAWER)}}
+                style={{
+                  fontSize: wp("4.93%"),
+                  fontFamily: com == "RECENT" ? "Inter-Black3" : "Inter-Black2",
+                  color: "white",
+                  marginBottom: "2%",
+                  marginTop: "4%",
+                }}
+              >
+                RECENT
+              </Text>
             </View>
           </TouchableOpacity>
 
@@ -120,14 +148,26 @@ export default function Main_Screen({ navigation }) {
             style={styles.add}
             onPress={() => {
               setcom("PRIORITY");
+              AsyncStorage.removeItem("op")
+              AsyncStorage.removeItem("set")
             }}
           >
             <View style={styles.home_text}>
-            <Text style={{ fontSize: wp("4.93%"),
-    fontFamily:com == "PRIORITY" ? "Inter-Black3" : "Inter-Black2",
-    color: "white",
-    marginBottom: "2%",
-    marginTop: "4%",}}>PRIORITY</Text>
+              <Text
+              
+              //  onPress={() => {AsyncStorage.setItem("op","p"),
+              //  navigation.push(ScreenNames.DRAWER)}}
+                style={{
+                  fontSize: wp("4.93%"),
+                  fontFamily:
+                    com == "PRIORITY" ? "Inter-Black3" : "Inter-Black2",
+                  color: "white",
+                  marginBottom: "2%",
+                  marginTop: "4%",
+                }}
+              >
+                PRIORITY
+              </Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
@@ -137,11 +177,17 @@ export default function Main_Screen({ navigation }) {
             }}
           >
             <View style={styles.home_text}>
-              <Text style={{  fontSize: wp("4.93%"),
-    fontFamily:com == "ALL" ? "Inter-Black3" : "Inter-Black2",
-    color: "white",
-    marginBottom: "2%",
-    marginTop: "4%",}}>ALL</Text>
+              <Text
+                style={{
+                  fontSize: wp("4.93%"),
+                  fontFamily: com == "ALL" ? "Inter-Black3" : "Inter-Black2",
+                  color: "white",
+                  marginBottom: "2%",
+                  marginTop: "4%",
+                }}
+              >
+                ALL
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -186,12 +232,17 @@ export default function Main_Screen({ navigation }) {
         ) : com == "PRIORITY" ? (
           <Priority />
         ) : com == "ALL" ? (
-          <All navigation={navigation} />
+          <All
+            navigation={navigation}
+            data={{
+              key: route?.params?.key,
+              i: route?.params?.i,
+            }}
+          />
         ) : (
           setcom("RECENT")
         )}
       </View>
-      
 
       <Modal
         transparent={true}
@@ -265,7 +316,6 @@ export default function Main_Screen({ navigation }) {
           </View>
         </TouchableOpacity>
       </Modal>
-
     </SafeAreaView>
   );
 }
@@ -363,7 +413,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 15,
-    fontFamily:"Inter-Black2",
+    fontFamily: "Inter-Black2",
     color: "white",
     marginBottom: "2%",
     marginTop: "4%",

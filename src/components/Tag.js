@@ -20,6 +20,7 @@ import { Images } from "../constant/images";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 import { useFonts } from 'expo-font';
+import New_pG from "./taglist/New";
 
 
 function Tag() {
@@ -37,7 +38,7 @@ function Tag() {
       <Header
         label2="Tags"
         leftIcon={Images.menu}
-        rightIcon={Images.time}
+        rightIcon={{}}
         onLeftPress={() => navigation.toggleDrawer()}
       />
 
@@ -72,7 +73,7 @@ function Tag() {
           style={{
             height: 3,
             width: width * 0.5,
-            backgroundColor: com == "User_tag" ? "#ffcc00" : "#003366",
+            backgroundColor: com == "User_tag" ? "#ffcc00" :Colors.MAIN_COLOR,
           }}
         ></View>
 
@@ -80,14 +81,14 @@ function Tag() {
           style={{
             height: 3,
             width: width * 0.5,
-            backgroundColor: com == "System_tag" ? "#ffcc00" : "#003366",
+            backgroundColor: com == "System_tag" ? "#ffcc00" : Colors.MAIN_COLOR,
           }}
         ></View>
       </View>
 
       <View style={{ flex: 1 }}>
         {com == "User_tag" ? (
-          <User_tag />
+          <New_pG />
         ) : com == "System_tag" ? (
           <System_tag />
         ) : (

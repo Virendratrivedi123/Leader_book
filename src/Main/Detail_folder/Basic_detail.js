@@ -81,7 +81,6 @@ function Basic_detail({ data }) {
   const [blank_tag2, setblank_tag2] = useState("yes");
   const [selected_data, setselected_data] = useState([]);
   const [selected_data2, setselected_data2] = useState([]);
-  
 
   useEffect(() => {
     (async () => {
@@ -136,17 +135,16 @@ function Basic_detail({ data }) {
           setselected_data2(b);
           setLoading(false);
           settag(t);
-         var g=tag.map((i)=>{
-          return(i.label.length)
-         })
-         
-let sum = 0;
+          var g = tag.map((i) => {
+            return i.label.length;
+          });
 
-for (let num of g){
+          let sum = 0;
 
-    sum = sum + num
-}
-        settag_id2(sum)
+          for (let num of g) {
+            sum = sum + num;
+          }
+          settag_id2(sum);
           // setLoading(false);
         })
         .catch((error) => console.log("error", error));
@@ -177,7 +175,7 @@ for (let num of g){
       console.error(error);
     }
   };
-// console.log(User_data.id)
+  // console.log(User_data.id)
   const call_api = async () => {
     try {
       setLoading(true);
@@ -228,17 +226,16 @@ for (let num of g){
           setselected_data2(b);
           setLoading(false);
           settag(t);
-          var g=tag.map((i)=>{
-            return(i.label.length)
-           })
-           
-  let sum = 0;
-  
-  for (let num of g){
-  
-      sum = sum + num
-  }
-          settag_id2(sum)
+          var g = tag.map((i) => {
+            return i.label.length;
+          });
+
+          let sum = 0;
+
+          for (let num of g) {
+            sum = sum + num;
+          }
+          settag_id2(sum);
           // setLoading(false);
         });
     } catch (error) {
@@ -265,20 +262,20 @@ for (let num of g){
     });
     setDATA2(temp);
   };
- 
+
   let selected = DATA1.filter((product) => product.isChecked);
   let selected1 = DATA2.filter((product) => product.isChecked);
   selected.push(...selected1);
 
-  var a= selected.map((i)=>{
-    return (i.value)
-  })
-  const myString=a.toString();
-console.log(myString);
+  var a = selected.map((i) => {
+    return i.value;
+  });
+  const myString = a.toString();
+  // console.log(myString);
   // a.map((i)=>{
   //   return(settag_id2(i))
   // })
- 
+
   useEffect(() => {
     (async () => {
       const user_data = await AsyncStorage.getItem("user_data");
@@ -365,9 +362,6 @@ console.log(myString);
 
   const Remove_tag = async () => {
     try {
-
-      
-    
       const user_data = await AsyncStorage.getItem("user_data");
       // const drop_data = await AsyncStorage.getItem("dropdown_data");
       const d = JSON.parse(user_data);
@@ -375,9 +369,8 @@ console.log(myString);
         email: d.email,
         password: d.password,
         lead_id: User_data?.id,
-        
+
         tag_id: tag_id,
-       
       };
       // var a = DATA.map((i)=>{
       //   return(i?.CrmTask)
@@ -390,10 +383,9 @@ console.log(myString);
       // })
       remove_tag(data).then((response) => {
         response.json().then((data) => {
-          console.log(data)
-          call_api()
+          console.log(data);
+          call_api();
           // Alert.alert(data.msg);
-         
         });
       });
     } catch (error) {
@@ -403,9 +395,6 @@ console.log(myString);
 
   const Add_tag = async () => {
     try {
-
-      
-    
       const user_data = await AsyncStorage.getItem("user_data");
       // const drop_data = await AsyncStorage.getItem("dropdown_data");
       const d = JSON.parse(user_data);
@@ -413,9 +402,8 @@ console.log(myString);
         email: d.email,
         password: d.password,
         lead_id: User_data?.id,
-        
+
         tag_id: myString,
-       
       };
       // var a = DATA.map((i)=>{
       //   return(i?.CrmTask)
@@ -428,10 +416,9 @@ console.log(myString);
       // })
       add_tag(data).then((response) => {
         response.json().then((data) => {
-          console.log(data)
-          call_api()
+          console.log(data);
+          call_api();
           // Alert.alert(data.msg);
-         
         });
       });
     } catch (error) {
@@ -439,7 +426,7 @@ console.log(myString);
     }
   };
 
-  console.log(tag_id2);
+  // console.log(tag_id2);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -586,10 +573,12 @@ console.log(myString);
                       />
                     </TouchableOpacity>
                   </View>
-                  <FlatList
-                  style={{ marginTop: "2%" }}
+
+                  {/* <FlatList
+                  style={{ marginTop: "2%", }}
                   data={item.Lead.lead_tags}
-                  numColumns={3 }
+                  
+                  numColumns={tag_id2}
                   keyExtractor={(item) => "#" + item.id}
                   renderItem={({ item, index }) => (
                     <View style={styles.box}>
@@ -599,8 +588,8 @@ console.log(myString);
                       >
                       <Image
                         style={{
-                          height: hp("4.5%"),
-                          width: wp("4.5%"),
+                          height: hp("4.2%"),
+                          width: wp("4.2%"),
                           resizeMode: "contain",
                           marginStart: 5,
                         }}
@@ -610,8 +599,31 @@ console.log(myString);
                       
                     </View>
                   )}
-                />
-                 
+                /> */}
+                  <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                    {item.Lead.lead_tags.map((i) => {
+                      return (
+                        <View style={styles.box}>
+                          <Text style={styles.tag}>{i.label}</Text>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setModalVisible4(true), settag_id(i.value);
+                            }}
+                          >
+                            <Image
+                              style={{
+                                height: hp("4.2%"),
+                                width: wp("4.2%"),
+                                resizeMode: "contain",
+                                marginStart: 5,
+                              }}
+                              source={Images.close_white}
+                            ></Image>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    })}
+                  </View>
                 </View>
                 <View style={styles.line}></View>
                 <View style={styles.pad}>
@@ -850,8 +862,8 @@ console.log(myString);
                       <Text style={styles.modalText}>{modalTitle2}</Text>
                       <Pressable
                         style={{}}
-                        onPress={() =>
-                          setModalVisible(!modalVisible)
+                        onPress={
+                          () => setModalVisible(!modalVisible)
                           // ,
                           // setd(0), setn("")
                         }
@@ -904,7 +916,11 @@ console.log(myString);
 
                     <Pressable
                       style={{}}
-                      onPress={() => {setModalVisible1(!modalVisible1),setsearch(""),call_api()}}
+                      onPress={() => {
+                        setModalVisible1(!modalVisible1),
+                          setsearch(""),
+                          call_api();
+                      }}
                     >
                       <Image style={styles.pencil} source={Images.close_icon} />
                     </Pressable>
@@ -1139,26 +1155,42 @@ console.log(myString);
                     ]}
                     // keyExtractor={(item, index) => item.name + index}
                   /> */}
-                  {myString.length == 0?<TouchableOpacity style={styles.save_lead_tag}
-                  //  onPress={() => {setModalVisible1(!modalVisible1),setsearch(""),Add_tag()}}
-                  activeOpacity={1}
-                   >
-                    <Text
-                      style={{ color: "white", fontFamily: "Inter-Black2",fontSize: wp("4.13%") }}
+                  {myString.length == 0 ? (
+                    <TouchableOpacity
+                      style={styles.save_lead_tag}
+                      //  onPress={() => {setModalVisible1(!modalVisible1),setsearch(""),Add_tag()}}
+                      activeOpacity={1}
                     >
-                      Save Lead To Tag
-                    </Text>
-                  </TouchableOpacity>:<TouchableOpacity style={styles.save_lead_tag}
-                   onPress={() => {setModalVisible1(!modalVisible1),setsearch(""),Add_tag()}}
-                  
-                   >
-                    <Text
-                      style={{ color: "white", fontFamily: "Inter-Black2",fontSize: wp("4.13%") }}
+                      <Text
+                        style={{
+                          color: "white",
+                          fontFamily: "Inter-Black2",
+                          fontSize: wp("4.13%"),
+                        }}
+                      >
+                        Save Lead To Tag
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.save_lead_tag}
+                      onPress={() => {
+                        setModalVisible1(!modalVisible1),
+                          setsearch(""),
+                          Add_tag();
+                      }}
                     >
-                      Save Lead To Tag
-                    </Text>
-                  </TouchableOpacity>}
-                  
+                      <Text
+                        style={{
+                          color: "white",
+                          fontFamily: "Inter-Black2",
+                          fontSize: wp("4.13%"),
+                        }}
+                      >
+                        Save Lead To Tag
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             </Modal>
@@ -1168,7 +1200,6 @@ console.log(myString);
               transparent={true}
               visible={modalVisible3}
               onRequestClose={() => {
-                
                 setModalVisible3(!modalVisible3);
               }}
             >
@@ -1201,14 +1232,15 @@ console.log(myString);
               transparent={true}
               visible={modalVisible4}
               onRequestClose={() => {
-                
                 setModalVisible4(!modalVisible4);
               }}
             >
               <View style={styles.centeredView_lead}>
                 <View style={styles.modalView_lead}>
                   <Text style={styles.textStyle1}>Lead Booker</Text>
-                  <Text style={styles.textStyle2}>Are you sure to remove this tag ?</Text>
+                  <Text style={styles.textStyle2}>
+                    Are you sure to remove this tag ?
+                  </Text>
                   <View
                     style={{
                       height: 1,
@@ -1217,33 +1249,38 @@ console.log(myString);
                       width: "100%",
                     }}
                   ></View>
-                  <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
-                  <Pressable
-                    style={{}}
-                    onPress={() => {
-                      setModalVisible4(!modalVisible4),Remove_tag()
-                    }}
-                  >
-                    <Text style={styles.textStyle3}>Yes</Text>
-                  </Pressable>
                   <View
                     style={{
-                      height:height*0.075,
-                      backgroundColor: "#cccccc",
-
-                      width: "0.5%",
-                    }}
-                  ></View>
-                  <Pressable
-                    style={{}}
-                    onPress={() => {
-                      setModalVisible4(!modalVisible4);
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-evenly",
                     }}
                   >
-                    <Text style={styles.textStyle3}>No</Text>
-                  </Pressable>
+                    <Pressable
+                      style={{}}
+                      onPress={() => {
+                        setModalVisible4(!modalVisible4), Remove_tag();
+                      }}
+                    >
+                      <Text style={styles.textStyle3}>Yes</Text>
+                    </Pressable>
+                    <View
+                      style={{
+                        height: height * 0.075,
+                        backgroundColor: "#cccccc",
+
+                        width: "0.5%",
+                      }}
+                    ></View>
+                    <Pressable
+                      style={{}}
+                      onPress={() => {
+                        setModalVisible4(!modalVisible4);
+                      }}
+                    >
+                      <Text style={styles.textStyle3}>No</Text>
+                    </Pressable>
                   </View>
-                  
                 </View>
               </View>
             </Modal>
@@ -1321,15 +1358,19 @@ const styles = StyleSheet.create({
   textStyle1: {
     fontSize: wp("5.41%"),
     fontFamily: "Inter-Black2",
-    marginTop: "7%",textAlign:"center"
+    marginTop: "7%",
+    textAlign: "center",
   },
   textStyle2: {
     fontSize: wp("4%"),
-   
+
     width: "80%",
     marginBottom: "7%",
     marginTop: "1%",
-    color: "#262626",textAlign:"center",alignSelf:"center", fontFamily: "Inter-Black",
+    color: "#262626",
+    textAlign: "center",
+    alignSelf: "center",
+    fontFamily: "Inter-Black",
   },
   textStyle3: {
     fontSize: wp("5.31%"),
@@ -1372,7 +1413,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: "2%",
-    padding: 3,width:"50%"
+    padding: 3,
+    width: "50%",
   },
   update_txt: {
     color: "white",
@@ -1591,14 +1633,14 @@ const styles = StyleSheet.create({
   },
 
   modal_tag_view: {
-    height: height*0.83,
+    height: height * 0.83,
     width: "93%",
     backgroundColor: "white",
     borderRadius: 6,
 
     elevation: 20,
     alignSelf: "center",
-   
+
     marginTop: "15%",
   },
   floating_btn: {

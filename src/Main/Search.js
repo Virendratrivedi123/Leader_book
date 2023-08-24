@@ -11,9 +11,9 @@ import {
   StyleSheet,
   Alert,
   Image,
-  
   Pressable,
-  Modal,SectionList
+  Modal,
+  SectionList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -28,6 +28,7 @@ import Loader from "../constant/Loader";
 import {
   New_lead_detail,
   New_lead_detail_update,
+  Search_filter,
   Search_page,
 } from "../Services";
 import Header4 from "../components/header4";
@@ -39,6 +40,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { ScreenNames } from "../constant/ScreenNames";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
@@ -53,9 +55,9 @@ function Search() {
   const navigation = useNavigation();
   const route = useRoute();
   const [data, setdata] = useState([]);
-  const [DATA1,setDATA1]= useState([]);
-  const [DATA2,setDATA2]= useState([]);
- const[bg,setbg]=useState("white")
+  const [DATA1, setDATA1] = useState([]);
+  const [DATA2, setDATA2] = useState([]);
+  const [bg, setbg] = useState("white");
 
   const [Lead_type, setLead_type] = useState([]);
   const [Lead_site, setLead_site] = useState([]);
@@ -72,10 +74,9 @@ function Search() {
   const [site_txt, setsite_txt] = useState("");
   const [status_txt, setstatus_txt] = useState("");
   const [range_txt, setrange_txt] = React.useState("");
-  
+
   const [email_txt, setEmail_txt] = React.useState("");
   const [Modal_date, setmodal_date] = React.useState("");
- 
 
   const [loading, setLoading] = React.useState(true);
   const [selected, setSelected] = useState("");
@@ -83,7 +84,10 @@ function Search() {
   const startDate = selected ? selected.format("YYYY-MM-DD").toString() : "";
   const EndDate = selected2 ? selected2.format("YYYY-MM-DD").toString() : "";
   const start_end_date = `${startDate} To ${EndDate}`;
-  
+  const [searchText, setSearchText] = useState("");
+  const [filteredNames, setFilteredNames] = useState([]);
+  const [key, setkey] = useState("");
+
   const customDayHeaderStylesCallback = (dayOfWeek, month, year) => {
     return {
       style: {
@@ -97,7 +101,6 @@ function Search() {
       },
     };
   };
-  
 
   useEffect(() => {
     (async () => {
@@ -111,35 +114,57 @@ function Search() {
         .then((response) => response.json())
         .then((result) => {
           //  console.log(result?.data?.searchfilters)
-          setDATA1(result?.data?.searchfilters?.tags.user_tags)
-          setDATA2(result?.data?.searchfilters?.tags.system_tags)
+          var c = [];
+          result?.data?.searchfilters?.tags.user_tags.map((i) => {
+            c.push({
+              ...i,
+
+              isChecked: false,color:false
+            });
+          });
+          var b = [];
+          result?.data?.searchfilters?.tags.system_tags.map((i) => {
+            b.push({
+              ...i,
+
+              isChecked: false,color:false
+            });
+          });
+          var d = [];
+          result?.data?.searchfilters?.agent_name.map((i) => {
+            d.push({
+              ...i,
+
+              isChecked: false,color:false
+            });
+          });
+          setDATA1(c);
+          setDATA2(b);
           setLead_type(result?.data?.searchfilters?.lead_type);
           setLead_site(result?.data?.searchfilters?.lead_site);
-          setAgent_data(result?.data?.searchfilters?.agent_name);
+          setAgent_data(d);
           setdate_range(result?.data?.searchfilters?.date_range);
           setLead_status(result?.data?.searchfilters?.lead_status);
-         setemail_status(result?.data?.searchfilters?.email_status);
+          setemail_status(result?.data?.searchfilters?.email_status);
           setdaytime_range(result?.data?.searchfilters?.daytime_range);
           setdata(result?.data?.searchfilters?.lead_type);
-          
-         
 
-          var item = result?.data?.searchfilters?.lead_site.map((i)=>{
-            return(i.label)
-          })
-          var item2 = result?.data?.searchfilters?.daytime_range.map((i)=>{
-            return(i.label)
-          })
-          var item3 = result?.data?.searchfilters?.lead_status.map((i)=>{
-            return(i.label)
-          })
-          var item4 = result?.data?.searchfilters?.email_status.map((i)=>{
-            return(i.label)
-          })
-          setsite_txt(item[0])
-          setEmail_txt(item4[0])
-          setstatus_txt(item3[0])
-          setrange_txt(item2[0])
+          var item = result?.data?.searchfilters?.lead_site.map((i) => {
+            return i.label;
+          });
+          var item2 = result?.data?.searchfilters?.daytime_range.map((i) => {
+            return i.label;
+          });
+          var item3 = result?.data?.searchfilters?.lead_status.map((i) => {
+            return i.label;
+          });
+          var item4 = result?.data?.searchfilters?.email_status.map((i) => {
+            return i.label;
+          });
+          setsite_txt(item[0]);
+          setEmail_txt(item4[0]);
+          setstatus_txt(item3[0]);
+          setrange_txt(item2[0]);
 
           // Array.push(item);
           // setdata(Array);
@@ -148,7 +173,77 @@ function Search() {
         .catch((error) => console.log("error", error));
     })();
   }, []);
-  
+
+  const postdata = async () => {
+    try {
+      const user_data = await AsyncStorage.getItem("user_data");
+      // const drop_data = await AsyncStorage.getItem("dropdown_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+      
+
+        password: d.password,
+        no: "",
+
+        date: "",
+        date_to: "",
+        date_from: "",
+        e_v: "",
+        i_g_c_l: "",
+        text: key,
+        l_d_t: "",
+        l_t_i: "",
+        s_i: "",
+        t_i: "",
+        u_i: "",
+      };
+      Search_filter(data).then((response) => {
+        response.json().then((data) => {
+         
+          AsyncStorage.setItem("set","1"),
+          AsyncStorage.setItem("search_data",JSON.stringify(data))
+          
+          AsyncStorage.setItem("op","1"),
+          navigation.push(ScreenNames.DRAWER)
+          // console.log(data);
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleChange_tag = (value) => {
+    let temp = DATA1.map((product) => {
+      if (value === product.value) {
+        return { ...product, isChecked: !product.isChecked,color:!product.color};
+      }
+      return product;
+    });
+    setDATA1(temp);
+  };
+
+  const handleChange1_tag = (value) => {
+    let temp = DATA2.map((product) => {
+      if (value === product.value) {
+        return { ...product, isChecked: !product.isChecked,color:!product.color };
+      }
+      return product;
+    });
+    setDATA2(temp);
+  };
+
+  const handleChange_agent = (value) => {
+    let temp = Agent_data.map((product) => {
+      if (value === product.value) {
+        return { ...product, isChecked: !product.isChecked,color:!product.color };
+      }
+      return product;
+    });
+    setAgent_data(temp);
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -161,15 +256,20 @@ function Search() {
             leftIcon={Images.close_icon}
             onLeftPress={() => navigation.goBack()}
             customRight={true}
-            onRightPress={() => {}}
+            onRightPress={() => {
+              postdata()
+              // AsyncStorage.setItem("search", "1");
+              
+            }}
           />
-          <ScrollView >
+          <ScrollView>
             <View style={styles.input}>
               <TextInput
                 style={{ fontSize: 16 }}
                 underlineColorAndroid="transparent"
                 placeholder="Name, Email, City or Street"
                 placeholderTextColor={"#cccccc"}
+                onChangeText={(txt) => setkey(txt)}
               />
               <FontAwesome name="search" size={22} color="black" />
             </View>
@@ -186,68 +286,74 @@ function Search() {
                   }}
                 >
                   <ScrollView>
-                  <Text style={styles.title_txt}>User Tags</Text>
-                  <FlatList
-                    style={{}}
-                    data={DATA1}
-                    numColumns={4}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item, index }) => (
-                      <View
-                        style={{
-                          backgroundColor: "#cccccc",
-                          marginEnd: "3%",
-                          marginBottom: "2%",
-                          height: height * 0.067,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: 6,
-                          width: width * 0.195,
-                        }}
-                      >
-                        <Text
+                    <Text style={styles.title_txt}>User Tags</Text>
+                    <FlatList
+                      style={{}}
+                      data={DATA1}
+                      numColumns={4}
+                      keyExtractor={(item) => item.id}
+                      renderItem={({ item, index }) => (
+                        <TouchableOpacity
+                        onPress={() => handleChange_tag(item.value)}
                           style={{
-                            textAlign: "center",
-                            fontSize: wp("4.13%"),
-                            color: "#6c6c6c",width:"90%",fontFamily:"Inter-Black4"
+                            backgroundColor: item.color? "#00ff00":"#cccccc",
+                            marginEnd: "3%",
+                            marginBottom: "2%",
+                            height: height * 0.067,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: 6,
+                            width: width * 0.195,
                           }}
                         >
-                          {item.label}
-                        </Text>
-                      </View>
-                    )}
-                  />
-                   <Text style={styles.title_txt2}>System Tags</Text>
-                  <FlatList
-                    style={{}}
-                    data={DATA2}
-                    numColumns={4}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item, index }) => (
-                      <View
-                        style={{
-                          backgroundColor: "#cccccc",
-                          marginEnd: "3%",
-                          marginBottom: "2%",
-                          height: height * 0.067,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: 6,
-                          width: width * 0.195,
-                        }}
-                      >
-                        <Text
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              fontSize: wp("4.13%"),
+                              color: item.color?"white": "#6c6c6c",
+                              width: "90%",
+                              fontFamily: "Inter-Black4",
+                            }}
+                          >
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                    <Text style={styles.title_txt2}>System Tags</Text>
+                    <FlatList
+                      style={{}}
+                      data={DATA2}
+                      numColumns={4}
+                      keyExtractor={(item) => item.id}
+                      renderItem={({ item, index }) => (
+                        <TouchableOpacity
+                        onPress={() => handleChange1_tag(item.value)}
                           style={{
-                            textAlign: "center",
-                            fontSize: wp("4.13%"),
-                            color: "#6c6c6c",width:"98%",fontFamily:"Inter-Black4"
+                            backgroundColor: item.color? "#00ff00":"#cccccc",
+                            marginEnd: "3%",
+                            marginBottom: "2%",
+                            height: height * 0.067,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: 6,
+                            width: width * 0.195,
                           }}
                         >
-                          {item.label}
-                        </Text>
-                      </View>
-                    )}
-                  />
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              fontSize: wp("4.13%"),
+                              color: item.color?"white": "#6c6c6c",
+                              width: "98%",
+                              fontFamily: "Inter-Black4",
+                            }}
+                          >
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    />
                   </ScrollView>
                 </View>
                 {/* {console.log(First_name)} */}
@@ -267,9 +373,10 @@ function Search() {
                     numColumns={4}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item, index }) => (
-                      <View
+                      <TouchableOpacity
+                      onPress={() => handleChange_agent(item.value)}
                         style={{
-                          backgroundColor: "#cccccc",
+                          backgroundColor: item.color? "#993399":"#cccccc",
                           marginEnd: "3%",
                           marginBottom: "2%",
                           height: height * 0.067,
@@ -283,12 +390,12 @@ function Search() {
                           style={{
                             textAlign: "center",
                             fontSize: 12,
-                            color: "#6c6c6c",
+                            color:item.color?"white": "#6c6c6c",
                           }}
                         >
                           {item.label}
                         </Text>
-                      </View>
+                      </TouchableOpacity>
                     )}
                   />
                 </View>
@@ -310,7 +417,7 @@ function Search() {
                       backgroundColor: "white",
                       height: height * 0.3,
                       width: "100%",
-                      
+
                       borderRadius: 6,
                       marginTop: "-5%",
                     }}
@@ -327,21 +434,25 @@ function Search() {
                           }}
                         >
                           <TouchableOpacity
-                          onPress={() => {
-                            setsite_txt(item.label),setd(!d),setbg(item.label)
-                          }}
-                          style={{backgroundColor : item.label == bg ? '#cccccc' : 'white'}}
-                          >
-                          <Text
-                          
+                            onPress={() => {
+                              setsite_txt(item.label),
+                                setd(!d),
+                                setbg(item.label);
+                            }}
                             style={{
-                              fontSize: 17,
-                              color: "black",
-                              marginVertical: "3%",
+                              backgroundColor:
+                                item.label == bg ? "#cccccc" : "white",
                             }}
                           >
-                            {item.label}
-                          </Text>
+                            <Text
+                              style={{
+                                fontSize: 17,
+                                color: "black",
+                                marginVertical: "3%",
+                              }}
+                            >
+                              {item.label}
+                            </Text>
                           </TouchableOpacity>
 
                           <View
@@ -592,7 +703,9 @@ function Search() {
                   activeOpacity={1}
                   onPress={() => setModalVisible(true)}
                 >
-                  <Text style={styles.dropdown_txt}>{Modal_date?Modal_date:"Date Search"}</Text>
+                  <Text style={styles.dropdown_txt}>
+                    {Modal_date ? Modal_date : "Date Search"}
+                  </Text>
                   <Image
                     style={{
                       height: hp("4.21%"),
@@ -626,7 +739,6 @@ function Search() {
               }}
             >
               <View style={styles.modalView}>
-                
                 <View style={styles.date_view}>
                   <View style={styles.date_box}>
                     {d ? (
@@ -640,7 +752,8 @@ function Search() {
 
                   <TouchableOpacity
                     onPress={() => {
-                      setModalVisible(!modalVisible),setmodal_date(`${startDate} To ${EndDate}`)
+                      setModalVisible(!modalVisible),
+                        setmodal_date(`${startDate} To ${EndDate}`);
                     }}
                   >
                     <Image source={Images.close_icon} style={styles.icon2} />
@@ -716,12 +829,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  title_txt:{ 
-  fontSize: wp("4.23%"),marginBottom:"4%",
-  color: "black",fontFamily:"Inter-Black"},
-  title_txt2:{ 
-    fontSize: wp("4.23%"),marginTop:"2%",marginBottom:"4%",
-    color: "black",fontFamily:"Inter-Black"},
+  title_txt: {
+    fontSize: wp("4.23%"),
+    marginBottom: "4%",
+    color: "black",
+    fontFamily: "Inter-Black",
+  },
+  title_txt2: {
+    fontSize: wp("4.23%"),
+    marginTop: "2%",
+    marginBottom: "4%",
+    color: "black",
+    fontFamily: "Inter-Black",
+  },
   start_end_date: {
     fontSize: 15,
     color: "#cccccc",

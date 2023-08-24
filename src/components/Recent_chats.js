@@ -1,8 +1,11 @@
-import React from "react";
-
-import { Entypo } from "@expo/vector-icons";
-import { useFonts } from 'expo-font';
+import React, { useState, useEffect, useRef } from "react";
 import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+
+import {
+  SafeAreaView,
   Dimensions,
   Text,
   View,
@@ -10,138 +13,167 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  Animated,
+  Easing,
+  Image,
+  ActivityIndicator,
+  Modal,
+  Pressable,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Colors } from "../constant/colors";
 import { ScreenNames } from "../constant/ScreenNames";
-import { STYLES } from "../constant/styles";
-import Header from "./header";
 import { Images } from "../constant/images";
+import { Mark_task, Recent_chat, Task_full } from "../Services";
+import Loader from "../constant/Loader";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Header from "./header";
+import moment from "moment";
 
+// import Icon from 'react-native-vector-icons/FontAwesome';
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
-const DATA = [
-  {
-    id: "0",
-    name: "test4",
-    Number: "James Test",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "1",
-    name: "test4",
-    Number: "Manjeet 12 Kumar",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "2",
-    name: "test4",
-    Number: "James Test",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "3",
-    name: "test4",
-    Number: "Test 3 Test",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "4",
-    name: "test4",
-    Number: "James & Testing",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "5",
-    name: "test4",
-    Number: "James Test",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "6",
-    name: "test4",
-    Number: "James Test",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "7",
-    name: "test4",
-    Number: "James Test",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-  {
-    id: "8",
-    name: "test4",
-    Number: "James Test",
-    voicemail: "5 May 14:02",
-    email: "praful.mishra121@gmail.com",
-  },
-];
-
 function Recent_chats() {
   const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../assets/fonts/Mulish-Regular.ttf'),
-   
+    "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black4": require("../../assets/fonts/Mulish-Regular.ttf"),
   });
   const navigation = useNavigation();
-  return (
-    <SafeAreaView style={styles.container}>
-<Header
-label="Recent chats"
-leftIcon={Images.menu}
-rightIcon={Images.time}
-onLeftPress={() => navigation.toggleDrawer()}
-/>
-    
-      <FlatList
-        style={{}}
-        data={DATA}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <View>
-            <TouchableOpacity
-              // onPress={()=>{navigation.navigate("chat",{name:item.Number})}}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginBottom: "5%",
-                  marginTop: "5%",
-                }}
-              >
-                <View style={{ flex: 0.35 }}>
-                  <View style={styles.circle}>
-                    <Text style={styles.circle_text}>JT</Text>
-                  </View>
-                </View>
+  const translation = useRef(new Animated.Value(0)).current;
+  const [loading, setLoading] = React.useState(false);
+  const [loading2, setLoading2] = React.useState(true);
+  const [DATA, setDATA] = useState([]);
+  const [DATA2, setDATA2] = useState([]);
+  const [DATA3, setDATA3] = useState([]);
+  const [d2, setd2] = useState(false);
+  const [t, sett] = useState(1);
+  const route = useRoute();
+  const h = (18 / 100) * height;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [modalVisible1, setModalVisible1] = useState(false);
 
-                <View style={{ flex: 0.55 }}>
-                  <Text style={styles.text2} numberOfLines={1}>
-                    {item.Number}
-                  </Text>
-                  <Text style={styles.text1}>{item.name}</Text>
+  const [dataSource, setDataSource] = useState([]);
+  const [offset, setOffset] = useState(1);
+  const [isListEnd, setIsListEnd] = useState(false);
+
+  React.useEffect(() => {
+    (async () => {
+      getData();
+    })();
+  }, []);
+
+  async function getData() {
+    console.log(offset);
+    if (!loading && !isListEnd) {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        no: offset,
+      };
+      Recent_chat(data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+          // Successful response from the API Call
+          // console.log(responseJson);
+          if (responseJson.data.recent_leads.length > 0) {
+            setOffset(offset + 1);
+            // After the response increasing the offset
+            setDataSource([...dataSource, ...responseJson?.data?.recent_leads]);
+            setLoading(false);
+            setLoading2(false);
+          
+          } else {
+            setIsListEnd(true);
+            setLoading(false);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }
+
+  const renderFooter = () => {
+    return (
+      // Footer View with Loader
+      <View style={styles.footer}>
+        {loading ? <Loader loading={loading} /> : null}
+      </View>
+    );
+  };
+
+  const ItemView = ({ item }) => {
+    return (
+      // Flat List Item
+      <View>
+        <View>
+          <TouchableOpacity
+          style={{paddingHorizontal:"5%"}}
+          onPress={()=>{navigation.navigate("chat",{name:item?.name,id:item?.lead_id,n_i:item?.name_initials})}}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                marginBottom: "5%",
+                marginTop: "5%",
+              }}
+            >
+              <View style={{  }}>
+                <View style={styles.circle}>
+                  <Text style={styles.circle_text}>{item?.name_initials}</Text>
                 </View>
-                <Text style={styles.text3}>{item.voicemail}</Text>
               </View>
 
-              <View style={styles.line}></View>
-            </TouchableOpacity>
-          </View>
-        )}
+              <View style={{marginStart:"5%" ,flex: 1 }}>
+                <Text style={styles.text2} numberOfLines={1}>
+                  {item?.name}
+                </Text>
+                <Text style={styles.text1}>{item?.last_message}</Text>
+              </View>
+              <Text style={styles.text3}>{moment(item?.last_message_time).format('Do MMMM h:mm')}
+                </Text>
+              {/* <Text style={styles.text3}>fgfdgfh</Text> */}
+            </View>
+
+            <View style={styles.line}></View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  
+   
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header
+        label2="Recent Chats"
+        leftIcon={Images.menu}
+        rightIcon={{}}
+        onLeftPress={() => navigation.toggleDrawer()}
       />
+      {loading2 ? (
+        <Loader loading={loading2} />
+      ) : (
+        <FlatList
+          data={dataSource}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={ItemView}
+          ListFooterComponent={renderFooter}
+          onEndReached={getData}
+          onEndReachedThreshold={0.5}
+        />
+      )}
+     
     </SafeAreaView>
   );
 }
@@ -156,7 +188,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: "2%",
     color: "#b3b3b3",
-    fontFamily:"Inter-Black",
+    fontFamily: "Inter-Black",
 
     // color: "black",
   },
@@ -164,9 +196,9 @@ const styles = StyleSheet.create({
     fontSize: 19,
     marginTop: "2%",
     // color: "#808080",
-    fontFamily:"Inter-Black3",
+    fontFamily: "Inter-Black3",
     color: "black",
-    width: width * 0.355,
+    width: width * 0.3,
   },
   text3: {
     fontSize: 14,
@@ -174,23 +206,26 @@ const styles = StyleSheet.create({
     // color: "#808080",
 
     color: "#b3b3b3",
-    fontFamily:"Inter-Black",
+    fontFamily: "Inter-Black",
   },
 
   circle: {
-    width: Dimensions.get('window').width * 0.16,
-    height: Dimensions.get('window').width * 0.16,
+    width: Dimensions.get("window").width * 0.16,
+    height: Dimensions.get("window").width * 0.16,
 
-borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
+    borderRadius:
+      Math.round(
+        Dimensions.get("window").width + Dimensions.get("window").height
+      ) / 2,
     backgroundColor: Colors.MAIN_COLOR,
-   
+
     alignItems: "center",
     justifyContent: "center",
-    marginStart: 20,
+   
   },
   circle_text: {
     fontSize: 24,
-    fontFamily:"Inter-Black3",
+    fontFamily: "Inter-Black3",
     color: "white",
   },
 

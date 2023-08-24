@@ -248,7 +248,7 @@ function Appoint_page() {
       >
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => navigation.navigate(ScreenNames.APage,{id:route.params.user.id})}
+          onPress={() => navigation.navigate(ScreenNames.APage,{id:route.params.user.id,check:"2"})}
         >
           <Image
             source={Images.addNote}

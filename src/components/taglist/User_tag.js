@@ -1,186 +1,187 @@
+
+
+
+
 import React, { useState, useEffect, useRef } from "react";
+import { useRoute } from "@react-navigation/native";
 import {
   StyleSheet,
   Text,
   View,
   Dimensions,
   TouchableOpacity,
-  
   FlatList,
+  Animated,
+  Easing,
   Modal,
   Pressable,
-  TextInput,Animated,Easing,SafeAreaView,Image
+  KeyboardAvoidingView,
+  TextInput,
+  Image,
+  SafeAreaView,
+  Alert,
+  TouchableHighlight,
+  Platform,
+  Keyboard,
 } from "react-native";
-
+import { useFonts } from "expo-font";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
-import {
- 
-  Ionicons,
- 
-  FontAwesome,
-  
-  MaterialCommunityIcons,Entypo
-} from "@expo/vector-icons";
+import { Entypo, FontAwesome, AntDesign ,MaterialCommunityIcons,Ionicons} from "@expo/vector-icons";
+import * as Linking from "expo-linking";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
+import { Delete_Tag, Pin_note, Save_tag, Tags, get_leads, get_leads_All } from "../../Services";
+import { useNavigation } from "@react-navigation/native";
+import Loader from "../../constant/Loader";
+import { ScreenNames } from "../../constant/ScreenNames";
 import { Colors } from "../../constant/colors";
-import { useFonts } from 'expo-font';
 import { Images } from "../../constant/images";
 
-export default function User_tag({ navigation }) {
-  const [fontsLoaded] = useFonts({
-    'Inter-Black': require('../../../assets/fonts/Mulish-SemiBold.ttf'),
-    'Inter-Black2': require('../../../assets/fonts/Mulish-Bold.ttf'),
-    'Inter-Black3': require('../../../assets/fonts/Mulish-ExtraBold.ttf'),
-    'Inter-Black4': require('../../../assets/fonts/Mulish-Regular.ttf'),
-   
-  });
-  const [d, setd] = useState();
-  const [modalVisible, setModalVisible] = useState(false);
-  const translation = useRef(new Animated.Value(0)).current;
-  const h = 18/100*height
-  useEffect(() => {
-    Animated.timing(translation, {
-      toValue: h,
-      delay: 0,
-      easing:  Easing.elastic(4),
-      useNativeDriver: true,
-    }).start();
-  }, []);
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import moment from "moment";
+import Tag from "../Tag";
 
-  const DATA = [
-    {
-      id: 0,
-      name: "Morining",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 1,
-      name: "Noon",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 2,
-      name: "Evening",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 3,
-      name: "6 AM To 9 AM",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 4,
-      name: "6 AM To 9 AM",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 5,
-      name: "6 AM To 9 AM",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 6,
-      name: "6 AM To 9 AM",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 7,
-      name: "Google Ads",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 8,
-      name: "Facebook Buyer",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 9,
-      name: "Facebook Seller",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-    {
-      id: 10,
-      name: "Facebook Seller",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-      s: false,
-    },
-  ];
-  const [selected_data, setSelected_data] = useState(DATA);
+function User_tag() {
+  const [fontsLoaded] = useFonts({
+    "Inter-Black": require("../../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black4": require("../../../assets/fonts/Mulish-Regular.ttf"),
+  });
+
+ 
+  
+  const navigation = useNavigation();
+  const [DATA, setDATA] = useState([]);
+  const [selected_data, setSelected_data] = useState([]);
   const [search, setsearch] = useState("");
+  const [tag, settag] = useState("");
+  const [des, setdes] = useState("");
+  const [id, setid] = useState("");
   const [arr, setarr] = useState(DATA);
   const [notes, setmynotes] = useState("");
   const searchref = useRef();
+  const [n, setn] = useState("");
+  const [loading2, setLoading2] = React.useState(true);
+  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible1, setModalVisible1] = useState(false);
+ 
+ 
+  const [d2, setd2] = useState(false);
+  const [d, setd] = useState("1");
+  
+ 
+  const translation = useRef(new Animated.Value(0)).current;
+  const h = (18 / 100) * height;
+  const [loading, setLoading] = useState(false); 
+   
+
+  const [dataSource, setDataSource] = useState([]);
+ 
+  const [offset, setOffset] = useState(1);
+  const [isListEnd, setIsListEnd] = useState(false);
+  
+ 
+
+  
+  React.useEffect(() => {
+    (async () => {
+      
+     
+        getData()
+        setd2(true);
+        Animated.timing(translation, {
+          toValue: h,
+          delay: 0,
+          easing: Easing.elastic(4),
+          useNativeDriver: true,
+        }).start();
+      
+    })();
+  }, []);
+
+  async function getData() {
+    console.log(offset);
+    if (!loading && !isListEnd) {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+        no: offset,
+      };
+     Tags(data)
+        .then((response) => response.json())
+        .then(async (responseJson) => {
+          // Successful response from the API Call
+
+          if (responseJson.data.user_tags.length > 0) {
+            setOffset(offset + 1);
+            // After the response increasing the offset
+            setDataSource([...dataSource, ...responseJson.data.user_tags]);
+            // await AsyncStorage.setItem('Dts', JSON.stringify(dataSource));
+            drs();
+            
+            setLoading2(false);
+           
+           
+          } else {
+            setIsListEnd(true);
+            
+            drs();
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }
 
   const up_down = (item) => {
-    const newitem = selected_data.map((val) => {
+    const newitem = DATA.map((val) => {
       if (val.id == item.id) {
-        return { ...val, s: !val.s };
+        return { ...val, isChecked: !val.isChecked };
       } else {
         return val;
       }
     });
-    setSelected_data(newitem);
+    setDATA(newitem);
   };
-  const Delete = (i) => {
-    const newPeople = selected_data.filter((person) => person.id !== i.id);
 
-    setSelected_data(newPeople);
-    setarr(newPeople);
-  };
+  const press =(item)=>{
+    const temp=[]
+     DATA.map((val)=>{
+     if(val.id == item.id)
+     {
+         temp.push({...val,isChecked:!val.isChecked})
+     }
+     else{temp.push({...val,isChecked:false})}
+    });
+    setDATA(temp)
+   }
+  // const Delete = (i) => {
+  //   const newPeople = selected_data.filter((person) => person.id !== i.id);
+
+  //   setSelected_data(newPeople);
+  //   setarr(newPeople);
+  // };
 
   const onsearch = (text) => {
     if (text == "") {
-      setSelected_data(arr);
+      setDATA(selected_data)
     } else {
-      let temp = selected_data.filter((item) => {
+      let temp = DATA.filter((item) => {
         return item.name.toLowerCase().indexOf(text.toLowerCase()) > -1;
       });
-      setSelected_data(temp);
+      setDATA(temp);
     }
   };
 
@@ -194,30 +195,152 @@ export default function User_tag({ navigation }) {
     //  setSelected_data([...arr,newdata]);
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-    <View style={styles.container}>
-      <View style={styles.input}>
-        <TextInput
-          ref={searchref}
-          style={{fontSize:17,}}
-          onChangeText={(text) => {
-            onsearch(text), setsearch(text);
-          }}
-          value={search}
-          underlineColorAndroid="transparent"
-          placeholder="Search Tags"
-          placeholderTextColor={"#cccccc"}
-        />
-        <FontAwesome name="search" size={22} color="black" />
-      </View>
+  const drs = async () => {
 
-      <FlatList
-        style={{ height: "100%" }}
-        data={selected_data}
-        keyExtractor={(item, index) => item.id}
-        renderItem={({ item, index }) => (
-          <View>
+    var it = 0;
+    // const myArray = await AsyncStorage.getItem('Dts')
+    // const rt = JSON.parse(myArray)
+    // console.log(rt.length)
+    // console.log(rt)
+
+    var a = [];
+    dataSource.map((i) => {
+      a.push({ ...i.CrmTag, isChecked: false,  });
+    });
+    
+    setDATA(a);
+   setSelected_data(a)
+  };
+
+ 
+  const renderFooter = () => {
+    return (
+      // Footer View with Loader
+      <View style={styles.footer}>
+        {loading2 ? <Loader loading={loading2} /> : null}
+      </View>
+    );
+  };
+  
+  const postdata = async () => {
+    
+     try {
+      
+    
+       const user_data = await AsyncStorage.getItem("user_data");
+       // const drop_data = await AsyncStorage.getItem("dropdown_data");
+       const d = JSON.parse(user_data);
+       const data = {
+         email: d.email,
+         des: des,
+         id: id,
+         name:tag,
+         password: d.password,
+       };
+       Save_tag(data).then((response) => {
+         response.json().then(async (data) => {
+          
+           console.log(data)
+          //  DATA.map((i,index)=>{
+          //   if(i.id== id){
+          //     DATA[index] = { ...i, ...i.name = tag,
+          //     };
+          //   }
+            
+            
+          // })
+       
+          navigation.navigate("Notifications")
+           setModalVisible(!modalVisible)
+       
+         
+         
+         });
+       });
+     } catch (error) {
+       console.error(error);
+     }
+   };
+ 
+   const Delete = async () => {
+    
+    try {
+     
+   
+      const user_data = await AsyncStorage.getItem("user_data");
+      // const drop_data = await AsyncStorage.getItem("dropdown_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+     
+        id: id,
+       
+        password: d.password,
+      };
+    Delete_Tag(data).then((response) => {
+        response.json().then(async (data) => {
+         
+          console.log(data)
+         //  DATA.map((i,index)=>{
+         //   if(i.id== id){
+         //     DATA[index] = { ...i, ...i.name = tag,
+         //     };
+         //   }
+           
+           
+         // })
+      
+         navigation.navigate("Notifications")
+          setModalVisible(!modalVisible)
+      
+        
+        
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setOffset(0)
+      setLoading2(true)
+      getData();
+    });
+    
+    return () => {
+     // executed when unmount
+     unsubscribe();
+    
+    }
+}, [navigation]);
+
+useEffect(() => {
+  const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+    setd2(false) 
+  });
+  const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+    setd2(true)
+  });
+
+  return () => {
+    showSubscription.remove();
+    hideSubscription.remove();
+  };
+}, []);
+
+
+  
+// console.log(DATA)
+  const ItemView = ({ item, index }) => {
+    return (
+      
+      // Flat List Item
+     
+       
+      
             <View
               style={styles.flat_data}
             >
@@ -233,43 +356,31 @@ export default function User_tag({ navigation }) {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Text style={styles.name}>{item.name}</Text>
+                  <Text style={styles.name}>{item?.name}</Text>
                   <View style={{ flexDirection: "row" }}>
+                    
+                      <TouchableOpacity
+                        onPress={() =>{setd("1"),settag(item?.name),setid(item?.id),setdes(item?.description), setModalVisible(true)}}
+                        style={styles.icn}
+                      >
+                        <Image style={styles.pencil} source={Images.editYellow} />
+                      </TouchableOpacity>
+                   
                     <TouchableOpacity
                       style={{  }}
-                      onPress={() => {
-                        setModalVisible(true);
-                      }}
+                      onPress={() =>{ setid(item?.id),setd("5"),setModalVisible(true)}}
                     >
                       <View
                         style={styles.icn}
                       >
-                        <MaterialCommunityIcons
-                          name="pencil"
-                          size={24}
-                          color="orange"
-                        />
+                         <Image style={styles.pencil} source={Images.delete} />
                       </View>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{  }}
-                      onPress={() => Delete(item)}
+                      onPress={() => press(item)}
                     >
-                      <View
-                        style={styles.icn}
-                      >
-                        <MaterialCommunityIcons
-                          name="delete-outline"
-                          size={24}
-                          color="black"
-                        />
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{  }}
-                      onPress={() => up_down(item)}
-                    >
-                      {item.s ? (
+                      {item?.isChecked ? (
                         <Ionicons
                           name="ios-chevron-up"
                           size={25}
@@ -286,42 +397,95 @@ export default function User_tag({ navigation }) {
                   </View>
                 </View>
                 <View style={{ flexDirection: "row",  }}>
-                  <Text style={styles.number}>Total Leads ({item.Number})</Text>
+                  <Text style={styles.number}>Total Leads ({item?.total_leads})</Text>
                 </View>
-                {item.s ? (
-                  <View style={{ flexDirection: "row",  }}>
+                {item?.isChecked ? (
+                  <View style={{ flexDirection: "row",marginTop:"3%"  }}>
                     <Text style={styles.number}>
-                      Description: ({item.description})
+                      Description: ({item?.description})
                     </Text>
                   </View>
+                  
+                ) : null}
+                 {item?.isChecked ? (
+                  <View style={{ flexDirection: "row",  }}>
+                    <Text style={styles.number}>
+                      Verified Leads: ({item?.verified_leads})
+                    </Text>
+                  </View>
+                  
                 ) : null}
               </View>
             </View>
-          </View>
-        )}
-      />
-      
-      <Animated.View
-            style={{
-             
-              alignItems: "center",
-              justifyContent: "center",
-             
-              position: "absolute",
+         
+    );
+  };
 
-              right: "6%",
-              
-borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window').height) / 2,
-              backgroundColor: Colors.float_btn,
-              
-              transform: [{ translateY: translation }],
-              bottom: (height )*0.28,
-              elevation: 5,
-            }}
-          >
+ 
+
+  return (
+    <SafeAreaView style={styles.container}>
+
+      {loading2 ? (
+        <Loader loading={loading2} />
+      ) : (
+        <View>
+          <View style={styles.input}>
+        <TextInput
+          ref={searchref}
+          style={{fontSize:17,width:"90%",height:"100%"}}
+          onChangeText={(text) => {
+            onsearch(text), setsearch(text);
+          }}
+          value={search}
+          underlineColorAndroid="transparent"
+          placeholder="Search Tags"
+          placeholderTextColor={"#cccccc"}
+        />
+        <FontAwesome name="search" size={22} color="black" />
+      </View>
+       
+          <FlatList
+          style={{marginBottom:"15%"}}
+            data={DATA}
+           
+           
+            keyExtractor={(item, index) => index.toString()}
+           
+            renderItem={ItemView}
+            ListFooterComponent={renderFooter}
+            onEndReached={getData}
+            onEndReachedThreshold={0.5}
+          />
+        </View>
+      )}
+
+      {d2 ? (
+        <Animated.View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+
+            position: "absolute",
+
+            right: "6%",
+            // width: Dimensions.get("window").width * 0.16,
+            // height: Dimensions.get("window").width * 0.16,
+
+            borderRadius:
+              Math.round(
+                Dimensions.get("window").width + Dimensions.get("window").height
+              ) / 2,
+
+            transform: [{ translateY: translation }],
+            bottom: height * 0.28,
+            elevation: 5,
+          }}
+        >
             <TouchableOpacity
+            activeOpacity={1}
               // onPress={() => navigation.navigate(ScreenNames.NEW_LEADS)}
-              onPress={() => setModalVisible(true)}
+              onPress={() =>{ setd("2"),setModalVisible(true)}}
               // style={styles.floating_btn}
             >
               <Image
@@ -330,15 +494,82 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
                 height: Dimensions.get('window').width * 0.18, resizeMode: "contain" }}
               />
             </TouchableOpacity>
-          </Animated.View>
+            </Animated.View>
+      ) : null}
 
-      <Modal
+
+      {d == "1"?<Modal
+        animationType="slide"
+        transparent={true}
+        avoidKeyboard={false}
+        visible={modalVisible}
+        onRequestClose={() => {
+          
+          setd(false)
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View
+          style={styles.main_modal}
+        >
+          <View style={styles.modalView}>
+            <View
+              style={styles.main_view}
+            >
+              <Text style={{ fontSize: 20 }}></Text>
+              <Text style={styles.add}>
+                Edit Your Tag
+              </Text>
+              <Pressable
+                style={{}}
+                onPress={() =>{setd(), setModalVisible(!modalVisible)}}
+              >
+                <Entypo name="cross" size={30} color="black" />
+              </Pressable>
+            </View>
+            <View
+              style={styles.modal_page}
+            ></View>
+            <View style={styles.modal_inner_view}>
+              <Text
+                style={styles.nam_tag}
+              >
+                Edit your tag
+              </Text>
+              <TextInput
+                style={styles.input2}
+                onChangeText={(txt) => settag(txt)}
+                value={tag}
+              
+              />
+              <Text
+                style={styles.description}
+              >
+                Description
+              </Text>
+              <TextInput
+                style={styles.input2}
+                onChangeText={(txt) => setdes(txt)}
+                value={des}
+               
+              
+              />
+              <TouchableOpacity
+                onPress={() => setd("4")}
+                style={styles.create}
+              >
+                <Text style={styles.create_txt}>Save Tag</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>: d=="2" ?<Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
-          setModalVisible(!modalVisible);
+          setd(!d), setModalVisible(!modalVisible)
         }}
       >
         <View
@@ -354,7 +585,7 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
               </Text>
               <Pressable
                 style={{}}
-                onPress={() => setModalVisible(!modalVisible)}
+                onPress={() =>{setd(!d), setModalVisible(!modalVisible)}}
               >
                 <Entypo name="cross" size={30} color="black" />
               </Pressable>
@@ -370,10 +601,9 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
               </Text>
               <TextInput
                 style={styles.input2}
-                // onChangeText={onChangeNumber}
-                // value={number}
-                placeholder=""
-                keyboardType="numeric"
+                onChangeText={(txt) => settag(txt)}
+                // value={tag}
+              
               />
               <Text
                 style={styles.description}
@@ -382,13 +612,12 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
               </Text>
               <TextInput
                 style={styles.input2}
-                // onChangeText={onChangeNumber}
-                // value={number}
-                placeholder=""
-                keyboardType="numeric"
+                onChangeText={(txt) => setdes(txt)}
+                // value={des}
+             
               />
               <TouchableOpacity
-                // onPress={() => setd(!d)}
+                    onPress={() => setd("3")}
                 style={styles.create}
               >
                 <Text style={styles.create_txt}>Create Tag</Text>
@@ -396,19 +625,143 @@ borderRadius: Math.round(Dimensions.get('window').width + Dimensions.get('window
             </View>
           </View>
         </View>
-      </Modal>
-    </View>
-
+      </Modal>:d=="3"?<Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredVieww}>
+              <View style={styles.modalVieww}>
+              
+                <Text style={styles.textStyle2}>Tag has been saved successfully</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                   
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                   
+                    setModalVisible(!modalVisible),postdata()
+                  }}
+                >
+                  <Text style={styles.textStyle3}>OK</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>:d=="4"?<Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredVieww}>
+              <View style={styles.modalVieww}>
+                
+                <Text style={styles.textStyle2}>Tag has been updated successfully</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                   
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                   
+                    setModalVisible(!modalVisible),postdata()
+                  }}
+                >
+                  <Text style={styles.textStyle3}>OK</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>:d=="5"?<Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredVieww}>
+              <View style={styles.modalVieww}>
+                
+                <Text style={styles.textStyle2}>Are you sure to delete this tag?</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                   
+                    width: "100%",
+                  }}
+                ></View>
+                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                   
+                    setModalVisible(!modalVisible)
+                  }}
+                >
+                  <Text style={styles.textStyle3}>Cancel</Text>
+                </Pressable>
+                <View
+                  style={{
+                    height: height*0.06,
+                    backgroundColor: "#cccccc",
+                   
+                    width: 1,marginLeft:"-8%"
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                   
+                  Delete()
+                  }}
+                >
+                  <Text style={styles.textStyle3}>OK</Text>
+                </Pressable>
+                </View>
+                
+              </View>
+            </View>
+          </Modal>:null}
+      
+    
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  footer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  pencil: {
+    height: height * 0.025,
+    width: width * 0.07,
+    resizeMode: "contain",
+  },
   icn:{
                          
     borderWidth: 1,
     borderColor: "#808080",
-    borderRadius: 6,marginEnd:5
+    borderRadius: 6,marginEnd:5,alignItems:"center",justifyContent:"center",height:height*0.038
   },
   flat_data:{
     flexDirection: "row",
@@ -435,18 +788,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     margin: "5%",
   },
-  add:{ fontSize: 20, color: Colors.MAIN_COLOR,fontFamily:"Inter-Black", },
-  modal_page:{
-    height: 1,
-    width: "100%",
-    backgroundColor: "#cccccc",
-  },
+  add:{ color: Colors.MAIN_COLOR,fontSize: wp("5.41%"), fontFamily: "Inter-Black" },
+  
   modal_inner_view:{ marginHorizontal: "3%", marginTop: "2%" },
   nam_tag:{
-    fontSize: 16,
+    
     color: Colors.MAIN_COLOR,
     marginTop: "4%",
-    fontFamily:"Inter-Black",
+   fontSize: wp("5.01%"), fontFamily: "Inter-Black"
   },
   description:{
     fontSize: 16,
@@ -454,7 +803,7 @@ const styles = StyleSheet.create({
     marginTop: "4%",
     fontFamily:"Inter-Black",
   },
-  create_txt:{ color: "white", fontSize: 17,fontFamily:"Inter-Black",paddingHorizontal:"5%",paddingVertical:"3%" },
+  create_txt:{ color: "white", fontSize: wp("5.01%"), fontFamily: "Inter-Black4",paddingHorizontal:"5%",paddingVertical:"3%" },
   create:{
     
     
@@ -466,8 +815,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalText: {
-    fontSize: 25,
-    fontFamily:"Inter-Black2",
+    fontSize: wp("5.21%"), fontFamily: "Inter-Black2"
   },
   input2: {
     height: height * 0.06,
@@ -475,7 +823,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     padding: 10,
     borderRadius: 6,
-    marginTop: "1%",
+    marginTop: "1%",color:Colors.txt,fontSize: wp("5.21%"), fontFamily: "Inter-Black4"
   },
   input: {
     height: height * 0.075,
@@ -501,8 +849,8 @@ const styles = StyleSheet.create({
   modalView: {
     // height: height * 0.42,
     width: "87%",
-    backgroundColor: "white",
-    borderRadius: 6,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
 
     elevation: 15,
     alignSelf: "center",marginTop:"50%"
@@ -545,39 +893,22 @@ const styles = StyleSheet.create({
   name: {
     borderRadius: 20,
     
-    fontSize: 17,
-    fontFamily:"Inter-Black2",
+    fontSize: wp("5.41%"), fontFamily: "Inter-Black",
     color: Colors.blue_txt,
   },
   number: {
-    fontSize: 14,
-
-    fontFamily:"Inter-Black",
+    fontSize: wp("4.01%"), fontFamily: "Inter-Black",
     color: Colors.blue_txt,
 
     marginBottom: "1.5%",
   },
-  email: {
-    fontSize: 16,
-    flex: 0.9,
-    marginTop: "5%",
-    fontWeight: "600",
-    color: "#808080",
-  },
-  voicemail: {
-    fontSize: 17,
-    flex: 0.9,
-    marginTop: "5%",
-    fontWeight: "600",
-    color: "#808080",
-  },
-
+  
   circleview: { marginStart: "1%", marginEnd: "7%" },
   circle: {
     height: height * 0.1,
     width: width * 0.2,
     backgroundColor: "#e6e6e6",
-    borderRadius: 50,
+    
     alignItems: "center",
     justifyContent: "center",
   },
@@ -629,4 +960,34 @@ const styles = StyleSheet.create({
   },
 
   container: { flex: 1, },
+  line: {
+    backgroundColor: "#cccccc",
+    height: 0.5,
+    marginVertical: "0%",
+    width: "100%",
+  },
+  centeredVieww: {
+    flex: 1,
+    justifyContent: "center",
+    
+    marginTop: 0,
+    backgroundColor: "rgba(52, 52, 52, 0.3)",
+  },
+  modalVieww: {
+    width: "85%",
+    backgroundColor: "#ececee",
+    borderRadius: 20,
+
+    elevation: 5,alignSelf:"center"
+   
+    // elevation: 20,
+  },
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",marginVertical:"7%",color:"#262626",},
+  textStyle3: { fontSize: wp("5.01%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",textAlign:"center"},
+
+
 });
+
+
+export default User_tag;

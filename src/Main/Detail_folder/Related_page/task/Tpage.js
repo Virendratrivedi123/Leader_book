@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import SelectDropdown from 'react-native-select-dropdown';
+import SelectDropdown from "react-native-select-dropdown";
 import { AntDesign } from "@expo/vector-icons";
 import {
   widthPercentageToDP as wp,
@@ -17,25 +17,28 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
-  Modal,  KeyboardAvoidingView,Pressable
+  Modal,
+  KeyboardAvoidingView,
+  Pressable,
+  TouchableHighlight,
 } from "react-native";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 
 import { Colors } from "../../../../constant/colors";
 
 import { Images } from "../../../../constant/images";
 import Header from "../../../../components/header";
 import { useFonts } from "expo-font";
-import { Create_lead_task, add_lead_task } from "../../../../Services";
+import {
+  Create_lead_task,
+  add_lead_task,
+  get_leads_All,
+} from "../../../../Services";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
-
-
-
 
 function Tpage() {
   const [fontsLoaded] = useFonts({
@@ -44,7 +47,11 @@ function Tpage() {
     "Inter-Black3": require("../../../../../assets/fonts/Mulish-ExtraBold.ttf"),
     "Inter-Black4": require("../../../../../assets/fonts/Mulish-Regular.ttf"),
   });
+  const [modalVisible7, setModalVisible7] = useState(false);
   const navigation = useNavigation();
+  const [selected_data, setselected_data] = useState([]);
+  const [v, setV] = useState("");
+  const [lead_id, setlead_id] = useState("");
   const route = useRoute();
   const [value1, setValue1] = useState();
   const [value2, setValue2] = useState();
@@ -65,16 +72,19 @@ function Tpage() {
   const [subject, setsubject] = useState("");
   const [notes, setnotes] = useState("");
   const [percentage, setpercentage] = useState("");
-  const scroll = React.createRef()
+  const scroll = React.createRef();
   const [d1, setd1] = useState(false);
   const [d2, setd2] = useState(false);
   const [d3, setd3] = useState(false);
-  const [er,seter]=useState([])
-  const [st_data,setst_data]=useState([])
-  const [pr_data,setpr_data]=useState([])
-
+  const [er, seter] = useState([]);
+  const [st_data, setst_data] = useState([]);
+  const [pr_data, setpr_data] = useState([]);
+  const check = route?.params?.check;
+  const searchref = useRef();
+  const [search, setsearch] = useState("");
   const [loading, setLoading] = React.useState(true);
   const [DATA, setDATA] = useState([]);
+  const [DATA2, setDATA2] = useState([]);
   useEffect(() => {
     (async () => {
       const user_data = await AsyncStorage.getItem("user_data");
@@ -85,33 +95,65 @@ function Tpage() {
       const data = {
         email: d.email,
         password: d.password,
-        id:route.params.id
+        id: route.params.id,
       };
 
-     Create_lead_task(data)
+      Create_lead_task(data)
         .then((response) => response.json())
         .then((result) => {
           // console.log(result)
           // result?.data?.task_detail.map((i)=>{
           //   return(setDATA(i.CrmTask))
           // })
-          var a = result?.data?.create_lead_task_detail
-          seter(a.enable_reminder?.dropdown_arr)
-          setst_data(a.status?.dropdown_arr)
-          setpr_data(a.priority?.dropdown_arr)
-       
-         
+          var a = result?.data?.create_lead_task_detail;
+          seter(a.enable_reminder?.dropdown_arr);
+          setst_data(a.status?.dropdown_arr);
+          setpr_data(a.priority?.dropdown_arr);
+
           // setDATA(result?.data?.task_detail);
 
           // setModalTitle2(result?.data?.leads?.name)
           // setnote(result?.data?.leads?.first_name)
-        
+
           setLoading(false);
         })
 
         .catch((error) => console.log("error", error));
     })();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      const user_data = await AsyncStorage.getItem("user_data");
+      const d = JSON.parse(user_data);
+      const data = {
+        email: d.email,
+        password: d.password,
+      };
+
+      get_leads_All(data)
+        .then((response) => response.json())
+        .then((result) => {
+          setDATA(result?.data?.leads);
+          setselected_data(result?.data?.leads);
+          setLoading(false);
+        })
+
+        .catch((error) => console.log("error", error));
+    })();
+  }, []);
+
+  const onsearch = (text) => {
+    if (text == "") {
+      setDATA2(DATA);
+    } else {
+      let temp = selected_data.filter((item) => {
+        return item?.Lead?.name.toLowerCase().indexOf(text.toLowerCase()) > -1;
+      });
+
+      setDATA2(temp);
+    }
+  };
 
   const showDatePicker2 = () => {
     setDatePickerVisibility(true);
@@ -187,7 +229,7 @@ function Tpage() {
         response.json().then((data) => {
           console.log(data);
           // Alert.alert(data.msg);
-          setModalVisible6(true)
+          setModalVisible6(true);
         });
       });
     } catch (error) {
@@ -196,195 +238,235 @@ function Tpage() {
   };
 
   // console.log(value3,value4,value5)
-  
-  
+
   return (
     <SafeAreaView style={styles.container}>
-
       <Header
         label="New Task"
         leftIcon={Images.backArrow}
         // rightIcon={Images.search}
         onLeftPress={() => navigation.goBack()}
         onRightPress={() => {
-          if(subject.length <1 || date.length < 1 || date1.length < 1)
-        { setModalVisible5(true)}
-        if(subject.length >0 && date.length > 0 && date1.length >0)
-        { postdata()}
-       
+          if (subject.length < 1 || date.length < 1 || date1.length < 1) {
+            setModalVisible5(true);
+          }
+          if (subject.length > 0 && date.length > 0 && date1.length > 0) {
+            postdata();
+          }
         }}
         customRight={true}
       />
-        {loading ? (
-          <Loader loading={loading} />
-        ) :
-      <KeyboardAvoidingView
+      {loading ? (
+        <Loader loading={loading} />
+      ) : (
+        <KeyboardAvoidingView
           // keyboardVerticalOffset={height + 47}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ }}
+          style={{}}
           enabled
         >
-         
-      <ScrollView
-      ref={scroll}
-      >
-        <View
-          style={{
-            paddingHorizontal: "2%",
-            marginBottom: "30%",
-            // paddingStart: "15%",
-          }}
-        >
-          <Text style={styles.name_txt}>Subject</Text>
-          <TextInput
-            placeholder="Enter Subject"
-            style={styles.input}
-            //   value={text_sign}
-              onChangeText={(txt) => setsubject(txt)}
-            placeholderTextColor={"#cccccc"}
-          ></TextInput>
-
-        
-          
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.calender}></Image>
-            <Text style={styles.name_txt2}>Start Date</Text>
-          </View>
-          <View style={[styles.press]}>
-            <TouchableOpacity
-              style={{ width: "60%",flex:0.95 }}
-              onPress={() => setModalVisible(true)}
+          <ScrollView ref={scroll}>
+            <View
+              style={{
+                paddingHorizontal: "2%",
+                marginBottom: "30%",
+                // paddingStart: "15%",
+              }}
             >
+              <Text style={styles.name_txt}>Subject</Text>
               <TextInput
-                style={{
-                  color: "grey",
-                  fontSize: wp("5%"),
-                  fontFamily: "Inter-Black4",
-                }}
-                placeholder={"Start Date"}
-                showSoftInputOnFocus={false}
-                // editable={false}
-                value={date}
-                onPressIn={() => setModalVisible(true)}
+                placeholder="Enter Subject"
+                style={styles.input}
+                //   value={text_sign}
+                onChangeText={(txt) => setsubject(txt)}
                 placeholderTextColor={"#cccccc"}
               ></TextInput>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setdate("");
-              }}
-              style={{  }}
-            >
-              <Image style={styles.cancel} source={Images.cancel}></Image>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.calender}></Image>
-            <Text style={styles.name_txt2}>Due Date</Text>
-          </View>
-
-          <View style={[styles.press]}>
-            <TouchableOpacity
-              style={{ width: "60%" ,flex:0.95}}
-              onPress={() => setModalVisible2(true)}
-            >
+              <View style={styles.line2}></View>
+              <Text style={styles.name_txt}>Site</Text>
               <TextInput
-                style={{
-                  color: "grey",
-                  fontSize: wp("5%"),
-                  fontFamily: "Inter-Black4",
-                }}
-                placeholder={"Due Date"}
-                showSoftInputOnFocus={false}
-                // editable={false}
-                value={date1}
-                onPressIn={() => setModalVisible2(true)}
+                placeholder="Location"
+                style={styles.input}
+                value={"Test2"}
+                editable={false}
+                // onChangeText={(txt) => setlocation(txt)}
                 placeholderTextColor={"#cccccc"}
               ></TextInput>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setdate1("");
-              }}
-              style={{ }}
-            >
-              <Image style={styles.cancel} source={Images.cancel}></Image>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.set_alarm}></Image>
-            <Text style={styles.name_txt2}>Enable Reminder</Text>
-          </View>
-          <SelectDropdown
-            data={er}
-            defaultValueByIndex={0}
-          
-            onSelect={(item, index) => {
-              setValue3(item.label)
-            }}
-           
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem.label;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item.label;
-            }}
-            buttonStyle={styles.dropdown1BtnStyle}
-            buttonTextStyle={styles.dropdown1BtnTxtStyle}
-            renderDropdownIcon={isOpened => {
-              return  <AntDesign
-              style={styles.icon}
-              color="#003366"
-              name="downsquare"
-              size={30}
-            />
-            }}
-            dropdownIconPosition={"right"}
-            dropdownStyle={styles.dropdown1DropdownStyle}
-            rowStyle={styles.dropdown1RowStyle}
-            rowTextStyle={styles.dropdown1RowTxtStyle}
-            dropdownOverlayColor="rgba(52, 52, 52, 0)"
-          />
-        
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.clock_circular}></Image>
-            <Text style={styles.name_txt2}>Reminder Time</Text>
-          </View>
 
-          <View style={[styles.press]}>
+              {check == "1" ? (
+                <>
+                  <Text style={styles.name_txt}>Search Lead</Text>
+                  <TextInput
+                    underlineColorAndroid="transparent"
+                    placeholder="Search Lead"
+                    style={styles.input}
+                    //   value={text_sign}
+                    onKeyPress={() => {
+                      setModalVisible7(true);
+                    }}
+                    ref={searchref}
+                    onChangeText={(text) => {
+                      onsearch(text), setsearch(text);
+                    }}
+                    value={search}
+                    placeholderTextColor={"#cccccc"}
+                  ></TextInput>
+                  <View style={styles.line2}></View>
+                  <Text style={styles.name_txt}>Selected Lead</Text>
+                  <TextInput
+                    // placeholder="Location"
+                    style={styles.input}
+                    value={v}
+                    onChangeText={(txt) => setlocation(txt)}
+                    placeholderTextColor={"#cccccc"}
+                  ></TextInput>
+                </>
+              ) : null}
 
-            <TextInput
-             style={{flex:0.95,color: "grey",
-             fontSize: wp("5%"),
-             fontFamily: "Inter-Black4",}}
-              placeholder={"Reminder Date and Time"}
-              placeholderTextColor={"#cccccc"}
-              caretHidden={true}
-              showSoftInputOnFocus={false}
-                // editable={false}
-                value={date_time}
-                onPressIn={() => {scroll.current.scrollTo({x: 0, y: 180, animated: true}),setModalVisible3(true)}}
-            >
+              <View style={styles.line2}></View>
+              <View style={{ flexDirection: "row" }}>
+                <Image style={styles.icon2} source={Images.calender}></Image>
+                <Text style={styles.name_txt2}>Start Date</Text>
+              </View>
+              <View style={[styles.press]}>
+                <TouchableOpacity
+                  style={{ width: "60%", flex: 0.95 }}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <TextInput
+                    style={{
+                      color: "grey",
+                      fontSize: wp("5%"),
+                      fontFamily: "Inter-Black4",
+                    }}
+                    placeholder={"Start Date"}
+                    showSoftInputOnFocus={false}
+                    // editable={false}
+                    value={date}
+                    onPressIn={() => setModalVisible(true)}
+                    placeholderTextColor={"#cccccc"}
+                  ></TextInput>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setdate("");
+                  }}
+                  style={{}}
+                >
+                  <Image style={styles.cancel} source={Images.cancel}></Image>
+                </TouchableOpacity>
+              </View>
 
-            </TextInput>
-            <TouchableOpacity
-              onPress={() => {
-                setdate_time("");
-              }}
-              style={{ }}
-            >
-              <Image style={styles.cancel} source={Images.cancel}></Image>
-            </TouchableOpacity>
-            {/* <TouchableOpacity
+              <View style={styles.line2}></View>
+              <View style={{ flexDirection: "row" }}>
+                <Image style={styles.icon2} source={Images.calender}></Image>
+                <Text style={styles.name_txt2}>Due Date</Text>
+              </View>
+
+              <View style={[styles.press]}>
+                <TouchableOpacity
+                  style={{ width: "60%", flex: 0.95 }}
+                  onPress={() => setModalVisible2(true)}
+                >
+                  <TextInput
+                    style={{
+                      color: "grey",
+                      fontSize: wp("5%"),
+                      fontFamily: "Inter-Black4",
+                    }}
+                    placeholder={"Due Date"}
+                    showSoftInputOnFocus={false}
+                    // editable={false}
+                    value={date1}
+                    onPressIn={() => setModalVisible2(true)}
+                    placeholderTextColor={"#cccccc"}
+                  ></TextInput>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setdate1("");
+                  }}
+                  style={{}}
+                >
+                  <Image style={styles.cancel} source={Images.cancel}></Image>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.line2}></View>
+              <View style={{ flexDirection: "row" }}>
+                <Image style={styles.icon2} source={Images.set_alarm}></Image>
+                <Text style={styles.name_txt2}>Enable Reminder</Text>
+              </View>
+              <SelectDropdown
+                data={er}
+                defaultValueByIndex={0}
+                onSelect={(item, index) => {
+                  setValue3(item.label);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem.label;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item.label;
+                }}
+                buttonStyle={styles.dropdown1BtnStyle}
+                buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                renderDropdownIcon={(isOpened) => {
+                  return (
+                    <AntDesign
+                      style={styles.icon}
+                      color="#003366"
+                      name="downsquare"
+                      size={30}
+                    />
+                  );
+                }}
+                dropdownIconPosition={"right"}
+                dropdownStyle={styles.dropdown1DropdownStyle}
+                rowStyle={styles.dropdown1RowStyle}
+                rowTextStyle={styles.dropdown1RowTxtStyle}
+                dropdownOverlayColor="rgba(52, 52, 52, 0)"
+              />
+
+              <View style={styles.line2}></View>
+              <View style={{ flexDirection: "row" }}>
+                <Image
+                  style={styles.icon2}
+                  source={Images.clock_circular}
+                ></Image>
+                <Text style={styles.name_txt2}>Reminder Time</Text>
+              </View>
+
+              <View style={[styles.press]}>
+                <TextInput
+                  style={{
+                    flex: 0.95,
+                    color: "grey",
+                    fontSize: wp("5%"),
+                    fontFamily: "Inter-Black4",
+                  }}
+                  placeholder={"Reminder Date and Time"}
+                  placeholderTextColor={"#cccccc"}
+                  caretHidden={true}
+                  showSoftInputOnFocus={false}
+                  // editable={false}
+                  value={date_time}
+                  onPressIn={() => {
+                    scroll.current.scrollTo({ x: 0, y: 180, animated: true }),
+                      setModalVisible3(true);
+                  }}
+                ></TextInput>
+                <TouchableOpacity
+                  onPress={() => {
+                    setdate_time("");
+                  }}
+                  style={{}}
+                >
+                  <Image style={styles.cancel} source={Images.cancel}></Image>
+                </TouchableOpacity>
+                {/* <TouchableOpacity
               style={{ width: "80%" }}
               
             > */}
-              {/* <TextInput
+                {/* <TextInput
                 style={{
                   color: "grey",
                   fontSize: wp("5%"),
@@ -398,8 +480,8 @@ function Tpage() {
                 onPressIn={() => {scroll.current.scrollTo({x: 0, y: 180, animated: true}),setModalVisible3(true)}}
                 placeholderTextColor={"#cccccc"}
               ></TextInput> */}
-            
-            {/* <TouchableOpacity
+
+                {/* <TouchableOpacity
               onPress={() => {
                 setdate_time("");
               }}
@@ -407,105 +489,107 @@ function Tpage() {
             >
               <Image style={styles.cancel} source={Images.cancel}></Image>
             </TouchableOpacity> */}
-          </View>
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.graph}></Image>
-            <Text style={styles.name_txt2}>Status</Text>
-          </View>
-          <SelectDropdown
-            data={st_data}
-            defaultValueByIndex={"0"}
-            // defaultValue={'India'}
-            onSelect={(item, index) => {
-              setValue4(item.label)
-            }}
-           
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem.label;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item.label;
-            }}
-            buttonStyle={styles.dropdown1BtnStyle}
-            buttonTextStyle={styles.dropdown1BtnTxtStyle}
-            renderDropdownIcon={isOpened => {
-              return  <AntDesign
-              style={styles.icon}
-              color="#003366"
-              name="downsquare"
-              size={30}
-            />
-            }}
-            dropdownIconPosition={"right"}
-            dropdownStyle={styles.dropdown1DropdownStyle}
-            rowStyle={styles.dropdown1RowStyle}
-            rowTextStyle={styles.dropdown1RowTxtStyle}
-            dropdownOverlayColor="rgba(52, 52, 52, 0)"
-          />
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.warning}></Image>
-            <Text style={styles.name_txt2}>Priority</Text>
-          </View>
-          <SelectDropdown
-            data={pr_data}
-            defaultValueByIndex={"0"}
-            // defaultValue={'India'}
-            onSelect={(item, index) => {
-              setValue5(item.label)
-            }}
-           
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem.label;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item.label;
-            }}
-            buttonStyle={styles.dropdown1BtnStyle}
-            buttonTextStyle={styles.dropdown1BtnTxtStyle}
-            renderDropdownIcon={isOpened => {
-              return  <AntDesign
-              style={styles.icon}
-              color="#003366"
-              name="downsquare"
-              size={30}
-            />
-            }}
-            dropdownIconPosition={"right"}
-            dropdownStyle={styles.dropdown1DropdownStyle}
-            rowStyle={styles.dropdown1RowStyle}
-            rowTextStyle={styles.dropdown1RowTxtStyle}
-            dropdownOverlayColor="rgba(52, 52, 52, 0)"
-          />
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.percentage}></Image>
-            <Text style={styles.name_txt2}>Complete(%)</Text>
-          </View>
-          <TextInput
-            // placeholder="Reminder"
-            style={styles.input2}
-            keyboardType="number-pad"
-            //   value={text_sign}
-              onChangeText={(txt) => setpercentage(txt)}
-          ></TextInput>
-          <View style={styles.line2}></View>
-          <View style={{ flexDirection: "row" }}>
-            <Image style={styles.icon2} source={Images.task_note}></Image>
-            <Text style={styles.name_txt2}>Notes</Text>
-          </View>
-          <TextInput
-            // placeholder="Reminder"
-            style={styles.input2}
-            //   value={text_sign}
-              onChangeText={(txt) => setnotes(txt)}
-          ></TextInput>
-          <View style={styles.line3}></View>
-      
-        </View>
-      </ScrollView>
-      </KeyboardAvoidingView>}
+              </View>
+              <View style={styles.line2}></View>
+              <View style={{ flexDirection: "row" }}>
+                <Image style={styles.icon2} source={Images.graph}></Image>
+                <Text style={styles.name_txt2}>Status</Text>
+              </View>
+              <SelectDropdown
+                data={st_data}
+                defaultValueByIndex={"0"}
+                // defaultValue={'India'}
+                onSelect={(item, index) => {
+                  setValue4(item.label);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem.label;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item.label;
+                }}
+                buttonStyle={styles.dropdown1BtnStyle}
+                buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                renderDropdownIcon={(isOpened) => {
+                  return (
+                    <AntDesign
+                      style={styles.icon}
+                      color="#003366"
+                      name="downsquare"
+                      size={30}
+                    />
+                  );
+                }}
+                dropdownIconPosition={"right"}
+                dropdownStyle={styles.dropdown1DropdownStyle}
+                rowStyle={styles.dropdown1RowStyle}
+                rowTextStyle={styles.dropdown1RowTxtStyle}
+                dropdownOverlayColor="rgba(52, 52, 52, 0)"
+              />
+              <View style={styles.line2}></View>
+              <View style={{ flexDirection: "row" }}>
+                <Image style={styles.icon2} source={Images.warning}></Image>
+                <Text style={styles.name_txt2}>Priority</Text>
+              </View>
+              <SelectDropdown
+                data={pr_data}
+                defaultValueByIndex={"0"}
+                // defaultValue={'India'}
+                onSelect={(item, index) => {
+                  setValue5(item.label);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem.label;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item.label;
+                }}
+                buttonStyle={styles.dropdown1BtnStyle}
+                buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                renderDropdownIcon={(isOpened) => {
+                  return (
+                    <AntDesign
+                      style={styles.icon}
+                      color="#003366"
+                      name="downsquare"
+                      size={30}
+                    />
+                  );
+                }}
+                dropdownIconPosition={"right"}
+                dropdownStyle={styles.dropdown1DropdownStyle}
+                rowStyle={styles.dropdown1RowStyle}
+                rowTextStyle={styles.dropdown1RowTxtStyle}
+                dropdownOverlayColor="rgba(52, 52, 52, 0)"
+              />
+              <View style={styles.line2}></View>
+              <View style={{ flexDirection: "row" }}>
+                <Image style={styles.icon2} source={Images.percentage}></Image>
+                <Text style={styles.name_txt2}>Complete(%)</Text>
+              </View>
+              <TextInput
+                // placeholder="Reminder"
+                style={styles.input2}
+                keyboardType="number-pad"
+                //   value={text_sign}
+                onChangeText={(txt) => setpercentage(txt)}
+              ></TextInput>
+              <View style={styles.line2}></View>
+              <View style={{ flexDirection: "row" }}>
+                <Image style={styles.icon2} source={Images.task_note}></Image>
+                <Text style={styles.name_txt2}>Notes</Text>
+              </View>
+              <TextInput
+                // placeholder="Reminder"
+                style={styles.input2}
+                //   value={text_sign}
+                onChangeText={(txt) => setnotes(txt)}
+              ></TextInput>
+              <View style={styles.line3}></View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      )}
       {/* {com ? (
         <View
           style={{ height: 150, width: "100%", backgroundColor: "red" }}
@@ -570,6 +654,67 @@ function Tpage() {
         </View>
       </Modal>
       <Modal
+        transparent={true}
+        visible={modalVisible7}
+        onRequestClose={() => {
+          setModalVisible7(!modalVisible7);
+        }}
+      >
+        <TouchableHighlight
+          onPress={() => {
+            setModalVisible7(false);
+          }}
+          underlayColor={"rgba(52, 52, 52, 0.3)"}
+          activeOpacity={1}
+          style={styles.centeredView_box}
+        >
+          <View onPress={() => {}} style={styles.modalView_box2}>
+            <FlatList
+              style={{}}
+              data={DATA2}
+              extraData={DATA2}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item, index }) => (
+                <View>
+                  <TouchableOpacity style={{}} onPress={() => {}}>
+                    <TouchableOpacity
+                      style={{ width: "60%" }}
+                      onPress={() => {
+                        setV(item?.Lead?.name),
+                          setlead_id(item?.Lead?.id),
+                          setsearch(item?.Lead?.name),
+                          setModalVisible7(false);
+                      }}
+                    >
+                      <Text style={styles.textStyle1_box2}>
+                        {item?.Lead?.name}
+                      </Text>
+                    </TouchableOpacity>
+                    <View
+                      style={{
+                        height: 1,
+                        backgroundColor: "#cccccc",
+
+                        width: "100%",
+                      }}
+                    ></View>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+
+            {/* <Pressable
+              style={{}}
+              onPress={() => {
+                setModalVisible7(!modalVisible7);
+              }}
+            >
+              <Text style={styles.textStyle3_box}>OK</Text>
+            </Pressable> */}
+          </View>
+        </TouchableHighlight>
+      </Modal>
+      <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible2}
@@ -610,7 +755,7 @@ function Tpage() {
           </View>
         </View>
       </Modal>
-      
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -668,54 +813,18 @@ function Tpage() {
         </View>
       </Modal>
       <Modal
-          transparent={true}
-          visible={modalVisible6}
-          onRequestClose={() => {
-            setModalVisible5(!modalVisible6);
-          }}
-        >
-          <View style={styles.centeredView_box}>
-            <View style={styles.modalView_box}>
-              <Text style={styles.textStyle1_box}>Lead Booker</Text>
-              <Text style={styles.textStyle2_box}>
-                Task has been added successfully.
-              </Text>
-              <View
-                style={{
-                  height: 1,
-                  backgroundColor: "#cccccc",
-
-                  width: "100%",
-                }}
-              ></View>
-              <Pressable
-                style={{}}
-                onPress={() => {
-                  setModalVisible6(!modalVisible6),navigation.pop(1)
-                }}
-              >
-                <Text style={styles.textStyle3_box}>OK</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal><Modal
         transparent={true}
-        visible={modalVisible5}
+        visible={modalVisible6}
         onRequestClose={() => {
-          setModalVisible5(!modalVisible5);
+          setModalVisible6(!modalVisible6);
         }}
       >
         <View style={styles.centeredView_box}>
           <View style={styles.modalView_box}>
             <Text style={styles.textStyle1_box}>Lead Booker</Text>
-            {subject.length < 1 ? ( <Text style={styles.textStyle2_box}>
-             Enter subject
-            </Text>): date.length <1 ? ( <Text style={styles.textStyle2_box}>
-             Select Start Date
-            </Text>): date1.length <1 ? ( <Text style={styles.textStyle2_box}>
-             Select End Date
-            </Text>):null}
-           
+            <Text style={styles.textStyle2_box}>
+              Task has been added successfully.
+            </Text>
             <View
               style={{
                 height: 1,
@@ -727,7 +836,7 @@ function Tpage() {
             <Pressable
               style={{}}
               onPress={() => {
-                setModalVisible5(!modalVisible5)
+                setModalVisible6(!modalVisible6), navigation.pop(1);
               }}
             >
               <Text style={styles.textStyle3_box}>OK</Text>
@@ -735,7 +844,43 @@ function Tpage() {
           </View>
         </View>
       </Modal>
-      
+      <Modal
+        transparent={true}
+        visible={modalVisible5}
+        onRequestClose={() => {
+          setModalVisible5(!modalVisible5);
+        }}
+      >
+        <View style={styles.centeredView_box}>
+          <View style={styles.modalView_box}>
+            <Text style={styles.textStyle1_box}>Lead Booker</Text>
+            {subject.length < 1 ? (
+              <Text style={styles.textStyle2_box}>Enter subject</Text>
+            ) : date.length < 1 ? (
+              <Text style={styles.textStyle2_box}>Select Start Date</Text>
+            ) : date1.length < 1 ? (
+              <Text style={styles.textStyle2_box}>Select End Date</Text>
+            ) : null}
+
+            <View
+              style={{
+                height: 1,
+                backgroundColor: "#cccccc",
+
+                width: "100%",
+              }}
+            ></View>
+            <Pressable
+              style={{}}
+              onPress={() => {
+                setModalVisible5(!modalVisible5);
+              }}
+            >
+              <Text style={styles.textStyle3_box}>OK</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -817,13 +962,18 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "100%",
   },
-  selectedTextStyle: { color: Colors.txt, fontFamily: "Inter-Black4",fontSize: wp("5.5%") },
+  selectedTextStyle: {
+    color: Colors.txt,
+    fontFamily: "Inter-Black4",
+    fontSize: wp("5.5%"),
+  },
   icon2: {
     marginTop: "8%",
     height: hp("4.21%"),
-     width: wp("6.58%"),
-     resizeMode: "contain",
-    marginStart: "3%",marginEnd:"3.5%"
+    width: wp("6.58%"),
+    resizeMode: "contain",
+    marginStart: "3%",
+    marginEnd: "3.5%",
   },
   cancel: {
     height: 25,
@@ -841,7 +991,6 @@ const styles = StyleSheet.create({
   icon5: { marginTop: "8%", flex: 0.17, fontSize: 22 },
   icon_notes: {},
   dropdown: {
-  
     color: Colors.txt,
     paddingHorizontal: "2%",
     fontSize: wp("5%"),
@@ -850,10 +999,15 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Black",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",width:"86%",marginStart:"12%"
-   
+    justifyContent: "space-between",
+    width: "86%",
+    marginStart: "12%",
   },
-  dropdown_txt: { fontSize: wp("5%"), color: "#6c6c6c", fontFamily: "Inter-Black4" },
+  dropdown_txt: {
+    fontSize: wp("5%"),
+    color: "#6c6c6c",
+    fontFamily: "Inter-Black4",
+  },
   dropdown2: {
     height: "2.6%",
     marginStart: "12%",
@@ -884,19 +1038,17 @@ const styles = StyleSheet.create({
     marginTop: "1%",
   },
   name_txt: {
-  
     paddingTop: "5%",
     marginStart: "13.5%",
     color: Colors.blue_txt,
     fontSize: wp("5%"),
-                  fontFamily: "Inter-Black4",
+    fontFamily: "Inter-Black4",
   },
   name_txt2: {
-   
     marginTop: "5%",
     color: Colors.blue_txt,
     fontSize: wp("5%"),
-                  fontFamily: "Inter-Black4",
+    fontFamily: "Inter-Black4",
   },
   input: {
     color: "#666666",
@@ -905,23 +1057,19 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Black4",
     marginTop: "3%",
     marginStart: "13.5%",
-   
   },
   press: {
     color: "#8c8c8c",
-
-   
 
     marginStart: "13.5%",
     flexDirection: "row",
     alignItems: "center",
     // justifyContent: "space-between",
-    
   },
   input3: {
     color: "#8c8c8c",
     fontSize: wp("5%"),
-   
+
     marginStart: "14%",
     fontFamily: "Inter-Black4",
   },
@@ -946,23 +1094,35 @@ const styles = StyleSheet.create({
     marginEnd: "2%",
   },
   dropdown1BtnStyle: {
-    width: '100%',
-     paddingHorizontal:"3.8%",marginBottom:"-3%",backgroundColor:"transparent"
-    
+    width: "100%",
+    paddingHorizontal: "3.8%",
+    marginBottom: "-3%",
+    backgroundColor: "transparent",
   },
-  dropdown1BtnTxtStyle: {fontSize: wp("5%"), color: "#6c6c6c", fontFamily: "Inter-Black4", textAlign: 'left',marginStart:"11%",},
-  dropdown1DropdownStyle: { backgroundColor: "white",
-  color: Colors.txt,
-  paddingHorizontal: "2%",
-  fontSize: wp("5%"),
-  height: height * 0.13,
-  borderRadius: 6,
-  fontFamily: "Inter-Black",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",width:"80%",marginStart:"12%",marginTop:Platform.OS =="ios"?0:"-10%"},
-  dropdown1RowStyle: { borderBottomColor: '#C5C5C5'},
-  dropdown1RowTxtStyle: {color: '#444', textAlign: 'left'},
+  dropdown1BtnTxtStyle: {
+    fontSize: wp("5%"),
+    color: "#6c6c6c",
+    fontFamily: "Inter-Black4",
+    textAlign: "left",
+    marginStart: "11%",
+  },
+  dropdown1DropdownStyle: {
+    backgroundColor: "white",
+    color: Colors.txt,
+    paddingHorizontal: "2%",
+    fontSize: wp("5%"),
+    height: height * 0.13,
+    borderRadius: 6,
+    fontFamily: "Inter-Black",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "80%",
+    marginStart: "12%",
+    marginTop: Platform.OS == "ios" ? 0 : "-10%",
+  },
+  dropdown1RowStyle: { borderBottomColor: "#C5C5C5" },
+  dropdown1RowTxtStyle: { color: "#444", textAlign: "left" },
 
   centeredView_box: {
     flex: 1,
@@ -977,13 +1137,49 @@ const styles = StyleSheet.create({
     borderRadius: 20,
 
     elevation: 5,
-    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
     // elevation: 20,
   },
-  textStyle1_box: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
-  textStyle2_box: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
-  textStyle3_box: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
+  modalView_box2: {
+    width: "95%",
+    backgroundColor: "#ececee",
+    borderRadius: 4,
 
+    elevation: 5,
+    alignSelf: "center",
+
+    justifyContent: "center",
+    height: "70%",
+    // elevation: 20,
+  },
+  textStyle1_box2: {
+    fontSize: wp("5.41%"),
+    fontFamily: "Inter-Black",
+    marginVertical: "4%",
+    marginStart: "5%",
+  },
+
+  textStyle1_box: {
+    fontSize: wp("5.41%"),
+    fontFamily: "Inter-Black2",
+    marginTop: "7%",
+  },
+  textStyle2_box: {
+    fontSize: wp("4%"),
+    textAlign: "center",
+    width: "80%",
+    marginBottom: "7%",
+    marginTop: "1%",
+    color: "#262626",
+  },
+  textStyle3_box: {
+    fontSize: wp("5.31%"),
+    color: "#2b92ee",
+    fontFamily: "Inter-Black",
+    marginVertical: "5%",
+  },
 });
 
 export default Tpage;

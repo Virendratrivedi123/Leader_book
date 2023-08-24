@@ -61,5 +61,9 @@ Comment:require('./../Images/comments.png'),
 edit_Comment:require('./../Images/edit_comment.png'),
 call_green:require('./../Images/call_green.png'),
 apppintments:require('./../Images/appointments.png'),
+down_tag:require('./../Images/down-tag.png'),
+bath:require('./../Images/bathroom.png'),
+bed:require('./../Images/bedroom.png'),
+home_drop:require('./../Images/home-drop.png'),
 }
 

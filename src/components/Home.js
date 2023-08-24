@@ -6,13 +6,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import * as SplashScreen from 'expo-splash-screen';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { ScreenNames } from "../constant/ScreenNames";
 import { STYLES } from "../constant/styles";
 import { Dimensions } from "react-native";
 import Header from "./header";
 import { Images } from "../constant/images";
+import { Active_filters } from "../Services";
 
 function Home() {
   const [fontsLoaded] = useFonts({
@@ -21,6 +22,41 @@ function Home() {
    
   });
   const navigation = useNavigation();
+  React.useEffect(() => {
+    (async () => {
+    
+      get_it();
+    
+    })();
+  }, []);
+  async function get_it() {
+    const user_data = await AsyncStorage.getItem("user_data");
+    const search = await AsyncStorage.getItem("search");
+    const d = JSON.parse(user_data);
+
+    // console.log(dr)
+    const data = {
+      email: d.email,
+      password: d.password,
+      no: "",
+      filters: "0",
+    };
+    Active_filters(data)
+      .then((response) => response.json())
+      .then(async (responseJson) => {
+        // Successful response from the API Call
+        const f_v=(responseJson.data.active_users_filter_value);
+        responseJson.data.active_users_filter.map((i)=>{
+          if(f_v == i.value){
+            AsyncStorage.setItem("label",i.label)
+          }
+        })
+        
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -50,7 +86,8 @@ function Home() {
         </View>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => navigation.goBack()}
+         onPress={() => {AsyncStorage.setItem("op","2"),
+         navigation.push(ScreenNames.DRAWER)}}
         style={STYLES.button}
       >
         <View style={{ flexDirection: "row", marginStart: "3%" }}>

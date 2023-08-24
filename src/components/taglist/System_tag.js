@@ -1,147 +1,122 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useRoute } from "@react-navigation/native";
+import SelectDropdown from "react-native-select-dropdown";
 import {
   StyleSheet,
   Text,
   View,
   Dimensions,
   TouchableOpacity,
-  
-  FlatList,SafeAreaView
+  FlatList,
+  Animated,
+  Easing,
+  Modal,
+  Pressable,
+  KeyboardAvoidingView,
+  TextInput,
+  Image,
+  SafeAreaView,
+  Alert,
+  TouchableHighlight,
+  ScrollView,
 } from "react-native";
-import { useFonts } from 'expo-font';
-
+import { useFonts } from "expo-font";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
+import { Entypo, FontAwesome, AntDesign,Ionicons,MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
+import { useNavigation } from "@react-navigation/native";
+
+
+
+
 import {
-  
-  Ionicons,
-  
-} from "@expo/vector-icons";
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { Colors } from "../../constant/colors";
+import { system_Tag } from "../../Services";
 
-
-
-export default function System_tag() {
-  
-
-
-  const DATA = [
-    {
-      id: 0,
-      name: "Morining",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.",
-        s:false
-    },
-    {
-      id: 1,
-      name: "Noon",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 2,
-      name: "Evening",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 3,
-      name: "6 AM To 9 AM",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 4,
-      name: "6 AM To 9 AM",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 5,
-      name: "6 AM To 9 AM",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 6,
-      name: "6 AM To 9 AM",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 7,
-      name: "Google Ads",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 8,
-      name: "Facebook Buyer",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 9,
-      name: "Facebook Seller",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-    {
-      id: 10,
-      name: "Facebook Seller",
-      Number: "0",
-      voicemail: "Voicemail",
-      description:
-        "This tag will be automatically added to leads who visits mostly in mornings to view listings.", s:false
-    },
-  ];
-  const [selected_data, setSelected_data] = useState(DATA);
-  const press =(item)=>{
-    const temp=[]
-     selected_data.map((val)=>{
-     if(val.id == item.id)
-     {
-         temp.push({...val,s:!val.s})
-     }
-     else{temp.push({...val,s:false})}
-    });
-    setSelected_data(temp)
-   }
-   const [fontsLoaded] = useFonts({
+export default function Recent() {
+  const [fontsLoaded] = useFonts({
     'Inter-Black': require('../../../assets/fonts/Mulish-SemiBold.ttf'),
     'Inter-Black2': require('../../../assets/fonts/Mulish-Bold.ttf'),
     'Inter-Black3': require('../../../assets/fonts/Mulish-ExtraBold.ttf'),
     'Inter-Black4': require('../../../assets/fonts/Mulish-Regular.ttf'),
    
   });
-// console.log((selected_data))
+
+  const navigation = useNavigation();
+  const route = useRoute();
+  const [DATA, setDATA] = useState([]);
+
+  const [loading, setLoading] = React.useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const user_data = await AsyncStorage.getItem("user_data");
+
+      const d = JSON.parse(user_data);
+
+      // console.log(dr)
+      const data = {
+        email: d.email,
+        password: d.password,
+      };
+
+      system_Tag(data)
+        .then((response) => response.json())
+        .then((result) => {
+          // console.log(result?.data?.leads)
+         
+          var a = [];
+          result?.data?.system_tags.map((i) => {
+            a.push({
+              ...i.CrmTag,
+
+              isChecked: false,
+              
+            });
+          });
+          setDATA(a);
+
+          // setModalTitle2(result?.data?.leads?.name)
+          // setnote(result?.data?.leads?.first_name)
+        
+          setLoading(false);
+        })
+
+        .catch((error) => console.log("error", error));
+    })();
+  }, []);
+
+
+  
+  const press =(item)=>{
+    const temp=[]
+     DATA.map((val)=>{
+     if(val.id == item.id)
+     {
+         temp.push({...val,isChecked:!val.isChecked})
+     }
+     else{temp.push({...val,isChecked:false})}
+    });
+    setDATA(temp)
+  }
+   
+
   return (
     <SafeAreaView style={styles.container}>
     <View style={styles.container}>
+    {loading ? (
+          <Loader loading={loading} />
+        ) :(
       <FlatList
         style={{}}
-        data={selected_data}
+        data={DATA}
         keyExtractor={(item, index) => item.id}
         renderItem={({ item, index }) => (
           <View>
@@ -163,10 +138,10 @@ export default function System_tag() {
                     <View style={{borderRadius:12,
                      backgroundColor: "grey",
                     }}>
-                    <Text style={styles.name}>{item.name}</Text></View>
+                    <Text style={styles.name}>{item?.name}</Text></View>
 
                     <TouchableOpacity onPress={() =>  press(item)  }>
-                      {item.s ?<Ionicons
+                      {item?.isChecked ?<Ionicons
                         name="ios-chevron-up"
                         size={28}
                         color="#808080"
@@ -180,12 +155,17 @@ export default function System_tag() {
                   </View>
                   <View style={{ flexDirection: "row" }}>
                     <Text style={styles.number}>
-                      Total Leads ({item.Number})
+                      Total Leads ({item?.total_leads})
                     </Text>
                   </View>
-                  {   item.s  ?<View style={{ flexDirection: "row" }}>
-                    <Text style={styles.number}>
-                      Description: ({item.description})
+                  {   item?.isChecked ?<View style={{ flexDirection: "row" }}>
+                    <Text style={styles.des}>
+                      Description: {item?.description}
+                    </Text>
+                  </View>:null}
+                  {   item?.isChecked ?<View style={{ flexDirection: "row" }}>
+                    <Text style={styles.des}>
+                      Verified Leads: ({item?.verified_leads})
                     </Text>
                   </View>:null}
                   
@@ -194,7 +174,7 @@ export default function System_tag() {
             
           </View>
         )}
-      />
+      />)}
     </View>
     </SafeAreaView>
   );
@@ -221,17 +201,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: "4%",
    
     paddingVertical: "0.5%",
-    fontSize: 16,
-    fontFamily:"Inter-Black2",
+    fontSize: wp("4.51%"), fontFamily: "Inter-Black2",
     color: "white",
   },
   number: {
-    fontSize: 14,
-
-    fontFamily:"Inter-Black",
+    fontSize: wp("4.01%"), fontFamily: "Inter-Black",
     color: Colors.blue_txt,
     
-    marginBottom: "1.5%",marginStart:"2%"
+    marginBottom: "5%",marginStart:"3.5%"
+  },
+  des: {
+    fontSize: wp("4.21%"), fontFamily: "Inter-Black",
+    color: "black",
+    
+    marginBottom: "1.5%",marginStart:"0.5%"
   },
   
 

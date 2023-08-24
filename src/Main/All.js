@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRoute } from "@react-navigation/native";
+
 import {
   StyleSheet,
   Text,
@@ -15,7 +16,8 @@ import {
   TextInput,
   Image,
   SafeAreaView,
-  Alert,TouchableHighlight
+  Alert,
+  TouchableHighlight,
 } from "react-native";
 import { useFonts } from "expo-font";
 const height = Dimensions.get("window").height;
@@ -35,9 +37,9 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import moment from "moment";
 
-
-export default function All(data) {
+function All({ data }) {
   const [fontsLoaded] = useFonts({
     "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
     "Inter-Black2": require("../../assets/fonts/Mulish-Bold.ttf"),
@@ -54,9 +56,11 @@ export default function All(data) {
   const navigation = useNavigation();
   const route = useRoute();
   const [DATA, setDATA] = useState([]);
-
-  const [loading, setLoading] = React.useState(true);
+  const [myArray, setMayArray] = React.useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [loading2, setLoading2] = React.useState(true);
+  const [loading3, setLoading3] = React.useState(false);
+  const [loading4, setLoading4] = React.useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [d1, setd1] = useState(0);
@@ -69,54 +73,126 @@ export default function All(data) {
   const [modalTitle, setModalTitle] = useState("");
   const translation = useRef(new Animated.Value(0)).current;
   const h = (18 / 100) * height;
-  
-  useEffect(() => {
-    (async () => {
-      const user_data = await AsyncStorage.getItem("user_data");
+  const [loading, setLoading] = useState(false);
+  const [selected_data, setSelected_data] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
+  const [search, setsearch] = useState("");
+  const [offset, setOffset] = useState(1);
+  const [isListEnd, setIsListEnd] = useState(false);
+  const tex = "";
+  const searchref = useRef();
 
+  React.useEffect(() => {
+    (async () => {
+      getData();
+    })();
+  }, []);
+
+  async function getData() {
+    console.log(offset);
+    if (!loading && !isListEnd) {
+      const user_data = await AsyncStorage.getItem("user_data");
+      const search = await AsyncStorage.getItem("search");
       const d = JSON.parse(user_data);
 
       // console.log(dr)
       const data = {
         email: d.email,
         password: d.password,
+        no: offset,
       };
-
       get_leads_All(data)
         .then((response) => response.json())
-        .then((result) => {
-          // console.log(result?.data?.leads)
-          var a = [];
-          result?.data?.leads.map((i) => {
-            a.push({
-              ...i.Lead,
+        .then(async (responseJson) => {
+          // Successful response from the API Call
 
-              isChecked: false,
-              note_value: "",
-            });
-          });
-          setDATA(a);
+          if (responseJson.data.leads.length > 0) {
+            setOffset(offset + 1);
+            // After the response increasing the offset
+            setDataSource([...dataSource, ...responseJson.data.leads]);
 
-          // setModalTitle2(result?.data?.leads?.name)
-          // setnote(result?.data?.leads?.first_name)
-          setd2(true);
-          Animated.timing(translation, {
-            toValue: h,
-            delay: 0,
-            easing: Easing.elastic(4),
-            useNativeDriver: true,
-          }).start();
-          setLoading(false);
+            drs();
+
+            setLoading2(false);
+
+            setd2(true);
+            Animated.timing(translation, {
+              toValue: h,
+              delay: 0,
+              easing: Easing.elastic(4),
+              useNativeDriver: true,
+            }).start();
+          } else {
+            setIsListEnd(true);
+
+            drs();
+          }
         })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }
 
-        .catch((error) => console.log("error", error));
-    })();
-  }, []);
+  const drs = async () => {
+    const set = await AsyncStorage.getItem("set");
+    const d3 = JSON.parse(set);
+
+    if (d3 == "1") {
+      const user_data2 = await AsyncStorage.getItem("search_data");
+      const d2 = JSON.parse(user_data2);
+
+      // console.log(result?.data?.leads)
+      var a = [];
+      d2?.data?.leads.map((i) => {
+        a.push({
+          ...i.Lead,
+
+          isChecked: false,
+          note_value: "",
+        });
+      });
+
+      var c = [];
+      d2?.data?.tags?.user_tags.map((i) => {
+        c.push({
+          ...i,
+
+          isChecked: false,
+        });
+      });
+      var b = [];
+      d2?.data?.tags?.system_tags.map((i) => {
+        b.push({
+          ...i,
+
+          isChecked: false,
+        });
+      });
+      setDATA(a);
+    } else {
+      var it = 0;
+
+      var a = [];
+      dataSource.map((i) => {
+        a.push({ ...i.Lead, isChecked: false, note_value: "", ind: it++ });
+      });
+
+      setDATA(a);
+      setDATA(a);
+    }
+  };
+  const onsearch = (tex) => {};
+
+  const time = () => {
+    setTimeout(() => {
+      setLoading3(false);
+    }, 2000);
+  };
 
   const postdata = async () => {
+    setLoading3(true);
     try {
-      loading2 ? <Loader loading={loading2} /> : setModalVisible(!modalVisible);
-
       const user_data = await AsyncStorage.getItem("user_data");
       // const drop_data = await AsyncStorage.getItem("dropdown_data");
       const d = JSON.parse(user_data);
@@ -127,55 +203,41 @@ export default function All(data) {
         password: d.password,
       };
       Pin_note(data).then((response) => {
-        response.json().then((data) => {
-          console.log(data);
-          call_api(), setModalVisible(!modalVisible);
-          setLoading2(false);
+        response.json().then(async (data) => {
+          var date = moment()
+            .utcOffset("+05:30")
+            .format("YYYY-MM-DD HH:mm:ss ");
+
+          //  cg(),
+
+          //  getData()
+
+          // setModalVisible(!modalVisible)
+          // setLoading2(false)
+
+          console.log(note.length);
+
+          //   note.length == 0 ? DATA.map((i,index)=>{
+          //     if(i.id== modalTitle){
+          //       DATA[index] = { ...i, ...i.pinned_date = date,
+          //       ...i.pinned_by = l_pin_by,  ...i.pined_note= "No",...i.pined_note_text= note};
+          //     }
+
+          //   }): DATA.map((i,index)=>{
+          //     if(i.id== modalTitle){
+          //       DATA[index] = { ...i, ...i.pinned_date = date,
+          //       ...i.pinned_by = l_pin_by,  ...i.pined_note= "Yes",...i.pined_note_text= note};
+          //     }
+
+          //   })
+
+          //  time()
+
+          setModalVisible(!modalVisible);
+          AsyncStorage.setItem("op", "1");
+          navigation.push(ScreenNames.DRAWER);
         });
       });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const call_api = async () => {
-    try {
-      const user_data = await AsyncStorage.getItem("user_data");
-
-      const d = JSON.parse(user_data);
-
-      // console.log(dr)
-      const data = {
-        email: d.email,
-        password: d.password,
-      };
-
-      get_leads_All(data)
-        .then((response) => response.json())
-        .then((result) => {
-          // console.log(result?.data?.leads)
-          var a = [];
-          result?.data?.leads.map((i) => {
-            a.push({
-              ...i.Lead,
-
-              isChecked: false,
-              note_value: "",
-            });
-          });
-          setDATA(a);
-
-          // setModalTitle2(result?.data?.leads?.name)
-          // setnote(result?.data?.leads?.first_name)
-          setd2(true);
-          Animated.timing(translation, {
-            toValue: h,
-            delay: 0,
-            easing: Easing.elastic(4),
-            useNativeDriver: true,
-          }).start();
-          setLoading(false);
-        });
     } catch (error) {
       console.error(error);
     }
@@ -251,743 +313,718 @@ export default function All(data) {
     // sett2(true)
   };
 
-  // React.useEffect(() => {
-  //   (async () => {
-  //     let temp = DATA.map((i) => {
-  //       if (route?.params?.b.id === i.id) {
-  //         return {
-  //           ...i,
-  //           pinnednote: (i.pinnednote = route?.params?.b.pinnednote),
-  //         };
-  //       }
+  const renderFooter = () => {
+    return (
+      // Footer View with Loader
+      <View style={styles.footer}>
+        {loading2 ? <Loader loading={loading2} /> : null}
+      </View>
+    );
+  };
 
-  //       return i;
-  //     });
-  //     // sett2(!t2);
-  //     setDATA(temp);
-  //   })();
-  // }, []);
- 
-  React.useEffect(() => {
+  useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      // do something
-      setLoading(true)
-      call_api()
-      console.log("reload the page");
+      setOffset(0);
+      setLoading2(true);
+      getData();
     });
 
-    return unsubscribe;
+    return () => {
+      // executed when unmount
+      unsubscribe();
+    };
   }, [navigation]);
- 
-  return (
-    // <ScrollView style={{  }}>
-    <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
-        {loading ? (
-          <Loader loading={loading} />
-        ) : DATA && DATA.length > 0 ? (
-          <>
-            {t ? (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "center",
-                  height: height * 0.048,
-                  width: width * 0.42,
-                  // backgroundColor: d == true ? "orange" : null,
-                  margin: "3%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderWidth: 0.8,
-                  borderRadius: 25,
-                  borderColor: "black",
-                }}
-              >
+
+  const ItemView = ({ item, index }) => {
+    return (
+      // Flat List Item
+      <View>
+        <View style={styles.flat_view}>
+          {d == true ? (
+            <Pressable
+              style={{ marginStart: "6%" }}
+              onPress={() => handleChange(item.id)}
+            >
+              {item.isChecked ? (
+                <AntDesign name="checkcircle" size={23} color={"#4775d1"} />
+              ) : (
+                <FontAwesome name="circle-thin" size={23} color="#cccccc" />
+              )}
+            </Pressable>
+          ) : null}
+          <TouchableHighlight
+            style={{ paddingVertical: "3%" }}
+            underlayColor={"#d9d9d9"}
+            onLongPress={() => {
+              handleChange2(item.id), sett(!t);
+            }}
+          >
+            <View
+              activeOpacity={1}
+              style={{
+                backgroundColor: "white",
+
+                width: d == true ? width * 0.8 : width * 0.93,
+
+                elevation: 5,
+                alignSelf: "center",
+                justifyContent: "center",
+                borderRadius: 5,
+                shadowColor: "white",
+              }}
+            >
+              {}
+              <View style={styles.set}>
                 <TouchableOpacity
-                  style={{ alignItems: "center" }}
+                  activeOpacity={1}
                   onPress={() => {
-                    t2 ? selectAlldata2() : UnselectAlldata();
-                    // selectAlldata2()
+                    navigation.navigate(ScreenNames.DETAIL, {
+                      user: {
+                        name: item?.name,
+                        id: item?.id,
+                        logo: item?.name_initials,
+                      },
+                      index: index,
+                      DATA: DATA,
+                    });
+                    // AsyncStorage.setItem("user_id", item.id);
                   }}
+                  style={styles.circle_icon}
                 >
-                  <Text
-                    style={{
-                      color: "#999999",
-                      fontSize: wp("5.41%"),
-
-                      fontFamily: "Inter-Black",
-                    }}
-                  >
-                    Select All
-                  </Text>
+                  <View style={styles.circle}>
+                    <Text style={styles.circle_text}>
+                      {item?.name_initials}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
-              </View>
-            ) : (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "center",
-                  height: height * 0.048,
-                  width: width * 0.42,
-                  backgroundColor: d == true ? "orange" : null,
-                  margin: "3%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderWidth: 0.8,
-                  borderRadius: 25,
-                  borderColor: "black",
-                }}
-              >
-                <TouchableOpacity
-                  style={{ alignItems: "center" }}
+                <Text
                   onPress={() => {
-                    selectAlldata();
-                    
+                    navigation.navigate(ScreenNames.DETAIL, {
+                      user: {
+                        name: item?.name,
+                        id: item?.id,
+                        logo: item?.name_initials,
+                      },
+                      index: index,
+                      DATA: DATA,
+                    });
+                    // AsyncStorage.setItem("user_id", item.id);
                   }}
+                  style={styles.name}
                 >
-                  <Text
-                    style={{
-                      color: d == true ? "white" : "#999999",
-                      fontSize: wp("5.41%"),
-                      fontFamily: "Inter-Black",
-                    }}
-                  >
-                    Select All
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
-           
-            <FlatList
-              style={styles.flat}
-              data={DATA}
-              extraData={DATA}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item, index }) => (
-                <View>
-                  
-                  <View style={styles.flat_view}>
-                    {d == true ? (
-                      <Pressable
-                        style={{ marginStart: "6%" }}
-                        onPress={() => handleChange(item.id)}
-                      >
-                        {item.isChecked ? (
-                          <AntDesign
-                            name="checkcircle"
-                            size={23}
-                            color={"#4775d1"}
-                          />
-                        ) : (
-                          <FontAwesome
-                            name="circle-thin"
-                            size={23}
-                            color="#cccccc"
-                          />
-                        )}
-                      </Pressable>
-                    ) : null}
-                    <TouchableHighlight
-                      style={{ paddingVertical: "3%" }}
-                      underlayColor={"#d9d9d9"}
-                      onLongPress={() => {
-                        handleChange2(item.id), sett(!t);
-                      }}
-                    >
-                      <View
-                        activeOpacity={1}
-                        // onLongPress={() => {
-                        //   handleChange2(item.id), sett(!t);
-                        // }}
-                        // onPress={() => {
-                        //   navigation.navigate(ScreenNames.DETAIL, {
-                        //     user: {
-                        //       name: item.name,
-                        //       id: item.id,
-                        //       logo: item.name_initials,
-                        //     },
-                        //     index: index,
-                        //     DATA: DATA,
-                        //   });
-                        //   // AsyncStorage.setItem("user_id", item.id);
-                        // }}
-                        style={{
-                          backgroundColor: "white",
-
-                          width: d == true ? width * 0.8 : width * 0.93,
-
-                          elevation: 5,
-                          alignSelf: "center",
-                          justifyContent: "center",
-                          borderRadius: 5,
-                          shadowColor: "white",
-                        }}
-                      >{}
-                        <View style={styles.set}>
-                          <TouchableOpacity
-                          activeOpacity={1}
-                            onPress={() => {
-                              navigation.navigate(ScreenNames.DETAIL, {
-                                user: {
-                                  name: item.name,
-                                  id: item.id,
-                                  logo: item.name_initials,
-                                },
-                                index: index,
-                                DATA: DATA,
-                              });
-                              // AsyncStorage.setItem("user_id", item.id);
-                            }}
-                            style={styles.circle_icon}
-                          >
-                            <View style={styles.circle}>
-                              <Text style={styles.circle_text}>
-                                {item.name_initials}
-                              </Text>
-                            </View>
-                          </TouchableOpacity>
-                          <Text
-                            onPress={() => {
-                              navigation.navigate(ScreenNames.DETAIL, {
-                                user: {
-                                  name: item.name,
-                                  id: item.id,
-                                  logo: item.name_initials,
-                                },
-                                index: index,
-                                DATA: DATA,
-                              });
-                              // AsyncStorage.setItem("user_id", item.id);
-                            }}
-                            style={styles.name}
-                          >
-                            {item.name}
-                          </Text>
-                          {/* {route?.params?.b?.id == item.id ? (
+                  {item?.name}
+                </Text>
+                {/* {route?.params?.b?.id == item.id ? (
                             (item.pined_note = route?.params?.b?.pined_note)
                           ) : (
                             <> */}
 
-                          <TouchableOpacity
-                            style={{
-                              marginTop: "2%",
-                              shadowColor: "#000",
-                              shadowOffset: { width: 2, height: 4 },
-                              shadowOpacity: 0.95,
-                              shadowRadius: 2.84,
-                              elevation: 5,
-                            }}
-                            activeOpacity={1}
-                            onPress={() => {
-                              item.pined_note == "Yes" ? setd1(3) : setd1(0);
-                              setModalVisible(true),
-                                setModalTitle2(item.pinned_by),
-                                setModalTitle(item.id),
-                                setnote(item.pined_note_text),
-                                setpin_date(item.pinned_date),
-                                setpin_note(item.pined_note);
-                            }}
-                          >
-                            
-                            {item.pined_note == "Yes" ? (
-                              <Image
-                                style={styles.note2}
-                                source={Images.pencil_note}
-                              ></Image>
-                            ) : (
-                              <Image
-                                style={styles.note2}
-                                source={Images.plus_note}
-                              ></Image>
-                            )}
-                          </TouchableOpacity>
-                        </View>
-
-                        {item.phone ? (
-                          <>
-                            <View style={styles.line2}></View>
-                            <View style={styles.set}>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  Linking.openURL(`tel:${item.phone}`);
-                                }}
-                                style={styles.phone_icon}
-                              >
-                                <Image
-                                  style={styles.call}
-                                  source={Images.call_icon}
-                                ></Image>
-                              </TouchableOpacity>
-                              <Text
-                                onPress={() => {
-                                  Linking.openURL(`tel:${item.phone}`);
-                                }}
-                                style={styles.number}
-                              >
-                                {item.phone}
-                              </Text>
-
-                              <TouchableOpacity
-                                onPress={() => {
-                                  Linking.openURL(`sms:${item.phone}`);
-                                }}
-                              >
-                                <Image
-                                  style={styles.sms}
-                                  source={Images.sms}
-                                ></Image>
-                              </TouchableOpacity>
-                            </View>
-                          </>
-                        ) : null}
-
-                        {item.email ? (
-                          <>
-                            <View style={styles.line2}></View>
-                            <TouchableOpacity
-                              activeOpacity={1}
-                              onPress={() => {
-                                Linking.openURL(`mailto:${item.email}`);
-                              }}
-                              style={styles.set}
-                            >
-                              <View style={styles.email_icon}>
-                                <Image
-                                  style={styles.mail_icon}
-                                  source={Images.mail_icon}
-                                ></Image>
-                              </View>
-                              <Text style={styles.email}>{item.email}</Text>
-                            </TouchableOpacity>
-                          </>
-                        ) : (
-                          <View style={styles.line3}></View>
-                        )}
-                        {/* {item.voicemail ? (
-                        <> */}
-                        <View style={styles.line2}></View>
-                        <TouchableOpacity
-                          activeOpacity={1}
-                          // onPress={() => setModalVisible2(!modalVisible2)}
-                          style={styles.set}
-                        >
-                          <View style={styles.voice_icon}>
-                            <Image
-                              style={styles.voice}
-                              source={Images.Voice_icon}
-                            ></Image>
-                          </View>
-                          <Text style={styles.voicemail}>
-                            {/* {item.voicemail} */}
-                            Voicemail
-                          </Text>
-                        </TouchableOpacity>
-                        {/* </>
-                      ) : <View style={styles.line3}></View>} */}
-                      </View>
-                    </TouchableHighlight>
-                  </View>
-                  <View style={styles.line}></View>
-                </View>
-              )}
-            />
-
-            <View style={styles.centeredView}>
-              {/* {pin_note == "Yes" ? (setd1(3)):({})} */}
-              {d1 == 1 ? (
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={modalVisible}
-                  onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
-                    setModalVisible(!modalVisible);
-                  }}
-                >
-                  <View style={styles.modal_page}>
-                    <View style={styles.modalView1}>
-                      <View style={styles.pin2}>
-                        <Text style={styles.modalText1}>Pin Note</Text>
-                        <Pressable
-                          onPress={() => (
-                            setModalVisible(!modalVisible), setd1(0)
-                          )}
-                        >
-                          <Entypo name="cross" size={30} color="black" />
-                        </Pressable>
-                      </View>
-                      <View style={styles.line2}></View>
-
-                      <KeyboardAvoidingView enabled>
-                        <View style={styles.input}>
-                          <TextInput
-                            //  value={""}
-                            onChangeText={(txt) => (setnote(txt), setn(txt))}
-                          />
-                        </View>
-                      </KeyboardAvoidingView>
-                      <View style={styles.modal_btn_box}>
-                        {n.length > 0 ? (
-                          <TouchableOpacity
-                            onPress={() => {
-                              postdata();
-                            }}
-                            style={styles.modal_btn}
-                          >
-                            <Text style={styles.modal_btn_txt}>Save</Text>
-                          </TouchableOpacity>
-                        ) : (
-                          <TouchableOpacity
-                            onPress={() => {}}
-                            activeOpacity={1}
-                            style={styles.modal_btn}
-                          >
-                            <Text style={styles.modal_btn_txt}>Save</Text>
-                          </TouchableOpacity>
-                        )}
-
-                        <TouchableOpacity
-                          onPress={() => {
-                            {
-                              setd1(0);
-                            }
-                          }}
-                          style={styles.modal_btn}
-                        >
-                          <Text style={styles.modal_btn_txt}>Close</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
-                </Modal>
-              ) : d1 == 4 ? (
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={modalVisible}
-                  onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
-                    setModalVisible(!modalVisible);
-                  }}
-                >
-                  <View style={styles.modal_page}>
-                    <View style={styles.modalView1}>
-                      <View style={styles.pin2}>
-                        <Text style={styles.modalText1}>Pin Note</Text>
-                        <Pressable onPress={() => setd1(3)}>
-                          <Entypo name="cross" size={30} color="black" />
-                        </Pressable>
-                      </View>
-                      <View style={styles.line2}></View>
-
-                      <KeyboardAvoidingView enabled>
-                        <View style={styles.input}>
-                          <TextInput
-                            value={note}
-                            onChangeText={(txt) => setnote(txt)}
-                          />
-                        </View>
-                      </KeyboardAvoidingView>
-                      <View style={styles.modal_btn_box}>
-                        <TouchableOpacity
-                          onPress={() => {
-                            postdata();
-                          }}
-                          style={styles.modal_btn}
-                        >
-                          <Text style={styles.modal_btn_txt}>Save</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => {
-                            {
-                              setd1(3);
-                            }
-                          }}
-                          style={styles.modal_btn}
-                        >
-                          <Text style={styles.modal_btn_txt}>Close</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
-                </Modal>
-              ) : d1 == 0 ? (
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={modalVisible}
-                  onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
-                    setModalVisible(!modalVisible);
-                  }}
-                >
-                  <View style={styles.modal_page}>
-                    <View style={styles.modalView}>
-                      <View style={styles.pin}>
-                        <Text style={styles.modalText}>Pin Note</Text>
-                        <Pressable
-                          style={{}}
-                          onPress={() => setModalVisible(!modalVisible)}
-                        >
-                          <Entypo name="cross" size={30} color="black" />
-                        </Pressable>
-                      </View>
-
-                      <Text
-                        style={{
-                          color: "black",
-                          marginLeft: "4%",
-                          marginTop: "12%",
-                        }}
-                      >
-                        No note added yet.
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setd1(1);
-                        }}
-                        style={styles.add_note}
-                      >
-                        <Text
-                          style={{
-                            color: "white",
-                            fontSize: wp("6%"),
-                            fontFamily: "Inter-Black4",
-                          }}
-                        >
-                          Add Note
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </Modal>
-              ) : d1 == 3 ? (
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={modalVisible}
-                  onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
-                    setModalVisible(!modalVisible);
-                  }}
-                >
-                  <View style={styles.modal_page}>
-                    <View style={styles.modalView2}>
-                      <View style={styles.pin}>
-                        <Text style={styles.modalText}>{modalTitle2}</Text>
-                        <Pressable
-                          style={{}}
-                          onPress={() => (
-                            call_api(),
-                            setModalVisible(!modalVisible),
-                            // setd1(0),
-                            setn("")
-                          )}
-                        >
-                          <Entypo name="cross" size={30} color="black" />
-                        </Pressable>
-                      </View>
-                      <Text style={styles.date}>{pin_date}</Text>
-                      <Text style={styles.note3}>{note}</Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setd1(4);
-                        }}
-                        style={styles.update_note}
-                      >
-                        <Text style={styles.update_txt}>Update</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </Modal>
-              ) : null}
-            </View>
-            <View style={styles.centeredView}>
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible2}
-                onRequestClose={() => {
-                  setModalVisible2(!modalVisible2);
-                }}
-              >
-                <View style={styles.modal_page}>
-                  <View style={styles.modal_voicemail_view}>
-                    <View style={styles.pin2}>
-                      <Text style={styles.modalText1}>Voicemail</Text>
-                      <Pressable
-                        onPress={() => setModalVisible2(!modalVisible2)}
-                      >
-                        <Entypo name="cross" size={30} color="black" />
-                      </Pressable>
-                    </View>
-                    <View style={styles.line2}></View>
-                    <View style={styles.modal_btn_box_voicemail}>
-                      <TouchableOpacity
-                        onPress={() => {}}
-                        activeOpacity={1}
-                        style={styles.modal_btn_voicemail}
-                      >
-                        <Text style={styles.modal_btn_txt_voicemail1}>
-                          Ringing Voicemail
-                        </Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        onPress={() => {
-                          {
-                          }
-                        }}
-                        style={styles.modal_btn_voicemail2}
-                      >
-                        <Text style={styles.modal_btn_txt_voicemail2}>
-                          iVoiceCast
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => {}}
-                        style={styles.circle_icon_v}
-                      >
-                        <View style={styles.circle_v}>
-                          <Text style={styles.circle_text_v}>US</Text>
-                        </View>
-                      </TouchableOpacity>
-                      <Text onPress={() => {}} style={styles.name2}>
-                        Upashak Singh
-                      </Text>
-                    </View>
-                    <View style={styles.line4}></View>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => {}}
-                        style={{ marginStart: "7%", marginEnd: "5%" }}
-                      >
-                        <Image
-                          style={styles.mail_icon_v}
-                          source={Images.mail_icon}
-                        ></Image>
-                      </TouchableOpacity>
-                      <Text onPress={() => {}} style={styles.email_v}>
-                        Upashak88workgmail.com
-                      </Text>
-                    </View>
-                    <View style={styles.line4}></View>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => {}}
-                        style={{ marginStart: "7%", marginEnd: "5%" }}
-                      >
-                        <Image
-                          style={styles.mail_icon_v}
-                          source={Images.call_icon}
-                        ></Image>
-                      </TouchableOpacity>
-                      <Text onPress={() => {}} style={styles.email_v}>
-                        9893553321
-                      </Text>
-                    </View>
-                    <KeyboardAvoidingView enabled>
-                      <View style={styles.input2}>
-                        <TextInput
-                        //  value={""}
-                        // onChangeText={(txt) => (setnote(txt), setn(txt))}
-                        />
-                      </View>
-                    </KeyboardAvoidingView>
-                    <View style={styles.modal_btn_box}>
-                      <TouchableOpacity
-                        onPress={() => {}}
-                        activeOpacity={1}
-                        style={styles.modal_btn}
-                      >
-                        <Text style={styles.modal_btn_txt}>Save</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        onPress={() => {
-                          {
-                          }
-                        }}
-                        style={styles.modal_btn}
-                      >
-                        <Text style={styles.modal_btn_txt}>Close</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              </Modal>
-            </View>
-            {d2 ? (
-              <Animated.View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-
-                  borderRadius:
-                    Math.round(
-                      Dimensions.get("window").width +
-                        Dimensions.get("window").height
-                    ) / 2,
-                  position: "absolute",
-
-                  right: "6%",
-
-                  backgroundColor: Colors.float_btn,
-
-                  transform: [{ translateY: translation }],
-                  bottom: height * 0.28,
-                  elevation: 5,
-                }}
-              >
                 <TouchableOpacity
-                  onPress={() => navigation.navigate(ScreenNames.NEW_LEADS)}
-                  // onPress={() => navigation.navigate("demo")}
-                  // style={styles.floating_btn}
+                  style={{
+                    marginTop: "2%",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 2, height: 4 },
+                    shadowOpacity: 0.95,
+                    shadowRadius: 2.84,
+                    elevation: 5,
+                  }}
+                  activeOpacity={1}
+                  onPress={() => {
+                    item?.pined_note == "Yes" ? setd1(3) : setd1(0);
+                    setModalVisible(true),
+                      setModalTitle2(item?.pinned_by),
+                      setModalTitle(item?.id),
+                      setnote(item?.pined_note_text),
+                      setpin_date(item?.pinned_date),
+                      setpin_note(item?.pined_note);
+                  }}
+                >
+                  {item?.pined_note == "Yes" ? (
+                    <Image
+                      style={styles.note2}
+                      source={Images.pencil_note}
+                    ></Image>
+                  ) : (
+                    <Image
+                      style={styles.note2}
+                      source={Images.plus_note}
+                    ></Image>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              {item?.phone ? (
+                <>
+                  <View style={styles.line2}></View>
+                  <View style={styles.set}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        Linking.openURL(`tel:${item?.phone}`);
+                      }}
+                      style={styles.phone_icon}
+                    >
+                      <Image
+                        style={styles.call}
+                        source={Images.call_icon}
+                      ></Image>
+                    </TouchableOpacity>
+                    <Text
+                      onPress={() => {
+                        Linking.openURL(`tel:${item?.phone}`);
+                      }}
+                      style={styles.number}
+                    >
+                      {item?.phone}
+                    </Text>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        Linking.openURL(`sms:${item?.phone}`);
+                      }}
+                    >
+                      <Image style={styles.sms} source={Images.sms}></Image>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              ) : null}
+
+              {item?.email ? (
+                <>
+                  <View style={styles.line2}></View>
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={() => {
+                      Linking.openURL(`mailto:${item?.email}`);
+                    }}
+                    style={styles.set}
+                  >
+                    <View style={styles.email_icon}>
+                      <Image
+                        style={styles.mail_icon}
+                        source={Images.mail_icon}
+                      ></Image>
+                    </View>
+                    <Text style={styles.email}>{item?.email}</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <View style={styles.line3}></View>
+              )}
+              {/* {item.voicemail ? (
+                        <> */}
+              <View style={styles.line2}></View>
+              <TouchableOpacity
+                activeOpacity={1}
+                // onPress={() => setModalVisible2(!modalVisible2)}
+                style={styles.set}
+              >
+                <View style={styles.voice_icon}>
+                  <Image
+                    style={styles.voice}
+                    source={Images.Voice_icon}
+                  ></Image>
+                </View>
+                <Text style={styles.voicemail}>
+                  {/* {item.voicemail} */}
+                  Voicemail
+                </Text>
+              </TouchableOpacity>
+              {/* </>
+                      ) : <View style={styles.line3}></View>} */}
+            </View>
+          </TouchableHighlight>
+        </View>
+        <View style={styles.line}></View>
+      </View>
+    );
+  };
+
+  const ItemSeparatorView = () => {
+    return (
+      // Flat List Item Separator
+      <View style={styles.line}></View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {loading2 ? (
+        <Loader loading={loading2} />
+      ) : (
+        <View>
+          {t ? (
+            <View
+              style={{
+                flexDirection: "row",
+                alignSelf: "center",
+                height: height * 0.048,
+                width: width * 0.42,
+                // backgroundColor: d == true ? "orange" : null,
+                margin: "3%",
+                alignItems: "center",
+                justifyContent: "center",
+                borderWidth: 0.8,
+                borderRadius: 25,
+                borderColor: "black",
+              }}
+            >
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPress={() => {
+                  t2 ? selectAlldata2() : UnselectAlldata();
+                  // selectAlldata2()
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#999999",
+                    fontSize: wp("5.41%"),
+
+                    fontFamily: "Inter-Black",
+                  }}
+                >
+                  Select All
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View
+              style={{
+                flexDirection: "row",
+                alignSelf: "center",
+                height: height * 0.048,
+                width: width * 0.42,
+                backgroundColor: d == true ? "orange" : null,
+                margin: "3%",
+                alignItems: "center",
+                justifyContent: "center",
+                borderWidth: 0.8,
+                borderRadius: 25,
+                borderColor: "black",
+              }}
+            >
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPress={() => {
+                  selectAlldata();
+                }}
+              >
+                <Text
+                  style={{
+                    color: d == true ? "white" : "#999999",
+                    fontSize: wp("5.41%"),
+                    fontFamily: "Inter-Black",
+                  }}
+                >
+                  Select All
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {loading3 ? (
+            <Loader loading={loading3} />
+          ) : (
+            <FlatList
+              style={styles.flat}
+              data={DATA}
+              keyExtractor={(item, index) => index.toString()}
+              ItemSeparatorComponent={ItemSeparatorView}
+              renderItem={ItemView}
+              ListFooterComponent={renderFooter}
+              onEndReached={getData}
+              onEndReachedThreshold={0.5}
+            />
+          )}
+        </View>
+      )}
+      <View style={styles.centeredView}>
+        {/* {pin_note == "Yes" ? (setd1(3)):({})} */}
+        {d1 == 1 ? (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.modal_page}>
+              <View style={styles.modalView1}>
+                <View style={styles.pin2}>
+                  <Text style={styles.modalText1}>Pin Note</Text>
+                  <Pressable
+                    onPress={() => (setModalVisible(!modalVisible), setd1(0))}
+                  >
+                    <Entypo name="cross" size={30} color="black" />
+                  </Pressable>
+                </View>
+                <View style={styles.line2}></View>
+
+                <KeyboardAvoidingView enabled>
+                  <View style={styles.input}>
+                    <TextInput
+                      //  value={""}
+                      onChangeText={(txt) => (setnote(txt), setn(txt))}
+                    />
+                  </View>
+                </KeyboardAvoidingView>
+                <View style={styles.modal_btn_box}>
+                  {n.length > 0 ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        postdata();
+                      }}
+                      style={styles.modal_btn}
+                    >
+                      <Text style={styles.modal_btn_txt}>Save</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {}}
+                      activeOpacity={1}
+                      style={styles.modal_btn}
+                    >
+                      <Text style={styles.modal_btn_txt}>Save</Text>
+                    </TouchableOpacity>
+                  )}
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      {
+                        setd1(0);
+                      }
+                    }}
+                    style={styles.modal_btn}
+                  >
+                    <Text style={styles.modal_btn_txt}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        ) : d1 == 4 ? (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.modal_page}>
+              <View style={styles.modalView1}>
+                <View style={styles.pin2}>
+                  <Text style={styles.modalText1}>Pin Note</Text>
+                  <Pressable onPress={() => setd1(3)}>
+                    <Entypo name="cross" size={30} color="black" />
+                  </Pressable>
+                </View>
+                <View style={styles.line2}></View>
+
+                <KeyboardAvoidingView enabled>
+                  <View style={styles.input}>
+                    <TextInput
+                      value={note}
+                      onChangeText={(txt) => setnote(txt)}
+                    />
+                  </View>
+                </KeyboardAvoidingView>
+                <View style={styles.modal_btn_box}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      postdata();
+                    }}
+                    style={styles.modal_btn}
+                  >
+                    <Text style={styles.modal_btn_txt}>Save</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      {
+                        setd1(3);
+                      }
+                    }}
+                    style={styles.modal_btn}
+                  >
+                    <Text style={styles.modal_btn_txt}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        ) : d1 == 0 ? (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.modal_page}>
+              <View style={styles.modalView}>
+                <View style={styles.pin}>
+                  <Text style={styles.modalText}>Pin Note</Text>
+                  <Pressable
+                    style={{}}
+                    onPress={() => setModalVisible(!modalVisible)}
+                  >
+                    <Entypo name="cross" size={30} color="black" />
+                  </Pressable>
+                </View>
+
+                <Text
+                  style={{
+                    color: "black",
+                    marginLeft: "4%",
+                    marginTop: "12%",
+                  }}
+                >
+                  No note added yet.
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setd1(1);
+                  }}
+                  style={styles.add_note}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: wp("6%"),
+                      fontFamily: "Inter-Black4",
+                    }}
+                  >
+                    Add Note
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        ) : d1 == 3 ? (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.modal_page}>
+              <View style={styles.modalView2}>
+                <View style={styles.pin}>
+                  <Text style={styles.modalText}>{modalTitle2}</Text>
+                  <Pressable
+                    style={{}}
+                    onPress={() => (
+                      // call_api(),
+                      getData(),
+                      setModalVisible(!modalVisible),
+                      // setd1(0),
+                      setn("")
+                    )}
+                  >
+                    <Entypo name="cross" size={30} color="black" />
+                  </Pressable>
+                </View>
+                <Text style={styles.date}>{pin_date}</Text>
+                <Text style={styles.note3}>{note}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setd1(4);
+                  }}
+                  style={styles.update_note}
+                >
+                  <Text style={styles.update_txt}>Update</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        ) : null}
+      </View>
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible2}
+          onRequestClose={() => {
+            setModalVisible2(!modalVisible2);
+          }}
+        >
+          <View style={styles.modal_page}>
+            <View style={styles.modal_voicemail_view}>
+              <View style={styles.pin2}>
+                <Text style={styles.modalText1}>Voicemail</Text>
+                <Pressable onPress={() => setModalVisible2(!modalVisible2)}>
+                  <Entypo name="cross" size={30} color="black" />
+                </Pressable>
+              </View>
+              <View style={styles.line2}></View>
+              <View style={styles.modal_btn_box_voicemail}>
+                <TouchableOpacity
+                  onPress={() => {}}
+                  activeOpacity={1}
+                  style={styles.modal_btn_voicemail}
+                >
+                  <Text style={styles.modal_btn_txt_voicemail1}>
+                    Ringing Voicemail
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    {
+                    }
+                  }}
+                  style={styles.modal_btn_voicemail2}
+                >
+                  <Text style={styles.modal_btn_txt_voicemail2}>
+                    iVoiceCast
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  onPress={() => {}}
+                  style={styles.circle_icon_v}
+                >
+                  <View style={styles.circle_v}>
+                    <Text style={styles.circle_text_v}>US</Text>
+                  </View>
+                </TouchableOpacity>
+                <Text onPress={() => {}} style={styles.name2}>
+                  Upashak Singh
+                </Text>
+              </View>
+              <View style={styles.line4}></View>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  onPress={() => {}}
+                  style={{ marginStart: "7%", marginEnd: "5%" }}
                 >
                   <Image
-                    source={Images.addLeads}
-                    style={{
-                      width: Dimensions.get("window").width * 0.18,
-                      height: Dimensions.get("window").width * 0.18,
-                      resizeMode: "contain",
-                    }}
-                  />
+                    style={styles.mail_icon_v}
+                    source={Images.mail_icon}
+                  ></Image>
                 </TouchableOpacity>
-              </Animated.View>
-            ) : null}
-            <View style={styles.tag_box}>
-              {d == true ? (
-                <View style={styles.tag_view}>
-                  <View style={styles.btn1}>
-                    <TouchableOpacity style={styles.tag_touch}>
-                      <Text style={styles.tag}>Voice Call</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.btn2}>
-                    <TouchableOpacity style={styles.tag_touch}>
-                      <Text style={styles.tag}>Add Tags</Text>
-                    </TouchableOpacity>
-                  </View>
+                <Text onPress={() => {}} style={styles.email_v}>
+                  Upashak88workgmail.com
+                </Text>
+              </View>
+              <View style={styles.line4}></View>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  onPress={() => {}}
+                  style={{ marginStart: "7%", marginEnd: "5%" }}
+                >
+                  <Image
+                    style={styles.mail_icon_v}
+                    source={Images.call_icon}
+                  ></Image>
+                </TouchableOpacity>
+                <Text onPress={() => {}} style={styles.email_v}>
+                  9893553321
+                </Text>
+              </View>
+              <KeyboardAvoidingView enabled>
+                <View style={styles.input2}>
+                  <TextInput
+                  //  value={""}
+                  // onChangeText={(txt) => (setnote(txt), setn(txt))}
+                  />
                 </View>
-              ) : null}
+              </KeyboardAvoidingView>
+              <View style={styles.modal_btn_box}>
+                <TouchableOpacity
+                  onPress={() => {}}
+                  activeOpacity={1}
+                  style={styles.modal_btn}
+                >
+                  <Text style={styles.modal_btn_txt}>Save</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    {
+                    }
+                  }}
+                  style={styles.modal_btn}
+                >
+                  <Text style={styles.modal_btn_txt}>Close</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </>
+          </View>
+        </Modal>
+      </View>
+      {d2 ? (
+        <Animated.View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+
+            borderRadius:
+              Math.round(
+                Dimensions.get("window").width + Dimensions.get("window").height
+              ) / 2,
+            position: "absolute",
+
+            right: "6%",
+
+            backgroundColor: Colors.float_btn,
+
+            transform: [{ translateY: translation }],
+            bottom: height * 0.28,
+            elevation: 5,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navigation.navigate(ScreenNames.NEW_LEADS)}
+
+            // style={styles.floating_btn}
+          >
+            <Image
+              source={Images.addLeads}
+              style={{
+                width: Dimensions.get("window").width * 0.18,
+                height: Dimensions.get("window").width * 0.18,
+                resizeMode: "contain",
+              }}
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      ) : null}
+      <View style={styles.tag_box}>
+        {d == true ? (
+          <View style={styles.tag_view}>
+            <View style={styles.btn1}>
+              <TouchableOpacity style={styles.tag_touch}>
+                <Text style={styles.tag}>Voice Call</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.btn2}>
+              <TouchableOpacity style={styles.tag_touch}>
+                <Text style={styles.tag}>Add Tags</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         ) : null}
       </View>
     </SafeAreaView>
-    // </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  footer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+  },
   update_txt: {
     color: "white",
     fontSize: wp("6%"),
@@ -1020,6 +1057,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#f2f2f2",
     // paddingVertical: "3%",
   },
   pin2: {
@@ -1147,7 +1185,7 @@ const styles = StyleSheet.create({
   },
   tag_touch: { alignItems: "center" },
   tag: { color: "white", fontSize: wp("4.71%"), fontFamily: "Inter-Black2" },
-  flat: { backgroundColor: "#f2f2f2", marginBottom: "10%" },
+  flat: { marginBottom: "30%" },
   input: {
     height: height * 0.25,
     margin: 12,
@@ -1287,7 +1325,8 @@ const styles = StyleSheet.create({
     color: "#666666",
 
     flex: 0.97,
-    fontFamily: "Inter-Black",opacity:1
+    fontFamily: "Inter-Black",
+    opacity: 1,
   },
   name2: {
     fontSize: wp("4.31%"),
@@ -1421,6 +1460,7 @@ const styles = StyleSheet.create({
     marginEnd: "5%",
     elevation: 5,
   },
-
   container: { backgroundColor: "#e6e6e6", flex: 1 },
 });
+
+export default All;

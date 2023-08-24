@@ -19,6 +19,7 @@ import Related from "./Detail_folder/Related";
 import { ScreenNames } from "../constant/ScreenNames";
 
 import { Images } from "../constant/images";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -38,6 +39,17 @@ export default function Detail({ navigation }) {
   const [loading, setLoading] = React.useState(true);
   console.log(route?.params?.index)
   const [User_data, setUserData] = useState(route.params.DATA[ind]);
+  const [back_data,setback_data]=useState(route.params.user.imp2)
+
+  React.useEffect(() => {
+    (async () => {
+    const u= route.params.user.imp2
+    console.log(u,"sm")
+    })();
+  }, []);
+
+  
+
   React.useEffect(() => {
     (async () => {
       seti(route.params.user.id);
@@ -53,12 +65,18 @@ export default function Detail({ navigation }) {
       <View>
    
       <View style={styles.box}>
-        <TouchableOpacity
+        {back_data == "1"?  <TouchableOpacity
+          style={styles.back}
+          onPress={() => {navigation.goBack()}}
+        >
+          <Image source={Images.backArrow} style={styles.icon} />
+        </TouchableOpacity>: <TouchableOpacity
           style={styles.back}
           onPress={() => navigation.navigate(ScreenNames.MAIN_SCREEN)}
         >
           <Image source={Images.backArrow} style={styles.icon} />
-        </TouchableOpacity>
+        </TouchableOpacity>}
+       
 
         <TouchableOpacity
           style={{

@@ -142,7 +142,7 @@ export const get_leads_All = (data) => {
   formdata.append("email", data.email);
   formdata.append("password", data.password);
   formdata.append("action", "all");
-  formdata.append("page_number", "");
+  formdata.append("page_number", data.no);
 
   var requestOptions = {
     method: "POST",
@@ -378,7 +378,6 @@ export const update_lead_activity_comments = (data) => {
   return fetch(`${BASE_URI}/save_lead_activity_comments`, requestOptions);
 };
 
-
 export const Related_page_counter = (data) => {
   // console.log(data)
   var myHeaders = new Headers();
@@ -495,7 +494,7 @@ export const add_lead_task = (data) => {
     body: formdata,
     redirect: "follow",
   };
-
+  console.log(data);
   return fetch(`${BASE_URI}/add_lead_task`, requestOptions);
 };
 
@@ -521,7 +520,6 @@ export const edit_lead_task = (data) => {
 };
 
 export const update_lead_task = (data) => {
- 
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
 
@@ -573,7 +571,6 @@ export const Appointment = (data) => {
 };
 
 export const add_lead_appointment = (data) => {
- 
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -602,12 +599,11 @@ export const add_lead_appointment = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  
+
   return fetch(`${BASE_URI}/save_appointment`, requestOptions);
 };
 
 export const Update_lead_appointment = (data) => {
- 
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -636,13 +632,11 @@ export const Update_lead_appointment = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  
+
   return fetch(`${BASE_URI}/save_appointment`, requestOptions);
 };
 
-
 export const Appointment_detail = (data) => {
-  
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -651,7 +645,6 @@ export const Appointment_detail = (data) => {
   formdata.append("email", data.email);
   formdata.append("password", data.password);
   formdata.append("appointment_id", data.id);
- 
 
   var requestOptions = {
     method: "POST",
@@ -659,10 +652,9 @@ export const Appointment_detail = (data) => {
     body: formdata,
     redirect: "follow",
   };
- 
+
   return fetch(`${BASE_URI}/fetch_appointment_detail`, requestOptions);
 };
-
 
 export const Edit_Appointment_detail = (data) => {
   // console.log(data);
@@ -674,7 +666,6 @@ export const Edit_Appointment_detail = (data) => {
   formdata.append("email", data.email);
   formdata.append("password", data.password);
   formdata.append("appointment_id", data.id);
- 
 
   var requestOptions = {
     method: "POST",
@@ -682,12 +673,11 @@ export const Edit_Appointment_detail = (data) => {
     body: formdata,
     redirect: "follow",
   };
- 
+
   return fetch(`${BASE_URI}/manage_appointment`, requestOptions);
 };
 
 export const Create_Appointment_detail = (data) => {
-  
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -695,8 +685,7 @@ export const Create_Appointment_detail = (data) => {
   formdata.append("key", key);
   formdata.append("email", data.email);
   formdata.append("password", data.password);
-  formdata.append("lead_id", data.id);
- 
+  // formdata.append("lead_id", data.id);
 
   var requestOptions = {
     method: "POST",
@@ -704,12 +693,11 @@ export const Create_Appointment_detail = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  
+
   return fetch(`${BASE_URI}/manage_appointment`, requestOptions);
 };
 
 export const Task_detail = (data) => {
-
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -718,7 +706,6 @@ export const Task_detail = (data) => {
   formdata.append("email", data.email);
   formdata.append("password", data.password);
   formdata.append("task_id", data.id);
- 
 
   var requestOptions = {
     method: "POST",
@@ -726,12 +713,11 @@ export const Task_detail = (data) => {
     body: formdata,
     redirect: "follow",
   };
- 
+
   return fetch(`${BASE_URI}/view_task_detail`, requestOptions);
 };
 
 export const Create_lead_task = (data) => {
-
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -740,7 +726,6 @@ export const Create_lead_task = (data) => {
   formdata.append("email", data.email);
   formdata.append("password", data.password);
   formdata.append("lead_id", data.id);
- 
 
   var requestOptions = {
     method: "POST",
@@ -748,12 +733,11 @@ export const Create_lead_task = (data) => {
     body: formdata,
     redirect: "follow",
   };
- 
+
   return fetch(`${BASE_URI}/create_lead_task`, requestOptions);
 };
 
 export const Note = (data) => {
-  
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -762,7 +746,6 @@ export const Note = (data) => {
   formdata.append("email", data.email);
   formdata.append("password", data.password);
   formdata.append("lead_id", data.id);
- 
 
   var requestOptions = {
     method: "POST",
@@ -770,12 +753,11 @@ export const Note = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  
+
   return fetch(`${BASE_URI}/lead_notes`, requestOptions);
 };
 
 export const Add_Note = (data) => {
-  
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -785,7 +767,6 @@ export const Add_Note = (data) => {
   formdata.append("password", data.password);
   formdata.append("lead_id", data.id);
   formdata.append("note", data.note);
- 
 
   var requestOptions = {
     method: "POST",
@@ -793,12 +774,11 @@ export const Add_Note = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  
+
   return fetch(`${BASE_URI}/save_lead_notes`, requestOptions);
 };
 
 export const Update_lead_Note = (data) => {
-  
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -809,7 +789,6 @@ export const Update_lead_Note = (data) => {
   formdata.append("lead_id", data.id);
   formdata.append("note", data.note);
   formdata.append("note_id", data.note_id);
- 
 
   var requestOptions = {
     method: "POST",
@@ -817,13 +796,11 @@ export const Update_lead_Note = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  
+
   return fetch(`${BASE_URI}/save_lead_notes`, requestOptions);
 };
 
-
 export const Mark_task = (data) => {
-  
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -834,7 +811,6 @@ export const Mark_task = (data) => {
   formdata.append("lead_id", data.id);
   formdata.append("task_status", data.task_status);
   formdata.append("task_id", data.task_id);
- 
 
   var requestOptions = {
     method: "POST",
@@ -842,14 +818,12 @@ export const Mark_task = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  console.log(data)
-  
+  console.log(data);
+
   return fetch(`${BASE_URI}/mark_task_as_completed`, requestOptions);
 };
 
-
 export const remove_tag = (data) => {
-  
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -859,8 +833,6 @@ export const remove_tag = (data) => {
   formdata.append("password", data.password);
   formdata.append("lead_id", data.lead_id);
   formdata.append("tag_id", data.tag_id);
- 
- 
 
   var requestOptions = {
     method: "POST",
@@ -868,13 +840,12 @@ export const remove_tag = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  console.log(data)
-  
+  console.log(data);
+
   return fetch(`${BASE_URI}/remove_tag_from_lead`, requestOptions);
 };
 
 export const add_tag = (data) => {
-  
   var myHeaders = new Headers();
   myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
   var formdata = new FormData();
@@ -884,8 +855,6 @@ export const add_tag = (data) => {
   formdata.append("password", data.password);
   formdata.append("lead_id", data.lead_id);
   formdata.append("tag_id", data.tag_id);
- 
- 
 
   var requestOptions = {
     method: "POST",
@@ -893,7 +862,494 @@ export const add_tag = (data) => {
     body: formdata,
     redirect: "follow",
   };
-  console.log(data)
-  
+  console.log(data);
+
   return fetch(`${BASE_URI}/assign_tag_to_lead`, requestOptions);
+};
+
+export const Appointment_full = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+  console.log(data);
+
+  return fetch(`${BASE_URI}/fetch_appointments`, requestOptions);
+};
+
+export const Task_full = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("page_number", data.no);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/crm_task_list_full`, requestOptions);
+};
+
+export const Task_full_completed = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("page_number", data.no);
+  formdata.append("completed", "1");
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/crm_task_list_full`, requestOptions);
+};
+
+export const Tags = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("page_number", data.no);
+  formdata.append("search", "");
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/user_tags`, requestOptions);
+};
+
+export const Save_tag = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("tag_id", data.id);
+  formdata.append("tag_description", data.des);
+  formdata.append("tag_name", data.name);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/save_tag`, requestOptions);
+};
+
+export const Delete_Tag = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("tag_id", data.id);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/delete_tag`, requestOptions);
+};
+
+export const system_Tag = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/system_tags`, requestOptions);
+};
+
+export const Recent_chat = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("page_number", data.no);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/recent_sms_conversations`, requestOptions);
+};
+
+export const Sms_chat = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("lead_id", data.id);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/lead_sms_chat`, requestOptions);
+};
+
+export const Send_sms = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("lead_id", data.id);
+  formdata.append("text", data.msg);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/lead_sms_send`, requestOptions);
+};
+
+export const Delete_sms = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("lead_id", data.id);
+  formdata.append("message_id", data.msg_id);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  console.log(data);
+  return fetch(`${BASE_URI}/lead_sms_delete`, requestOptions);
+};
+
+export const Voicemail_audio = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("default_voicemail_method", "ivoicecast");
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  console.log(data);
+  return fetch(`${BASE_URI}/fetch_audios`, requestOptions);
+};
+
+export const Saved_Searches = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("lead_id", data.id);
+  formdata.append("page_number", data.no);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/view_saved_searches`, requestOptions);
+};
+
+export const Stop_saved_search_email = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("lead_id", data.id);
+  formdata.append("lead_user_id", data.user_id);
+  formdata.append("pause_searches_by_admin", data.no);
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+  console.log(data);
+
+  return fetch(`${BASE_URI}/stop_saved_search_email`, requestOptions);
+};
+
+export const View_visits = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("lead_id", data.id);
+  formdata.append("page_number", data.no);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/view_visits`, requestOptions);
+};
+
+export const View_statics = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("lead_id", data.id);
+  formdata.append("page_number", data.no);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/view_statics`, requestOptions);
+};
+
+export const View_Fav = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("lead_id", data.id);
+  formdata.append("page_number", data.no);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/view_favourite_properties`, requestOptions);
+};
+
+export const Upload_Audio = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("audio_title", data.a_t);
+  formdata.append("MIME TYPE", fileInput.files[0], "/path/to/file");
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+  console.log(data);
+  return fetch(`${BASE_URI}/upload_audio_file`, requestOptions);
+};
+
+export const Send_voicemail = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("audio_id", data.audio_id);
+  formdata.append("audio_url", data.url);
+  formdata.append("lead_id", data.id);
+  formdata.append("text", data.text);
+  formdata.append("default_voicemail_method", "ivoicecast");
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  console.log(data);
+  return fetch(`${BASE_URI}/send_voicemail`, requestOptions);
+};
+
+
+export const Search_filter = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("page_number", data.no);
+  formdata.append("action", "all");
+  formdata.append("date", data.date);
+  formdata.append("date_to", data.date_to);
+  formdata.append("date_from", data.date_from);
+  formdata.append("email_verified", data.e_v);
+  formdata.append("is_grl_crea_lead", data.i_g_c_l);
+  formdata.append("keyword", data.text);
+  formdata.append("lead_day_time", data.l_d_t);
+  formdata.append("lead_type_id", data.l_t_i);
+  formdata.append("site_id", data.s_i);
+  formdata.append("tag_ids", data.t_i);
+  formdata.append("user_id", data.u_i);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  console.log(data);
+  return fetch(`${BASE_URI}/getleads`, requestOptions);
+};
+
+
+export const Priority_hit = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+  formdata.append("action", "priority");
+formdata.append("priority_id", data.id);
+  formdata.append("page_number", data.no);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/getleads`, requestOptions);
+};
+
+export const Active_filters = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+ 
+formdata.append("active_users_filter", data.filters);
+  formdata.append("page_number", data.no);
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/most_active_users`, requestOptions);
 };

@@ -43,6 +43,7 @@ import {
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
 import { Edit_Appointment_detail, Update_lead_appointment } from "../../../../Services";
+import Loader from "../../../../constant/Loader";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
@@ -87,6 +88,9 @@ function Update_Appointment() {
   const [d, setd] = useState(false);
   const [d1, setd1] = useState(false);
   const [d2, setd2] = useState(false);
+  const [dt, setdt] = useState();
+  const [dt3, setdt3] = useState();
+  const [dt2, setdt2] = useState();
 
 
 
@@ -160,8 +164,10 @@ function Update_Appointment() {
           
           // console.log(result)
         var data= result?.data?.appointment_fields_arr
-        
-        
+      
+        setdt(data?.all_day_event?.dropdown_arr);
+        setdt2(data?.reminder_time_unit?.dropdown_arr);
+        setdt3(data?.show_time_as?.dropdown_arr);
          setsubject(data?.subject?.value)
          setnotes(data?.notes?.value)
          setlocation(data?.location?.value)
@@ -235,6 +241,9 @@ function Update_Appointment() {
         onRightPress={() => {postdata()}}
         customRight2={true}
       />
+         {loading ? (
+          <Loader loading={loading} />
+        ) :  (
       <ScrollView>
         <View
           style={{
@@ -264,14 +273,59 @@ function Update_Appointment() {
               onChangeText={(txt) => setlocation(txt)}
             placeholderTextColor={"#cccccc"}
           ></TextInput>
+<View style={styles.line2}></View>
+          <Text style={styles.name_txt}>Site</Text>
+          <TextInput
+            placeholder="Location"
+            style={styles.input}
+            value={"Test2"}
+            editable={false}
+            // onChangeText={(txt) => setlocation(txt)}
+            placeholderTextColor={"#cccccc"}
+          ></TextInput>
 
+          <View style={styles.line2}></View>
+          <Text style={styles.name_txt}>All Day Event</Text>
+          
+
+<SelectDropdown
+            data={dt}
+            defaultValueByIndex={"0"}
+          
+            onSelect={(item, index) => {
+              setday_event(item.value)
+            }}
+           
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem.label;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item.label;
+            }}
+            buttonStyle={styles.dropdown1BtnStyle}
+            buttonTextStyle={styles.dropdown1BtnTxtStyle}
+            renderDropdownIcon={isOpened => {
+              return  <AntDesign
+              style={styles.icon}
+              color="#003366"
+              name="downsquare"
+              size={30}
+            />
+            }}
+            dropdownIconPosition={"right"}
+            dropdownStyle={styles.dropdown1DropdownStyle}
+            rowStyle={styles.dropdown1RowStyle}
+            rowTextStyle={styles.dropdown1RowTxtStyle}
+            dropdownOverlayColor="rgba(52, 52, 52, 0)"
+          />
+ 
           
          
 
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.calender}></Image>
-            <Text style={styles.name_txt2}>Start Date</Text>
+            <Text style={styles.name_txt2}>Start Time</Text>
           </View>
           <View style={[styles.press]}>
             <TouchableOpacity
@@ -300,7 +354,7 @@ function Update_Appointment() {
           <View style={styles.line2}></View>
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.calender}></Image>
-            <Text style={styles.name_txt2}>Due Date</Text>
+            <Text style={styles.name_txt2}>End Time</Text>
           </View>
 
           <View style={[styles.press]}>
@@ -369,143 +423,74 @@ function Update_Appointment() {
             <Image style={styles.icon2} source={""}></Image>
             <Text style={styles.name_txt2}>Time Unit</Text>
           </View>
-          <TouchableOpacity
-                  style={styles.dropdown}
-                  activeOpacity={1}
-                  onPress={() => {
-                    setd1(!d1);
-                  }}
-                >
-                  <Text style={styles.dropdown_txt}>{reminder_time_unit}</Text>
-                  <AntDesign
-                        style={styles.icon}
-                        color="#003366"
-                        name="downsquare"
-                        size={30}
-                      />
-                </TouchableOpacity>
-                <View style={styles.line2}></View>
-                {d1 ? (
-                  <View
-                    style={{
-                      backgroundColor: "white",
-                      height: height * 0.13,
-                      width:"86%",marginStart:"12%",
-                      
-                      borderRadius: 6,
-                      marginTop: "1%",
-                    }}
-                  >
-                    <FlatList
-                      style={{}}
-                      data={pr_data}
-                      // numColumns={4}
-                      keyExtractor={(item) => item.id}
-                      renderItem={({ item, index }) => (
-                        <View
-                          style={{
-                            paddingStart: "5%",
-                          }}
-                        >
-                          <TouchableOpacity
-                          onPress={() => {
-                           
-                            setreminder_time_unit(item.value),setd1(!d1)
-                          }}
-                          style={{}}
-                          >
-                          <Text
-                          
-                            style={{
-                              fontSize: 17,
-                              color: "black",
-                              marginVertical: "5%",
-                            }}
-                          >
-                            {item.label}
-                          </Text>
-                          </TouchableOpacity>
-
-                          <View
-                            style={{ backgroundColor: "#cccccc", height: 1 }}
-                          ></View>
-                        </View>
-                      )}
-                    />
-                  </View>
-                ) : null}
+          <SelectDropdown
+            data={dt2}
+            defaultValueByIndex={"0"}
+          
+            onSelect={(item, index) => {
+              setreminder_time_unit(item.value)
+            }}
+           
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem.label;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item.label;
+            }}
+            buttonStyle={styles.dropdown1BtnStyle}
+            buttonTextStyle={styles.dropdown1BtnTxtStyle}
+            renderDropdownIcon={isOpened => {
+              return  <AntDesign
+              style={styles.icon}
+              color="#003366"
+              name="downsquare"
+              size={30}
+            />
+            }}
+            dropdownIconPosition={"right"}
+            dropdownStyle={styles.dropdown1DropdownStyle}
+            rowStyle={styles.dropdown1RowStyle}
+            rowTextStyle={styles.dropdown1RowTxtStyle}
+            dropdownOverlayColor="rgba(52, 52, 52, 0)"
+          />
+ <View style={styles.line2}></View>
           
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={""}></Image>
             <Text style={styles.name_txt2}>Show Time As</Text>
           </View>
-          <TouchableOpacity
-                  style={styles.dropdown}
-                  activeOpacity={1}
-                  onPress={() => {
-                    setd(!d);
-                  }}
-                >
-                  <Text style={styles.dropdown_txt}>{time_as}</Text>
-                  <AntDesign
-                        style={styles.icon}
-                        color="#003366"
-                        name="downsquare"
-                        size={30}
-                      />
-                </TouchableOpacity>
-                <View style={styles.line2}></View>
-                {d ? (
-                  <View
-                    style={{
-                      backgroundColor: "white",
-                      height: height * 0.13,
-                      width:"86%",marginStart:"12%",
-                      
-                      borderRadius: 6,
-                      marginTop: "1%",
-                    }}
-                  >
-                    <FlatList
-                      style={{}}
-                      data={st_data}
-                      // numColumns={4}
-                      keyExtractor={(item) => item.id}
-                      renderItem={({ item, index }) => (
-                        <View
-                          style={{
-                            paddingStart: "5%",
-                          }}
-                        >
-                          <TouchableOpacity
-                          onPress={() => {
-                           
-                            settime_as(item.value),setd(!d)
-                          }}
-                          style={{}}
-                          >
-                          <Text
-                          
-                            style={{
-                              fontSize: 17,
-                              color: "black",
-                              marginVertical: "5%",
-                            }}
-                          >
-                            {item.label}
-                          </Text>
-                          </TouchableOpacity>
-
-                          <View
-                            style={{ backgroundColor: "#cccccc", height: 1 }}
-                          ></View>
-                        </View>
-                      )}
-                    />
-                  </View>
-                ) : null}
+          <SelectDropdown
+            data={dt3}
+            defaultValueByIndex={"0"}
           
-         
+            onSelect={(item, index) => {
+              settime_as(item.value)
+            }}
+           
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem.label;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item.label;
+            }}
+            buttonStyle={styles.dropdown1BtnStyle}
+            buttonTextStyle={styles.dropdown1BtnTxtStyle}
+            renderDropdownIcon={isOpened => {
+              return  <AntDesign
+              style={styles.icon}
+              color="#003366"
+              name="downsquare"
+              size={30}
+            />
+            }}
+            dropdownIconPosition={"right"}
+            dropdownStyle={styles.dropdown1DropdownStyle}
+            rowStyle={styles.dropdown1RowStyle}
+            rowTextStyle={styles.dropdown1RowTxtStyle}
+            dropdownOverlayColor="rgba(52, 52, 52, 0)"
+          />
+          
+          <View style={styles.line2}></View>
           
           <View style={{ flexDirection: "row" }}>
             <Image style={styles.icon2} source={Images.task_note}></Image>
@@ -519,7 +504,7 @@ function Update_Appointment() {
           ></TextInput>
           <View style={styles.line3}></View>
         </View>
-      </ScrollView>
+      </ScrollView>)}
       {/* {com ? (
         <View
           style={{ height: 150, width: "100%", backgroundColor: "red" }}
@@ -721,8 +706,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  
-  
+
   done: { flex: 0.4, fontSize: 18, fontFamily: "Inter-Black2" },
   date: {
     flex: 0.8,
@@ -795,13 +779,13 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "100%",
   },
-  selectedTextStyle: { color: Colors.txt, fontFamily: "Inter-Black4",fontSize: wp("5.5%") },
+  selectedTextStyle: { color: "#8c8c8c", fontFamily: "Inter-Black4" },
   icon2: {
     marginTop: "8%",
-    height: hp("4.21%"),
-     width: wp("6.58%"),
-     resizeMode: "contain",
-    marginStart: "3%",marginEnd:"3.5%"
+    height: 25,
+    width: 25,
+    resizeMode: "contain",
+    marginHorizontal: "2.5%",
   },
   cancel: {
     height: 25,
@@ -819,11 +803,11 @@ const styles = StyleSheet.create({
   icon5: { marginTop: "8%", flex: 0.17, fontSize: 22 },
   icon_notes: {},
   dropdown: {
-    
+  
     color: Colors.txt,
     paddingHorizontal: "2%",
     fontSize: wp("5%"),
-    // height: height * 0.05,
+    height: height * 0.05,
     borderRadius: 6,
     fontFamily: "Inter-Black",
     flexDirection: "row",
@@ -850,7 +834,7 @@ const styles = StyleSheet.create({
     height: 1,
 
     width: "86%",
-    marginStart: "12%",
+    marginStart: "14%",
     marginTop: "8%",
   },
   line2: {
@@ -862,52 +846,44 @@ const styles = StyleSheet.create({
     marginTop: "1%",
   },
   name_txt: {
-  
-    paddingTop: "5%",
-    marginStart: "13.5%",
-    color: Colors.blue_txt,
     fontSize: wp("5%"),
-                  fontFamily: "Inter-Black4",
+    paddingTop: "5%",
+    paddingStart: "12%",
+    color: Colors.blue_txt,
+    fontFamily: "Inter-Black4",
   },
   name_txt2: {
-   
+    fontSize: wp("5%"),
     marginTop: "5%",
     color: Colors.blue_txt,
-    fontSize: wp("5%"),
-                  fontFamily: "Inter-Black4",
+    fontFamily: "Inter-Black4",
   },
   input: {
-    color: "#666666",
-
-    fontSize: wp("5%"),
-    fontFamily: "Inter-Black4",
-    marginTop: "3%",
-    marginStart: "13.5%",
-   
-  },
-  press: {
     color: "#8c8c8c",
 
-    fontSize: 17,
-
-    marginStart: "13.5%",
+    fontSize: wp("5%"),
+    marginTop: "3%",
+    marginStart: "12%",
+    fontFamily: "Inter-Black4",
+  },
+  press: {
+    marginStart: "12.5%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    fontFamily: "Inter-Black4",
   },
   input3: {
     color: "#8c8c8c",
-    fontSize: wp("5%"),
-   
+
+    fontSize: 17,
     marginStart: "14%",
     fontFamily: "Inter-Black4",
   },
   input2: {
     color: "#8c8c8c",
 
-    fontSize: wp("5%"),
-    marginStart: "14%",
+    fontSize: 17,
+    marginStart: "13%",
     fontFamily: "Inter-Black4",
   },
 
@@ -923,13 +899,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginEnd: "2%",
   },
-  
   dropdown1BtnStyle: {
     width: '100%',
      paddingHorizontal:"3.8%",marginBottom:"-3%",backgroundColor:"transparent"
     
   },
-  dropdown1BtnTxtStyle: {fontSize: wp("5%"), color: "#6c6c6c", fontFamily: "Inter-Black4", textAlign: 'left',marginStart:"11%",},
+  dropdown1BtnTxtStyle: {fontSize: wp("5%"), color: "#6c6c6c", fontFamily: "Inter-Black4", textAlign: 'left',marginStart:"9%",},
   dropdown1DropdownStyle: { backgroundColor: "white",
   color: Colors.txt,
   paddingHorizontal: "2%",
@@ -942,7 +917,6 @@ const styles = StyleSheet.create({
   justifyContent: "space-between",width:"80%",marginStart:"12%",marginTop:Platform.OS =="ios"?0:"-10%"},
   dropdown1RowStyle: { borderBottomColor: '#C5C5C5'},
   dropdown1RowTxtStyle: {color: '#444', textAlign: 'left'},
-
   centeredView_box: {
     flex: 1,
     justifyContent: "center",
@@ -956,14 +930,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
 
     elevation: 5,
-    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
     // elevation: 20,
   },
-  textStyle1_box: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
-  textStyle2_box: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
-  textStyle3_box: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
-
+  textStyle1_box: {
+    fontSize: wp("5.41%"),
+    fontFamily: "Inter-Black2",
+    marginTop: "7%",
+  },
+  textStyle2_box: {
+    fontSize: wp("4%"),
+    textAlign: "center",
+    width: "80%",
+    marginBottom: "7%",
+    marginTop: "1%",
+    color: "#262626",
+  },
+  textStyle3_box: {
+    fontSize: wp("5.31%"),
+    color: "#2b92ee",
+    fontFamily: "Inter-Black",
+    marginVertical: "5%",
+  },
 });
-
 
 export default Update_Appointment;

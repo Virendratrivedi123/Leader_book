@@ -33,6 +33,7 @@ const width = Dimensions.get("window").width;
 function Task_page() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible1, setModalVisible1] = useState(false);
   const route = useRoute();
   const translation = useRef(new Animated.Value(0)).current;
   const h = (18 / 100) * height;
@@ -60,12 +61,12 @@ function Task_page() {
          
           setDATA(result?.data?.tasks);
           
-        result?.data?.tasks.map((i)=>{
-          return(settask_id(i?.CrmTask?.id))
-        })
-        result?.data?.tasks.map((i)=>{
-          return(settask_status(i?.CrmTask?.status))
-        })
+        // result?.data?.tasks.map((i)=>{
+        //   return(settask_id(i?.CrmTask?.id))
+        // })
+        // result?.data?.tasks.map((i)=>{
+        //   return(settask_status(i?.CrmTask?.status))
+        // })
          
          
           // settask_id(a[0]?.id)
@@ -111,8 +112,8 @@ function Task_page() {
          
           // var b=  a[0].id
          
-          // settask_id(a[0]?.id)
-          // settask_status(a[0]?.status)
+          // settask_id("")
+          // settask_status("")
           // setModalTitle2(result?.data?.leads?.name)
           // setnote(result?.data?.leads?.first_name)
           setd2(true);
@@ -144,9 +145,9 @@ function Task_page() {
 
   
 
-  const postdata = async () => {
+  const postdata = async (i,r) => {
     try {
-
+   
       
     
       const user_data = await AsyncStorage.getItem("user_data");
@@ -156,8 +157,8 @@ function Task_page() {
         email: d.email,
         password: d.password,
         lead_id: route.params.user.id,
-        task_status:task_status,
-        task_id: task_id,
+        task_status:"1",
+        task_id: i,
        
       };
       // var a = DATA.map((i)=>{
@@ -172,7 +173,9 @@ function Task_page() {
       Mark_task(data).then((response) => {
         response.json().then((data) => {
           console.log(data)
-          call_api()
+          if(data?.message == "Task has been marked as completed successfully.")
+          {setModalVisible1(true),call_api()}
+          
           // Alert.alert(data.msg);
          
         });
@@ -181,9 +184,10 @@ function Task_page() {
       console.error(error);
     }
   };
-
+ 
   
-console.log(DATA)
+  
+console.log(route.params.user.id)
   // console.log(  route.params.user.name,
   //    route.params.user.id,
   //    route.params.user.logo,route.params.index)
@@ -213,9 +217,10 @@ console.log(DATA)
                 marginTop: "5%",
               }}
             >
+              
               <TouchableOpacity style={styles.circle}
               
-              onPress={() => {postdata()}}
+              onPress={() => {postdata(item?.CrmTask?.id)}}
               >
                 <Image style={styles.img} source={Images.task_cicle}></Image>
               </TouchableOpacity>
@@ -287,6 +292,37 @@ console.log(DATA)
                   style={{  }}
                   onPress={() => {
                     setModalVisible(!modalVisible)
+                  }}
+                >
+                  <Text style={styles.textStyle3}>OK</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            transparent={true}
+            visible={modalVisible1}
+            onRequestClose={() => {
+              
+              setModalVisible1(!modalVisible1);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.textStyle1}>Lead Booker</Text>
+                <Text style={styles.textStyle2}>Task has been marked as completed successfully</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                   
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                    setModalVisible1(!modalVisible1)
                   }}
                 >
                   <Text style={styles.textStyle3}>OK</Text>

@@ -36,6 +36,7 @@ import { Colors } from "../constant/colors";
 import { STYLES } from "../constant/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Images } from "../constant/images";
+import { Active_filters } from "../Services";
 function Customdrawer(props) {
   const [fontsLoaded] = useFonts({
     'Inter-Black': require('../../assets/fonts/Mulish-SemiBold.ttf'),
@@ -71,6 +72,7 @@ function Customdrawer(props) {
   if (!fontsLoaded) {
     return null;
   }
+  
 
   // console.log(company)
   return (
@@ -103,7 +105,8 @@ function Customdrawer(props) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate(ScreenNames.MAIN_SCREEN)}
+        onPress={() => {AsyncStorage.setItem("op","2"),
+        navigation.push(ScreenNames.DRAWER)}}
         style={styles.gap}
       >
         <View style={styles.icon}>
@@ -164,7 +167,12 @@ function Customdrawer(props) {
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => {}} style={styles.gap}>
+      <TouchableOpacity onPress={async () => {
+           
+            await AsyncStorage.clear()
+           
+            navigation.navigate(ScreenNames.LOGIN)
+          }}  style={styles.gap}>
         <View style={styles.icon}>
         <Image style={styles.icon2} source={Images.logout}></Image>
           <Text style={styles.ICON_TEXT}>LOG OUT</Text>
