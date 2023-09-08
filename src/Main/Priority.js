@@ -148,24 +148,11 @@ export default function Priority() {
 
         {d1 ? (
           <Animated.View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-
-              position: "absolute",
-
-              right: "6%",
-
-              backgroundColor: Colors.float_btn,
-
-              borderRadius:
-                Math.round(
-                  Dimensions.get("window").width +
-                    Dimensions.get("window").height
-                ) / 2,
+            style={[styles.ball,{
+             
               transform: [{ translateY: translation }],
-              bottom: height * 0.28,
-            }}
+            
+            }]}
           >
             <TouchableOpacity
               onPress={() => navigation.navigate(ScreenNames.NEW_LEADS)}
@@ -174,12 +161,7 @@ export default function Priority() {
             >
               <Image
                 source={Images.addLeads}
-                style={{
-                  width: Dimensions.get("window").width * 0.18,
-                  height: Dimensions.get("window").width * 0.18,
-                  resizeMode: "contain",
-                }}
-              />
+                style={styles.ball_img} />
 
               {/* <Ionicons name="person-add" size={40} color="white" /> */}
             </TouchableOpacity>
@@ -192,6 +174,26 @@ export default function Priority() {
 
 const styles = StyleSheet.create({
   mainview: { flexDirection: "row" },
+  ball_img:{
+    width: Dimensions.get("window").width * 0.18,
+    height: Dimensions.get("window").width * 0.18,
+    resizeMode: "contain",
+  },
+  ball:{ alignItems: "center",
+ 
+  justifyContent: "center",
+
+  position: "absolute",
+
+  right: "6%",
+
+  backgroundColor: Colors.float_btn,
+
+  borderRadius:
+    Math.round(
+      Dimensions.get("window").width +
+        Dimensions.get("window").height
+    ) / 2,  bottom: height * 0.28,},
   name_set: { flexDirection: "row", marginTop: "1%" },
   num_set: { flexDirection: "row", marginStart: "5%" },
   box: {

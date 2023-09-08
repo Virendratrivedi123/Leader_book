@@ -2,7 +2,7 @@
   "expo": {
     "name": "LeadBooker",
     "slug": "LeadBooker",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,10 +14,19 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.SellingToolz.LeadBooker",
       "infoPlist": {
+       "NSMicrophoneUsageDescription":"Allow $(PRODUCT_NAME) to access your microphone",
         "UIBackgroundModes": [
           "audio"
         ]

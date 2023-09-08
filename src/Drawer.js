@@ -9,7 +9,7 @@ import Tasks from "./components/Tasks";
 import Appointments from "./components/Appointments";
 import Phone from "./components/Phone";
 import Last_logged_users from "./components/home1_data/Last_logged_users";
-import Most_active_users from "./components/home1_data/Most_active_users";
+import Most_active_users from "./components/home1_data/Active_users";
 import Edit_profile from "./components/home1_data/Edit_profile";
 import Main_Screen from "./Main/Main_screen";
 import Home from "./components/Home";
@@ -18,6 +18,7 @@ import Add_appointment from "./components/Appointment/Add_appointment";
 import Recent_chats from "./components/Recent_chats";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Add_task from "./components/tasks/Add_tasks";
+
 
 const Drawer = createDrawerNavigator();
 
@@ -44,10 +45,8 @@ function Drawer_screen() {
         name={ScreenNames.LAST_LOGGED_USERS}
         component={Last_logged_users}
       />
-      <Drawer.Screen
-        name={ScreenNames.MOST_ACTIVE_USERS}
-        component={Most_active_users}
-      />
+     
+      
       <Drawer.Screen name={ScreenNames.EDIT_PROFILE} component={Edit_profile} />
       <Drawer.Screen
         name={ScreenNames.ADD_APPOINTMENT}

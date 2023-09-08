@@ -62,6 +62,7 @@ function User_tag() {
   const [tag, settag] = useState("");
   const [des, setdes] = useState("");
   const [id, setid] = useState("");
+  const [t, sett] = useState("1");
   const [arr, setarr] = useState(DATA);
   const [notes, setmynotes] = useState("");
   const searchref = useRef();
@@ -174,13 +175,15 @@ function User_tag() {
   //   setarr(newPeople);
   // };
 
-  const onsearch = (text) => {
-    if (text == "") {
+  const onsearch = () => {
+    if (search == "") {
       setDATA(selected_data)
     } else {
+      var a=[]
       let temp = DATA.filter((item) => {
-        return item.name.toLowerCase().indexOf(text.toLowerCase()) > -1;
+        return item.name.toLowerCase().indexOf(search.toLowerCase()) > -1;
       });
+      setDATA(a)
       setDATA(temp);
     }
   };
@@ -435,17 +438,26 @@ useEffect(() => {
           ref={searchref}
           style={{fontSize:17,width:"90%",height:"100%"}}
           onChangeText={(text) => {
-            onsearch(text), setsearch(text);
+             setsearch(text);
           }}
           value={search}
           underlineColorAndroid="transparent"
           placeholder="Search Tags"
           placeholderTextColor={"#cccccc"}
+          onKeyPress={({ nativeEvent }) => {
+            if (nativeEvent.key === 'Backspace') {
+              setDATA(selected_data),sett("1")
+            }
+          }}
         />
-        <FontAwesome name="search" size={22} color="black" />
-      </View>
+        <TouchableOpacity
+          onPress={() =>{ onsearch(),sett("2")}}
+        >
+ <FontAwesome name="search" size={22} color="black" />
+        </TouchableOpacity>
        
-          <FlatList
+      </View>
+       {t=="1"?<FlatList
           style={{marginBottom:"15%"}}
             data={DATA}
            
@@ -456,7 +468,19 @@ useEffect(() => {
             ListFooterComponent={renderFooter}
             onEndReached={getData}
             onEndReachedThreshold={0.5}
-          />
+          />:<FlatList
+          style={{marginBottom:"15%"}}
+            data={DATA}
+           
+           
+            keyExtractor={(item, index) => index.toString()}
+           
+            renderItem={ItemView}
+            // ListFooterComponent={renderFooter}
+            // onEndReached={getData}
+            // onEndReachedThreshold={0.5}
+          />}
+          
         </View>
       )}
 

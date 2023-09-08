@@ -25,7 +25,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Colors } from "../constant/colors";
 import { ScreenNames } from "../constant/ScreenNames";
 import { Images } from "../constant/images";
-import { Mark_task, Recent_chat, Task_full } from "../Services";
+import { Mark_task, Recent_chat, Task_full, recent_chat } from "../Services";
 import Loader from "../constant/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "./header";
@@ -62,7 +62,27 @@ function Recent_chats() {
 
   React.useEffect(() => {
     (async () => {
-      getData();
+      var myHeaders = new Headers();
+myHeaders.append("Cookie", "PHPSESSID=cf98f38f531a0f8eaba27560409909df");
+
+var formdata = new FormData();
+formdata.append("hash", "c0e4ac08899b02ca1a92b4e2f26fb0b6");
+formdata.append("key", "7632d69f1f8ddac65151c56dea11d76a");
+formdata.append("email", "san88work@gmail.com");
+formdata.append("password", "dGVzdC0xOTg0");
+formdata.append("page_number", "");
+
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: formdata,
+  redirect: 'follow'
+};
+
+fetch("http://www.advancewebsites.com/crm_api/recent_sms_conversations", requestOptions)
+  .then(response => response.json())
+  .then(result => console.log(result),setDataSource(result?.data?.recent_leads))
+  .catch(error => console.log('error', error));
     })();
   }, []);
 
@@ -79,7 +99,7 @@ function Recent_chats() {
         password: d.password,
         no: offset,
       };
-      Recent_chat(data)
+      recent_chat(data)
         .then((response) => response.json())
         .then((responseJson) => {
           // Successful response from the API Call
@@ -168,9 +188,7 @@ function Recent_chats() {
           data={dataSource}
           keyExtractor={(item, index) => index.toString()}
           renderItem={ItemView}
-          ListFooterComponent={renderFooter}
-          onEndReached={getData}
-          onEndReachedThreshold={0.5}
+          
         />
       )}
      

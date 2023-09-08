@@ -58,8 +58,12 @@ import Web_page from "./src/Main/Detail_folder/Profile_page/Web_page";
 import P_box from "./src/P_box";
 import P1 from "./src/Main/P1";
 import P2 from "./src/Main/P2";
-import Most_active_users1 from "./src/components/home1_data/MOST_Pages/Most_active_users";
-import Most_active_users from "./src/components/home1_data/Most_active_users";
+
+
+import Active from "./src/components/home1_data/Active_users copy";
+import Most_active_users from "./src/components/home1_data/Active_users";
+import Active1 from "./src/components/home1_data/Active_users";
+import Active2 from "./src/components/home1_data/Active_users copy 2";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -149,8 +153,11 @@ export default function App() {
         <Stack.Screen name={"P_box"} component={P_box}  />
         <Stack.Screen name={"P1"} component={P1}  />
         <Stack.Screen name={"P2"} component={P2}  />
-        <Stack.Screen name={"M1"} component={Most_active_users1}  />
-        <Stack.Screen name={"M2"} component={Most_active_users}  />
+        <Stack.Screen name={"A"} component={Active}  />
+        
+       
+        <Stack.Screen name={"A1"} component={Active1}  />
+        <Stack.Screen name={"A2"} component={Active2}  />
 
       </Stack.Navigator>
     </NavigationContainer>

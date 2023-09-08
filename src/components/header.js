@@ -75,16 +75,16 @@ export default function Header({
           />
         </TouchableOpacity>
       ) : customRight ? (
-        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"#ace600",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
-          <Text style={{fontSize:15,color:"#ace600",fontFamily:"Inter-Black2",}}> SAVE </Text>
+        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:Colors.WHITE,borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
+          <Text style={{fontSize:15,color:Colors.WHITE,fontFamily:"Inter-Black2",}}> SAVE </Text>
         </TouchableOpacity>
       ) : customRight2 ? (
-        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"#ace600",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
-          <Text style={{fontSize:15,color:"#ace600",fontFamily:"Inter-Black2",}}> Update </Text>
+        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:Colors.WHITE,borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
+          <Text style={{fontSize:15,color:Colors.WHITE,fontFamily:"Inter-Black2",}}> Update </Text>
         </TouchableOpacity>
       )  :customRight3 ? (
-        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:"#ace600",borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
-        <Text style={{fontSize:15,color:"#ace600",fontFamily:"Inter-Black2",paddingHorizontal:"3%"}}> Add </Text>
+        <TouchableOpacity style={{alignItems:"center",justifyContent:"center",borderColor:Colors.WHITE,borderWidth:1.3,borderRadius:15,height:27}} onPress={onRightPress}>
+        <Text style={{fontSize:15,color:Colors.WHITE,fontFamily:"Inter-Black2",paddingHorizontal:"3%"}}> Add </Text>
       </TouchableOpacity>
       ) : (
         <View />

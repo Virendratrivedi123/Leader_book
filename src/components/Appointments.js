@@ -138,7 +138,7 @@ function Appointments() {
     <SafeAreaView style={styles.container}>
     <Header
       label={"Appointments"}
-      leftIcon={Images.backArrow}
+      leftIcon={Images.menu}
       rightIcon={{}}
       onLeftPress={() =>  navigation.toggleDrawer()}
       onRightPress={() => {}}

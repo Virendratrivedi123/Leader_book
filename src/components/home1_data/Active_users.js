@@ -25,48 +25,45 @@ const width = Dimensions.get("window").width;
 import { Entypo, FontAwesome, AntDesign } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import { Active_filters, Pin_note, get_leads, get_leads_All } from "../../../Services";
+import { Active_filters, Pin_note } from "../../Services";
 import { useNavigation } from "@react-navigation/native";
-import Loader from "../../../constant/Loader";
-import { ScreenNames } from "../../../constant/ScreenNames";
-import { Colors } from "../../../constant/colors";
-import { Images } from "../../../constant/images";
-
+import Loader from "../../constant/Loader";
+import { ScreenNames } from "../../constant/ScreenNames";
+import { Colors } from "../../constant/colors";
+import { Images } from "../../constant/images";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import moment from "moment";
-import Header from "../../header";
+
+import Header from "../header";
 import SelectDropdown from "react-native-select-dropdown";
 
-function Most_active_users1({ data }) {
+function Active1() {
   const [fontsLoaded] = useFonts({
-    "Inter-Black": require("../../../../assets/fonts/Mulish-SemiBold.ttf"),
-    "Inter-Black2": require("../../../../assets/fonts/Mulish-Bold.ttf"),
-    "Inter-Black3": require("../../../../assets/fonts/Mulish-ExtraBold.ttf"),
-    "Inter-Black3": require("../../../../assets/fonts/Mulish-Regular.ttf"),
+    "Inter-Black": require("../../../assets/fonts/Mulish-SemiBold.ttf"),
+    "Inter-Black2": require("../../../assets/fonts/Mulish-Bold.ttf"),
+    "Inter-Black3": require("../../../assets/fonts/Mulish-ExtraBold.ttf"),
+    "Inter-Black3": require("../../../assets/fonts/Mulish-Regular.ttf"),
   });
 
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
   const [d, setd] = useState(false);
   const [t, sett] = useState(false);
   const [t2, sett2] = useState(true);
   const navigation = useNavigation();
   const route = useRoute();
   const [DATA, setDATA] = useState([]);
- 
+  const [v_data, setv_data] = useState([]);
   const [loading2, setLoading2] = React.useState(true);
   const [loading3, setLoading3] = React.useState(false);
-  
+  const [v_id, setv_id] = useState("");
   const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalVisible7, setModalVisible7] = useState(false);
+  const [modalVisible8, setModalVisible8] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible_box, setModalVisible_box] = useState(false);
   const [d1, setd1] = useState(0);
-  const [d2, setd2] = useState(false);
+
   const [pin_note, setpin_note] = useState("");
   const [pin_date, setpin_date] = useState("");
   const [note, setnote] = useState("");
@@ -76,12 +73,12 @@ function Most_active_users1({ data }) {
   const translation = useRef(new Animated.Value(0)).current;
   const h = (18 / 100) * height;
   const [loading, setLoading] = useState(false);
- 
+
   const [dataSource, setDataSource] = useState([]);
 
   const [offset, setOffset] = useState(1);
   const [isListEnd, setIsListEnd] = useState(false);
-  const [fil_ter, setfil_ter] = useState("");
+
   const [fil_ter_data, setfil_ter_data] = useState([]);
 
   React.useEffect(() => {
@@ -94,40 +91,29 @@ function Most_active_users1({ data }) {
     console.log(offset);
     if (!loading && !isListEnd) {
       const user_data = await AsyncStorage.getItem("user_data");
-      const search = await AsyncStorage.getItem("search");
       const d = JSON.parse(user_data);
-
-      // console.log(dr)
       const data = {
         email: d.email,
         password: d.password,
         no: offset,
-        filters:route.params?.F
+        filters: route.params.Value,
       };
       Active_filters(data)
         .then((response) => response.json())
         .then(async (responseJson) => {
-          // Successful response from the API Call
-setfil_ter_data(responseJson.data.active_users_filter)
-          if (responseJson.data.active_leads_arr.length >= 0) {
+          setfil_ter_data(responseJson.data.active_users_filter);
+          if (responseJson.data.active_leads_arr.length > 0) {
             setOffset(offset + 1);
-            // After the response increasing the offset
-            setDataSource([...dataSource, ...responseJson.data.active_leads_arr]);
+            setDataSource([
+              ...dataSource,
+              ...responseJson.data.active_leads_arr,
+            ]);
 
             drs();
-
             setLoading2(false);
 
-            setd2(true);
-            Animated.timing(translation, {
-              toValue: h,
-              delay: 0,
-              easing: Easing.elastic(4),
-              useNativeDriver: true,
-            }).start();
           } else {
             setIsListEnd(true);
-
             drs();
           }
         })
@@ -136,7 +122,7 @@ setfil_ter_data(responseJson.data.active_users_filter)
         });
     }
   }
-console.log(fil_ter)
+
   const drs = async () => {
     const set = await AsyncStorage.getItem("set");
     const d3 = JSON.parse(set);
@@ -144,8 +130,6 @@ console.log(fil_ter)
     if (d3 == "1") {
       const user_data2 = await AsyncStorage.getItem("search_data");
       const d2 = JSON.parse(user_data2);
-
-      // console.log(result?.data?.leads)
       var a = [];
       d2?.data?.active_leads_arr.map((i) => {
         a.push({
@@ -178,19 +162,24 @@ console.log(fil_ter)
 
       var a = [];
       dataSource.map((i) => {
-        a.push({ ...i.Lead, isChecked: false, note_value: "", ind: it++ });
+        a.push({
+          ...i.Lead,
+          ...i.LeadUserLog,
+          isChecked: false,
+          note_value: "",
+          ind: it++,
+        });
       });
 
       setDATA(a);
       setDATA(a);
     }
   };
- 
+
   const postdata = async () => {
     setLoading3(true);
     try {
       const user_data = await AsyncStorage.getItem("user_data");
-      // const drop_data = await AsyncStorage.getItem("dropdown_data");
       const d = JSON.parse(user_data);
       const data = {
         email: d.email,
@@ -200,20 +189,48 @@ console.log(fil_ter)
       };
       Pin_note(data).then((response) => {
         response.json().then(async (data) => {
-        
-      
-
-       
           setModalVisible(!modalVisible);
-          AsyncStorage.setItem("op", "1");
-          navigation.push(ScreenNames.DRAWER);
+          navigation.push("A", {
+            Value: route?.params?.Value,
+            Label: route?.params?.Label,
+          });
+          setLoading3(true);
         });
       });
     } catch (error) {
       console.error(error);
     }
   };
-  // console.log(DATA);
+ 
+
+  async function get_it(i, l) {
+    setLoading2(true);
+    const user_data = await AsyncStorage.getItem("user_data");
+    const d = JSON.parse(user_data);
+    const data = {
+      email: d.email,
+      password: d.password,
+      no: "",
+      filters: i,
+    };
+    Active_filters(data)
+      .then((response) => response.json())
+      .then(async (responseJson) => {
+        if (responseJson.message == "No lead logged yet.") {
+          navigation.push("A2", { Value: i, Label: l });
+        } else {
+          navigation.push("A", { Value: i, Label: l });
+        }
+     
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  const postdata2 = (i, l) => {
+    get_it(i, l);
+  };
 
   const handleChange = (id) => {
     let temp = DATA.map((i) => {
@@ -226,7 +243,33 @@ console.log(fil_ter)
   };
 
   let selected = DATA.filter((i) => i.isChecked);
-  // console.log(selected)
+
+  var ab = selected.map((i) => {
+    return i.id;
+  });
+ 
+  const voice = () => {
+    setv_data(selected);
+    setModalVisible7(true);
+  };
+
+  const voice_remove_data = (i) => {
+    let filteredArray = v_data.filter((item) => item.id !== i);
+    setv_data(filteredArray);
+    handleChange(i);
+
+    setModalVisible8(false);
+  };
+
+  const voice_remove_data2 = (i) => {
+    let filteredArray = v_data.filter((item) => item.id !== i);
+    setv_data(filteredArray);
+    handleChange(i);
+
+    setModalVisible8(false);
+    setModalVisible7(false);
+    setd(false);
+  };
 
   const selectAlldata = () => {
     let temp = DATA.map((i) => {
@@ -247,15 +290,12 @@ console.log(fil_ter)
         return { ...i, isChecked: true };
       }
 
-      // if (i.isChecked == true&& t == true) {
-      //   return { ...i, isChecked: false };
-      // }
     });
 
     setDATA(temp);
     sett2(!t2);
   };
-  // console.log(t2 ? Alert.alert("ut"):"");
+
   const UnselectAlldata = () => {
     let temp = DATA.map((i) => {
       if (t == true) {
@@ -268,7 +308,6 @@ console.log(fil_ter)
 
     setd(!d);
   };
-  // console.log(d);
 
   const handleChange2 = (id) => {
     let temp = DATA.map((i) => {
@@ -278,15 +317,12 @@ console.log(fil_ter)
 
       return i;
     });
-    // sett2(!t2);
     setd(!d);
     setDATA(temp);
-    // sett2(true)
   };
 
   const renderFooter = () => {
     return (
-      // Footer View with Loader
       <View style={styles.footer}>
         {loading2 ? <Loader loading={loading2} /> : null}
       </View>
@@ -301,14 +337,12 @@ console.log(fil_ter)
     });
 
     return () => {
-      // executed when unmount
       unsubscribe();
     };
   }, [navigation]);
 
   const ItemView = ({ item, index }) => {
     return (
-      // Flat List Item
       <View>
         <View style={styles.flat_view}>
           {d == true ? (
@@ -358,7 +392,7 @@ console.log(fil_ter)
                       index: index,
                       DATA: DATA,
                     });
-                    // AsyncStorage.setItem("user_id", item.id);
+                    
                   }}
                   style={styles.circle_icon}
                 >
@@ -379,17 +413,12 @@ console.log(fil_ter)
                       index: index,
                       DATA: DATA,
                     });
-                    // AsyncStorage.setItem("user_id", item.id);
+                   
                   }}
                   style={styles.name}
                 >
                   {item?.name}
                 </Text>
-                {/* {route?.params?.b?.id == item.id ? (
-                            (item.pined_note = route?.params?.b?.pined_note)
-                          ) : (
-                            <> */}
-
                 <TouchableOpacity
                   style={{
                     marginTop: "2%",
@@ -481,12 +510,10 @@ console.log(fil_ter)
               ) : (
                 <View style={styles.line3}></View>
               )}
-              {/* {item.voicemail ? (
-                        <> */}
+           
               <View style={styles.line2}></View>
               <TouchableOpacity
                 activeOpacity={1}
-                // onPress={() => setModalVisible2(!modalVisible2)}
                 style={styles.set}
               >
                 <View style={styles.voice_icon}>
@@ -496,12 +523,17 @@ console.log(fil_ter)
                   ></Image>
                 </View>
                 <Text style={styles.voicemail}>
-                  {/* {item.voicemail} */}
                   Voicemail
                 </Text>
               </TouchableOpacity>
-              {/* </>
-                      ) : <View style={styles.line3}></View>} */}
+              <View style={styles.line2}></View>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={styles.set}
+              >
+                <Text style={styles.logg_date}>{item.last_logged_date}</Text>
+              </TouchableOpacity>
+             
             </View>
           </TouchableHighlight>
         </View>
@@ -512,7 +544,6 @@ console.log(fil_ter)
 
   const ItemSeparatorView = () => {
     return (
-      // Flat List Item Separator
       <View style={styles.line}></View>
     );
   };
@@ -520,7 +551,7 @@ console.log(fil_ter)
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        label="Most Active Users"
+        label="Most Active Users1"
         leftIcon={Images.backArrow}
         onLeftPress={() => navigation.navigate(ScreenNames.HOME)}
       ></Header>
@@ -528,15 +559,12 @@ console.log(fil_ter)
         <Loader loading={loading2} />
       ) : (
         <View>
-         <SelectDropdown
+          <SelectDropdown
             data={fil_ter_data}
-            // defaultValueByIndex={0}
-            defaultButtonText={route?.params?.L}
+            defaultButtonText={route?.params?.Label}
             onSelect={(item, index) => {
-              navigation.navigate("M2", { F: item.value ,L:item.label});
-              // setValue3(item.label)
+              postdata2(item.value, item.label);
             }}
-            
             buttonTextAfterSelection={(selectedItem, index) => {
               return selectedItem.label;
             }}
@@ -554,18 +582,7 @@ console.log(fil_ter)
               );
             }}
             dropdownIconPosition={"right"}
-            dropdownStyle={{
-              backgroundColor: "white",
-
-              height: height * 0.35,
-              shadowOpacity: 0.6,
-              shadowRadius: 10,
-              shadowColor: "#000",
-              borderColor: "rgba(22,20,10,0.1)",
-              overflow: "visible",
-              borderRadius: 6,
-              marginTop: "-8%",width:width*0.8,paddingStart:"8%"
-            }}
+            dropdownStyle={styles.drop_style}
             rowStyle={styles.dropdown1RowStyle}
             rowTextStyle={styles.dropdown1RowTxtStyle}
             dropdownOverlayColor="rgba(52, 52, 52, 0)"
@@ -573,18 +590,7 @@ console.log(fil_ter)
 
           {t ? (
             <View
-              style={{
-                flexDirection: "row",
-                alignSelf: "center",
-                height: height * 0.048,
-                width: width * 0.42,
-                margin: "3%",
-                alignItems: "center",
-                justifyContent: "center",
-                borderWidth: 0.8,
-                borderRadius: 25,
-                borderColor: "black",
-              }}
+              style={styles.t}
             >
               <TouchableOpacity
                 style={{ alignItems: "center" }}
@@ -656,7 +662,7 @@ console.log(fil_ter)
         </View>
       )}
       <View style={styles.centeredView}>
-        {/* {pin_note == "Yes" ? (setd1(3)):({})} */}
+        
         {d1 == 1 ? (
           <Modal
             animationType="slide"
@@ -727,7 +733,6 @@ console.log(fil_ter)
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
-              Alert.alert("Modal has been closed.");
               setModalVisible(!modalVisible);
             }}
           >
@@ -778,7 +783,7 @@ console.log(fil_ter)
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
-              Alert.alert("Modal has been closed.");
+              
               setModalVisible(!modalVisible);
             }}
           >
@@ -828,7 +833,7 @@ console.log(fil_ter)
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
-              Alert.alert("Modal has been closed.");
+              
               setModalVisible(!modalVisible);
             }}
           >
@@ -980,48 +985,347 @@ console.log(fil_ter)
         </Modal>
       </View>
       <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible_box}
-            onRequestClose={() => {
-             
-              setModalVisible_box(!modalVisible_box);
-            }}
-          >
-            <View style={styles.modal_page}>
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible_box}
+        onRequestClose={() => {
+          setModalVisible_box(!modalVisible_box);
+        }}
+      >
+        <View style={{}}>
+          <FlatList
+            style={styles.flat_modal}
+            data={fil_ter_data}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => (
+              <View
+                style={{
+                  alignItems: "flex-start",
+                }}
+              >
+                <Text
+                  style={{
+                    marginVertical: "3%",
+                    marginHorizontal: "5%",
+                    fontSize: wp("5.01%"),
+                    fontFamily: "Inter-Black4",
+                  }}
+                  onPress={() => {
+                    setModalVisible_box(false);
+                    navigation.navigate("M1", { F: item.value });
+                  }}
+                >
+                  {item.label}
+                </Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                    width: "90%",
+                  }}
+                ></View>
+              </View>
+            )}
+          />
+        </View>
+      </Modal>
+      <Modal
+        transparent={true}
+        visible={modalVisible7}
+        onRequestClose={() => {
+          setModalVisible7(!modalVisible7);
+        }}
+      >
+        <View style={styles.centeredView_box}>
+          <View style={styles.modalView_box2}>
             <FlatList
-              style={{marginTop:"50%"}}
-              data={fil_ter_data}
-              keyExtractor={(item, index) => index.toString()}
-              
-              renderItem={({item,index})=>(
-                <View style={{backgroundColor:"white",alignItems:'center',width:"60%",alignSelf:"center",}}>
-                <Text style={{margin:"3%"}} 
-                 onPress={() => {
-                   setModalVisible_box(false)
-                   navigation.navigate("M2",{"F":item.value})
-                 }}
-                >{item.label}</Text>
-               </View>
-              )}
-              
-            />
+              style={styles.flat2}
+              data={v_data}
+              extraData={v_data}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item, index }) => (
+                <View>
+                  <View style={styles.flat_view}>
+                    <TouchableHighlight
+                      style={{ paddingVertical: "3%" }}
+                      underlayColor={"#d9d9d9"}
+                      // onLongPress={() => {
+                      //   handleChange2(item.id), sett(!t),settag_id(item.id)
+                      // }}
+                    >
+                      <View
+                        activeOpacity={1}
+                        style={{
+                          backgroundColor: "white",
 
-             
+                          width: width * 0.93,
+
+                          elevation: 5,
+                          alignSelf: "center",
+                          justifyContent: "center",
+                          borderRadius: 5,
+                          shadowColor: "white",
+                        }}
+                      >
+                        {}
+                        <View style={styles.set}>
+                          <TouchableOpacity
+                            activeOpacity={1}
+                            onPress={() => {}}
+                            style={styles.circle_icon}
+                          >
+                            <View style={styles.circle}>
+                              <Text style={styles.circle_text}>
+                                {item.name_initials}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                          <Text
+                            onPress={() => {
+                              // AsyncStorage.setItem("user_id", item.id);
+                            }}
+                            style={styles.name}
+                          >
+                            {item?.name}
+                          </Text>
+
+                          <TouchableOpacity
+                            style={{
+                              marginTop: "-10%",
+                            }}
+                            activeOpacity={1}
+                            onPress={() => {
+                              setModalVisible8(true), setv_id(item.id);
+                            }}
+                          >
+                            <Image
+                              style={styles.cancel}
+                              source={Images.cancel}
+                            ></Image>
+                          </TouchableOpacity>
+                        </View>
+
+                        {item.phone ? (
+                          <>
+                            <View style={styles.line2}></View>
+                            <View style={styles.set}>
+                              <TouchableOpacity
+                                onPress={() => {}}
+                                style={styles.phone_icon}
+                              >
+                                <Image
+                                  style={styles.call}
+                                  source={Images.call_icon}
+                                ></Image>
+                              </TouchableOpacity>
+                              <Text onPress={() => {}} style={styles.number}>
+                                {item?.phone}
+                              </Text>
+
+                              <TouchableOpacity
+                                style={{
+                                  marginTop: "2%",
+                                  shadowColor: "#000",
+                                  shadowOffset: { width: 2, height: 4 },
+                                  shadowOpacity: 0.95,
+                                  shadowRadius: 2.84,
+                                  elevation: 5,
+                                }}
+                                activeOpacity={1}
+                                onPress={() => {
+                                  item.pined_note == "Yes"
+                                    ? setd1(3)
+                                    : setd1(0);
+                                  setModalVisible(true),
+                                    setModalTitle2(item.pinned_by),
+                                    setModalTitle(item.id),
+                                    setnote(item.pined_note_text),
+                                    setpin_date(item.pinned_date),
+                                    setpin_note(item.pined_note);
+                                }}
+                              >
+                                {item.pined_note == "Yes" ? (
+                                  <Image
+                                    style={styles.note2}
+                                    source={Images.pencil_note}
+                                  ></Image>
+                                ) : (
+                                  <Image
+                                    style={styles.note2}
+                                    source={Images.plus_note}
+                                  ></Image>
+                                )}
+                              </TouchableOpacity>
+                            </View>
+                          </>
+                        ) : null}
+
+                        {item.email ? (
+                          <>
+                            <View style={styles.line2}></View>
+                            <TouchableOpacity
+                              activeOpacity={1}
+                              onPress={() => {}}
+                              style={styles.set}
+                            >
+                              <View style={styles.email_icon}>
+                                <Image
+                                  style={styles.mail_icon}
+                                  source={Images.mail_icon}
+                                ></Image>
+                              </View>
+                              <Text style={styles.email}>{item?.email}</Text>
+                            </TouchableOpacity>
+                          </>
+                        ) : (
+                          <View style={styles.line3}></View>
+                        )}
+
+                        <View style={styles.line2}></View>
+                        <TouchableOpacity
+                          activeOpacity={1}
+                          onPress={() => {
+                            // setname(item?.name),
+                            //   setemail(item?.email),
+                            //   setno(item?.phone),
+                            //   setname_ini(item?.name_initials),
+                            //   setModalVisible2(!modalVisible2);
+                          }}
+                          style={styles.set}
+                        >
+                          <View style={styles.voice_icon}>
+                            <Image
+                              style={styles.voice}
+                              source={Images.Voice_icon}
+                            ></Image>
+                          </View>
+                          <Text style={styles.voicemail}>
+                            {/* {item.voicemail} */}
+                            Voicemail
+                          </Text>
+                        </TouchableOpacity>
+                        {/* </>
+                      ) : <View style={styles.line3}></View>} */}
+                      </View>
+                    </TouchableHighlight>
+                  </View>
+                  <View style={styles.line}></View>
+                </View>
+              )}
+            />
+            <View
+              style={{
+                backgroundColor: Colors.MAIN_COLOR,
+                alignItems: "center",
+                justifyContent: "space-between",
+                height: "15%",
+                flexDirection: "row",
+              }}
+            >
+              <Pressable
+                style={{}}
+                onPress={() => {
+                  Linking.openURL(`tel:${v_data[0].phone}`);
+                }}
+              >
+                <Text style={styles.textStyle3_box}>Start Dialing</Text>
+              </Pressable>
+              <Pressable
+                style={{}}
+                onPress={() => {
+                  // setModalVisible7(!modalVisible7);
+                }}
+              >
+                <Text style={styles.textStyle3_box}>Pause Queue</Text>
+              </Pressable>
+
+              <Pressable
+                style={{}}
+                onPress={() => {
+                  setModalVisible7(!modalVisible7);
+                }}
+              >
+                <Text style={styles.textStyle3_box}>Cancel Queue</Text>
+              </Pressable>
             </View>
-          </Modal>
-     
-          {d == true ? (
-           <View style={styles.tag_box}>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        transparent={true}
+        visible={modalVisible8}
+        onRequestClose={() => {
+          setModalVisible8(!modalVisible8);
+        }}
+      >
+        <View style={styles.centeredView_box}>
+          <View style={styles.modalView_box}>
+            <Text style={styles.textStyle1_box}>Lead Booker</Text>
+            <Text style={styles.textStyle2_box}>
+              Are you sure? You want to remove this lead from queue?
+            </Text>
+            <View
+              style={{
+                height: 1,
+                backgroundColor: "#cccccc",
+
+                width: "100%",
+              }}
+            ></View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-evenly",
+                marginVertical: "3%",
+              }}
+            >
+              {v_data.length == 1 ? (
+                <Pressable
+                  onPress={() => {
+                    voice_remove_data2(v_id);
+                  }}
+                >
+                  <Text style={styles.textStyle4_box}>Yes</Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={() => {
+                    voice_remove_data(v_id);
+                  }}
+                >
+                  <Text style={styles.textStyle4_box}>Yes</Text>
+                </Pressable>
+              )}
+
+              <View style={styles.mid_line}></View>
+              <Pressable
+                onPress={() => {
+                  setModalVisible8(!modalVisible8);
+                }}
+              >
+                <Text style={styles.textStyle4_box}>No</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      {d == true ? (
+        <View style={styles.tag_box}>
           <View style={styles.tag_view}>
             <View style={styles.btn1}>
-              <TouchableOpacity style={styles.tag_touch}>
+              <TouchableOpacity
+                onPress={() => {
+                  voice();
+                }}
+                style={styles.tag_touch}
+              >
                 <Text style={styles.tag}>Voice Call</Text>
               </TouchableOpacity>
             </View>
           </View>
-          </View>
-        ) : null}
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -1192,6 +1496,15 @@ const styles = StyleSheet.create({
 
     resizeMode: "contain",
   },
+  flat_modal: {
+    marginTop: height * 0.15,
+    borderColor: "black",
+    borderRadius: 6,
+    borderWidth: 0.5,
+    width: width * 0.8,
+    backgroundColor: "white",
+    alignSelf: "center",
+  },
   tag_view: {
     flexDirection: "row",
     alignItems: "center",
@@ -1199,7 +1512,7 @@ const styles = StyleSheet.create({
   },
   tag_touch: { alignItems: "center" },
   tag: { color: "white", fontSize: wp("4.71%"), fontFamily: "Inter-Black2" },
-  flat: { marginBottom: "30%" },
+  flat: { marginBottom: "50%" },
   input: {
     height: height * 0.25,
     margin: 12,
@@ -1381,6 +1694,15 @@ const styles = StyleSheet.create({
     color: "#808080",
     fontFamily: "Inter-Black2",
   },
+  logg_date: {
+    fontSize: wp("4.01%"),
+    flex: 0.9,
+
+    // fontWeight: "700",
+    color: "#808080",
+    fontFamily: "Inter-Black",
+    marginStart: "8%",
+  },
 
   circleview: { alignItems: "center" },
   circle_icon_v: { marginStart: "5%", marginEnd: "7%" },
@@ -1475,19 +1797,19 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   dropdown1BtnStyle: {
-    width: width*0.8,
+    width: width * 0.8,
     backgroundColor: "white",
     alignSelf: "center",
     borderWidth: 0.8,
-                borderRadius: 25,
-                borderColor: "black",marginVertical:"3%"
+    borderRadius: 25,
+    borderColor: "black",
+    marginVertical: "3%",
   },
   dropdown1BtnTxtStyle: {
     fontSize: wp("4.9%"),
     color: "black",
     fontFamily: "Inter-Black4",
     textAlign: "left",
-   
   },
   dropdown1DropdownStyle: {
     backgroundColor: "red",
@@ -1508,9 +1830,119 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "left",
     fontSize: wp("5.01%"),
-                    fontFamily: "Inter-Black4",marginLeft:"-0.5%"
+    fontFamily: "Inter-Black4",
+    marginLeft: "-0.5%",
   },
   container: { backgroundColor: "#e6e6e6", flex: 1 },
+  centeredView_box: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 0,
+    backgroundColor: "rgba(52, 52, 52, 0.3)",
+  },
+  modalView_box: {
+    width: "85%",
+    backgroundColor: "#ececee",
+    borderRadius: 20,
+
+    elevation: 5,
+    alignSelf: "center",
+
+    // elevation: 20,
+  },
+  modalView_box3: {
+    width: "85%",
+    backgroundColor: "#ececee",
+
+    elevation: 5,
+    alignSelf: "center",
+    padding: "5%",
+
+    // elevation: 20,
+  },
+  modalView_box2: {
+    width: "100%",
+    backgroundColor: "#ececee",
+    borderRadius: 4,
+
+    elevation: 5,
+
+    height: "100%",
+    // elevation: 20,
+  },
+  textStyle1_box2: {
+    fontSize: wp("5.41%"),
+    fontFamily: "Inter-Black",
+    marginVertical: "4%",
+    marginStart: "5%",
+  },
+
+  textStyle1_box: {
+    fontSize: wp("5.41%"),
+    fontFamily: "Inter-Black2",
+    marginTop: "7%",
+    textAlign: "center",
+  },
+  textStyle2_box: {
+    fontSize: wp("4%"),
+    textAlign: "center",
+    width: "100%",
+    marginBottom: "7%",
+    marginTop: "1%",
+    color: "#262626",
+  },
+  textStyle3_box: {
+    fontSize: wp("4.31%"),
+    color: "white",
+    fontFamily: "Inter-Black2",
+    backgroundColor: "red",
+    paddingVertical: "5%",
+    paddingHorizontal: "2%",
+    borderRadius: 25,
+  },
+  textStyle4_box: {
+    fontSize: wp("4.91%"),
+    color: "blue",
+    fontFamily: "Inter-Black",
+  },
+  textStyle5_box: {
+    fontSize: wp("4.41%"),
+    color: "black",
+    fontFamily: "Inter-Black",
+    marginTop: "15%",
+  },
+  cancel: {
+    height: hp("5%"),
+    width: wp("7.38%"),
+
+    resizeMode: "contain",
+  },
+  drop_style:{
+    backgroundColor: "white",
+    height: height * 0.35,
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    shadowColor: "#000",
+    borderColor: "rgba(22,20,10,0.1)",
+    overflow: "visible",
+    borderRadius: 6,
+    marginTop: "-8%",
+    width: width * 0.8,
+    paddingStart: "8%",
+  },
+  t:{
+    flexDirection: "row",
+    alignSelf: "center",
+    height: height * 0.048,
+    width: width * 0.42,
+    margin: "3%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 0.8,
+    borderRadius: 25,
+    borderColor: "black",
+  }
 });
 
-export default Most_active_users1;
+export default Active1;

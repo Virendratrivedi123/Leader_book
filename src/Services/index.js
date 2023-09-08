@@ -257,7 +257,7 @@ export const New_lead_detail_update = (data) => {
   formdata.append("key", key);
   formdata.append("email", data.email);
   formdata.append("password", data.password);
-  formdata.append("site_id", "258");
+  formdata.append("site_id", "413");
   formdata.append("first_name", data.first_name);
   formdata.append("last_name", data.last_name);
   formdata.append("lead_email", data.lead_email);
@@ -1010,9 +1010,10 @@ export const system_Tag = (data) => {
   return fetch(`${BASE_URI}/system_tags`, requestOptions);
 };
 
-export const Recent_chat = (data) => {
+export const recent_chat = (data) => {
   var myHeaders = new Headers();
-  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  myHeaders.append("Cookie", "PHPSESSID=cf98f38f531a0f8eaba27560409909df");
+
   var formdata = new FormData();
   formdata.append("hash", hash);
   formdata.append("key", key);
@@ -1352,4 +1353,73 @@ formdata.append("active_users_filter", data.filters);
   };
 
   return fetch(`${BASE_URI}/most_active_users`, requestOptions);
+};
+
+export const User_settings = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+
+ 
+
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/get_user_settings`, requestOptions);
+};
+
+export const Settings = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("calling_method", data.set)
+ 
+
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/save_user_settings`, requestOptions);
+};
+
+
+export const Delete = (data) => {
+  var myHeaders = new Headers();
+  myHeaders.append("Cookie", "PHPSESSID=5abfd9f47bfd3d6af8aab5d8036c0725");
+  var formdata = new FormData();
+  formdata.append("hash", hash);
+  formdata.append("key", key);
+  formdata.append("email", data.email);
+  formdata.append("password", data.password);
+  formdata.append("lead_id", data.id)
+  formdata.append("delete_lead", data.point)
+ 
+ 
+
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  return fetch(`${BASE_URI}/delete_lead`, requestOptions);
 };

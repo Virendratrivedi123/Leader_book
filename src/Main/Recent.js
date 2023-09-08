@@ -87,6 +87,8 @@ export default function Recent(data) {
 
   const [loading, setLoading] = React.useState(true);
   const [loading2, setLoading2] = React.useState(true);
+  const [loading3, setLoading3] = React.useState(false);
+  
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible3, setModalVisible3] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -140,6 +142,25 @@ export default function Recent(data) {
   const [s, sets] = useState([]);
   const [url, seturl] = useState("");
   const [url_title, seturl_title] = useState("");
+  const [demo, setdemo] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const fadeIn = () => {
+    // Will change fadeAnim value to 1 in 5 seconds
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 3000,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeOut = () => {
+    // Will change fadeAnim value to 0 in 3 seconds
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 3000,
+      useNativeDriver: true,
+    }).start();
+  };
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -156,8 +177,25 @@ export default function Recent(data) {
   }, []);
 
   useEffect(() => {
+    Audio.setAudioModeAsync({
+      // allowsRecordingIOS: false,
+      extension: '.wav',
+      outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
+      sampleRate: 16000,
+      bitRateStrategy:
+        Audio.RECORDING_OPTION_IOS_BIT_RATE_STRATEGY_CONSTANT,
+      playsInSilentModeIOS: true,
+    });
+  
+    return () => {
+      // Clean up the audio resources if needed
+    };
+  }, []);
+
+  useEffect(() => {
     GetPermission();
   }, []);
+
 
   // Function to get the audio permission
   const GetPermission = async () => {
@@ -175,7 +213,7 @@ export default function Recent(data) {
       setIsPlaying(!isPlaying);
     }
   };
-
+ 
   const handleSliderValueChange = (value) => {
     if (sound) {
       sound.setPositionAsync(value * duration);
@@ -234,10 +272,18 @@ export default function Recent(data) {
   };
 
   const handleChangeAudioUrl = (i) => {
+
     // Call your API to get the new audio URL and update the state
-    seturl(i);
-    replay(i);
+   
+    
   };
+
+  const time = () => {
+    setTimeout(() => {
+      setLoading3(false);
+    }, 2000);
+  };
+
 
   useEffect(() => {
     const updatePosition = async () => {
@@ -270,6 +316,23 @@ export default function Recent(data) {
       // Check if user has given the permission to record
       if (AudioPermission === true) {
         try {
+          await Audio.setAudioModeAsync({
+            allowsRecordingIOS: true,
+            
+         extension: '.wav',
+            outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
+            sampleRate: 16000,
+            bitRateStrategy:
+              Audio.RECORDING_OPTION_IOS_BIT_RATE_STRATEGY_CONSTANT,
+            playsInSilentModeIOS: true,
+          
+           
+          
+           
+            
+           
+         
+          })
           // Prepare the Audio Recorder
           await AudioRecorder.current.prepareToRecordAsync(
             Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
@@ -297,15 +360,22 @@ export default function Recent(data) {
     try {
       // Stop recording
       await AudioRecorder.current.stopAndUnloadAsync();
-
+      await Audio.setAudioModeAsync(
+        {
+          allowsRecordingIOS: false,
+       
+        }
+      );
       // Get the recorded URI here
       const result = AudioRecorder.current.getURI();
       const status = await AudioRecorder.current.getStatusAsync();
       const soundDuration = status.durationMillis / 1000;
       setSoundStatus(soundDuration);
       if (result) SetRecordedURI(result);
-      console.log(RecordedURI);
-      setModalVisible9(true);
+      replay(result)
+      // console.log(RecordedURI);
+      // SetRecordedURI(result)
+      // setModalVisible9(true);
 
       // Reset the Audio Recorder
       AudioRecorder.current = new Audio.Recording();
@@ -313,7 +383,7 @@ export default function Recent(data) {
     } catch (error) {}
   };
 
-  console.log(RecordedURI)
+  console.log(RecordedURI);
   // Function to play the recorded audio
 
   useEffect(() => {
@@ -536,8 +606,14 @@ export default function Recent(data) {
     });
     let selected = temp.filter((i) => i.isChecked);
     sets(selected);
-    s.length;
+
     setDATA(temp);
+  };
+
+  const press = (item) => {
+    if (item.isChecked == true && s.length <= 1) {
+      setd(!d), navigation.push(ScreenNames.DRAWER);
+    }
   };
 
   console.log(s.length);
@@ -582,6 +658,7 @@ export default function Recent(data) {
         return { ...i, isChecked: false };
       }
     });
+    setdemo(!demo)
     setd(!d);
     setDATA(temp);
   };
@@ -618,11 +695,14 @@ export default function Recent(data) {
   const handleChange2 = (id) => {
     let temp = DATA.map((i) => {
       if (id === i.id) {
+       
         return { ...i, isChecked: (i.isChecked = !i.isChecked) };
       }
-
+    
       return i;
     });
+    
+    // fadeOut(),
     // sett2(!t2);
     setd(!d);
     setDATA(temp);
@@ -747,21 +827,7 @@ export default function Recent(data) {
         ) : DATA && DATA.length > 0 ? (
           <>
             {t ? (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "center",
-                  height: height * 0.048,
-                  width: width * 0.42,
-                  // backgroundColor: d == true ? "orange" : null,
-                  margin: "3%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderWidth: 0.8,
-                  borderRadius: 25,
-                  borderColor: "black",
-                }}
-              >
+              <View style={styles.select}>
                 <TouchableOpacity
                   style={{ alignItems: "center" }}
                   onPress={() => {
@@ -769,33 +835,15 @@ export default function Recent(data) {
                     // selectAlldata2()
                   }}
                 >
-                  <Text
-                    style={{
-                      color: "#999999",
-                      fontSize: wp("5.41%"),
-
-                      fontFamily: "Inter-Black",
-                    }}
-                  >
-                    Select All
-                  </Text>
+                  <Text style={styles.select_txt}>Select All</Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <View
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "center",
-                  height: height * 0.048,
-                  width: width * 0.42,
-                  backgroundColor: d == true ? "orange" : null,
-                  margin: "3%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderWidth: 0.8,
-                  borderRadius: 25,
-                  borderColor: "black",
-                }}
+                style={[
+                  styles.select,
+                  { backgroundColor: d == true ? "orange" : null },
+                ]}
               >
                 <TouchableOpacity
                   style={{ alignItems: "center" }}
@@ -804,11 +852,12 @@ export default function Recent(data) {
                   }}
                 >
                   <Text
-                    style={{
-                      color: d == true ? "white" : "#999999",
-                      fontSize: wp("5.41%"),
-                      fontFamily: "Inter-Black",
-                    }}
+                    style={[
+                      styles.select_txt2,
+                      {
+                        color: d == true ? "white" : "#999999",
+                      },
+                    ]}
                   >
                     Select All
                   </Text>
@@ -824,11 +873,20 @@ export default function Recent(data) {
               renderItem={({ item, index }) => (
                 <View>
                   <View style={styles.flat_view}>
-                    {d == true ? (
+                    {d == true ?  (
+                       <Animated.View
+                       style={[
+                         styles.fadingContainer,
+                         {
+                           // Bind opacity to animated value
+                           opacity: fadeAnim,
+                         },
+                       ]}>
                       <Pressable
                         style={{ marginStart: "6%" }}
                         onPress={() => {
-                          handleChange(item.id);
+                          demo?handleChange(item.id):
+                          (handleChange(item.id),press(item))
                         }}
                       >
                         {item.isChecked ? (
@@ -845,16 +903,19 @@ export default function Recent(data) {
                           />
                         )}
                       </Pressable>
+                     </Animated.View>
+                      
                     ) : null}
                     <TouchableHighlight
                       style={{ paddingVertical: "3%" }}
                       underlayColor={"#d9d9d9"}
+                      delayLongPress={3}
                       onLongPress={() => {
                         handleChange2(item.id), sett(!t);
                       }}
                       onPress={() => {
                         d
-                          ? handleChange(item.id)
+                          ? (handleChange(item.id), press(item))
                           : navigation.navigate(ScreenNames.DETAIL, {
                               user: {
                                 name: item.name,
@@ -868,32 +929,10 @@ export default function Recent(data) {
                     >
                       <View
                         activeOpacity={1}
-                        // onLongPress={() => {
-                        //   handleChange2(item.id), sett(!t);
-                        // }}
-                        // onPress={() => {
-                        //   navigation.navigate(ScreenNames.DETAIL, {
-                        //     user: {
-                        //       name: item.name,
-                        //       id: item.id,
-                        //       logo: item.name_initials,
-                        //     },
-                        //     index: index,
-                        //     DATA: DATA,
-                        //   });
-                        //   // AsyncStorage.setItem("user_id", item.id);
-                        // }}
-                        style={{
-                          backgroundColor: "white",
-
+                       
+                        style={[styles.touch,{
                           width: d == true ? width * 0.8 : width * 0.93,
-
-                          elevation: 5,
-                          alignSelf: "center",
-                          justifyContent: "center",
-                          borderRadius: 5,
-                          shadowColor: "white",
-                        }}
+                      }]}
                       >
                         {}
                         <View style={styles.set}>
@@ -942,14 +981,7 @@ export default function Recent(data) {
                             <> */}
 
                           <TouchableOpacity
-                            style={{
-                              marginTop: "2%",
-                              shadowColor: "#000",
-                              shadowOffset: { width: 2, height: 4 },
-                              shadowOpacity: 0.95,
-                              shadowRadius: 2.84,
-                              elevation: 5,
-                            }}
+                             style={styles.note_box}
                             activeOpacity={1}
                             onPress={() => {
                               item.pined_note == "Yes" ? setd1(3) : setd1(0);
@@ -1222,30 +1254,14 @@ export default function Recent(data) {
                         </Pressable>
                       </View>
 
-                      <Text
-                        style={{
-                          color: "black",
-                          marginLeft: "4%",
-                          marginTop: "12%",
-                        }}
-                      >
-                        No note added yet.
-                      </Text>
+                      <Text style={styles.no_note}>No note added yet.</Text>
                       <TouchableOpacity
                         onPress={() => {
                           setd1(1);
                         }}
                         style={styles.add_note}
                       >
-                        <Text
-                          style={{
-                            color: "white",
-                            fontSize: wp("6%"),
-                            fontFamily: "Inter-Black4",
-                          }}
-                        >
-                          Add Note
-                        </Text>
+                        <Text style={styles.add_note_txt}>Add Note</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -1483,6 +1499,8 @@ export default function Recent(data) {
                             defaultButtonText="Select An Audio"
                             onSelect={(item, index) => {
                               handleChangeAudioUrl(item.audio_url);
+                              seturl(item.audio_url);
+                              replay(item.audio_url);
                               setA_id(item?.audio_id);
 
                               // SetRecordedURI(item.audio_url);
@@ -1558,7 +1576,7 @@ export default function Recent(data) {
                               maximumTrackTintColor="#000000"
                               minimumValue={0}
                               maximumValue={1}
-                              value={sliderValue}
+                              value={sliderValue||0}
                               onValueChange={handleSliderValueChange}
                               disabled={!sound}
                             />
@@ -1595,7 +1613,9 @@ export default function Recent(data) {
                                 </Text>
                               )}
                             </TouchableOpacity>
-                            <Text style={{ flex: 0.6 }}>
+                            <Text
+                                 onPress={() => navigation.navigate("demo",{n:RecordedURI})}
+                            style={{ flex: 0.6 }}>
                               <SimpleLineIcons
                                 name="microphone"
                                 size={28}
@@ -2295,43 +2315,25 @@ export default function Recent(data) {
 
             {d2 ? (
               <Animated.View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-
-                  borderRadius:
-                    Math.round(
-                      Dimensions.get("window").width +
-                        Dimensions.get("window").height
-                    ) / 2,
-                  position: "absolute",
-
-                  right: "6%",
-
-                  backgroundColor: Colors.float_btn,
-
-                  transform: [{ translateY: translation }],
-                  bottom: height * 0.28,
-                  elevation: 5,
-                }}
+                style={[
+                  styles.ball,
+                  {
+                    transform: [{ translateY: translation }],
+                  },
+                ]}
               >
                 <TouchableOpacity
                   // onPress={() => navigation.navigate(ScreenNames.NEW_LEADS)}
-                  // onPress={() => navigation.navigate("demo")}
-                  onPress={() => {
-                    setModalVisible9(true);
-                  }}
+                  onPress={() => navigation.navigate("demo")}
+                  // onPress={() => {
+                  //   setModalVisible9(true);
+                  // }}
 
                   // style={styles.floating_btn}
                 >
                   <Image
                     source={Images.addLeads}
-                    style={{
-                      width: Dimensions.get("window").width * 0.18,
-                      height: Dimensions.get("window").width * 0.18,
-                      resizeMode: "contain",
-                    }}
-                  />
+                    style={styles.ball_img} />
                 </TouchableOpacity>
               </Animated.View>
             ) : null}
@@ -2375,6 +2377,48 @@ const styles = StyleSheet.create({
     fontSize: wp("6%"),
     fontFamily: "Inter-Black4",
   },
+  note_box:{
+    marginTop: "2%",
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.95,
+    shadowRadius: 2.84,
+    elevation: 5,
+  },
+  touch:{ backgroundColor: "white",
+
+             
+
+  elevation: 5,
+  alignSelf: "center",
+  justifyContent: "center",
+  borderRadius: 5,
+  shadowColor: "white",},
+  no_note: {
+    color: "black",
+    marginLeft: "4%",
+    marginTop: "12%",
+  },
+  select: {
+    flexDirection: "row",
+    alignSelf: "center",
+    height: height * 0.048,
+    width: width * 0.42,
+    // backgroundColor: d == true ? "orange" : null,
+    margin: "3%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 0.8,
+    borderRadius: 25,
+    borderColor: "black",
+  },
+  select_txt: {
+    color: "#999999",
+    fontSize: wp("5.41%"),
+
+    fontFamily: "Inter-Black",
+  },
+  select_txt2: { fontSize: wp("5.41%"), fontFamily: "Inter-Black" },
   voice_modal_txt: {
     fontSize: wp("7.5%"),
 
@@ -2525,6 +2569,33 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
+  },
+  ball: {
+    alignItems: "center",
+    justifyContent: "center",
+
+    position: "absolute",
+
+    right: "6%",
+
+    backgroundColor: Colors.float_btn,
+
+    bottom: height * 0.28,
+    borderRadius:
+      Math.round(
+        Dimensions.get("window").width + Dimensions.get("window").height
+      ) / 2,
+    elevation: 5,
+  },
+  ball_img:{
+    width: Dimensions.get("window").width * 0.18,
+    height: Dimensions.get("window").width * 0.18,
+    resizeMode: "contain",
+  },
+  add_note_txt: {
+    color: "white",
+    fontSize: wp("6%"),
+    fontFamily: "Inter-Black4",
   },
   update_note: {
     height: height * 0.065,

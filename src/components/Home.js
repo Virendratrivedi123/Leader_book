@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
@@ -22,6 +22,8 @@ function Home() {
    
   });
   const navigation = useNavigation();
+  const [label, setlabel] = useState("");
+  const [value, setvalue] = useState("");
   React.useEffect(() => {
     (async () => {
     
@@ -46,9 +48,12 @@ function Home() {
       .then(async (responseJson) => {
         // Successful response from the API Call
         const f_v=(responseJson.data.active_users_filter_value);
+        setvalue(responseJson.data.active_users_filter_value)
         responseJson.data.active_users_filter.map((i)=>{
           if(f_v == i.value){
+            setlabel(i.label)
             AsyncStorage.setItem("label",i.label)
+            AsyncStorage.setItem("value",f_v)
           }
         })
         
@@ -77,7 +82,7 @@ function Home() {
         </View>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => navigation.navigate(ScreenNames.MOST_ACTIVE_USERS)}
+        onPress={() => navigation.push("A2", { Value: value ,Label:label})}
         style={STYLES.button}
       >
         <View style={{ flexDirection: "row", marginStart: "3%" }}>

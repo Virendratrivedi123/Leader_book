@@ -171,13 +171,15 @@ function User_tag2() {
   //   setarr(newPeople);
   // };
 
-  const onsearch = (text) => {
-    if (text == "") {
+  const onsearch = () => {
+    if (search == "") {
       setDATA(selected_data)
     } else {
+      var a=[]
       let temp = DATA.filter((item) => {
-        return item.name.toLowerCase().indexOf(text.toLowerCase()) > -1;
+        return item.name.toLowerCase().indexOf(search.toLowerCase()) > -1;
       });
+      setDATA(a)
       setDATA(temp);
     }
   };
@@ -408,39 +410,60 @@ function User_tag2() {
   return (
     <SafeAreaView style={styles.container}>
 
-      {loading2 ? (
-        <Loader loading={loading2} />
-      ) : (
-        <View>
-          <View style={styles.input}>
-        <TextInput
-          ref={searchref}
-          style={{fontSize:17,}}
-          onChangeText={(text) => {
-            onsearch(text), setsearch(text);
-          }}
-          value={search}
-          underlineColorAndroid="transparent"
-          placeholder="Search Tags"
-          placeholderTextColor={"#cccccc"}
-        />
-        <FontAwesome name="search" size={22} color="black" />
+    {loading2 ? (
+      <Loader loading={loading2} />
+    ) : (
+      <View>
+        <View style={styles.input}>
+      <TextInput
+        ref={searchref}
+        style={{fontSize:17,width:"90%",height:"100%"}}
+        onChangeText={(text) => {
+           setsearch(text);
+        }}
+        value={search}
+        underlineColorAndroid="transparent"
+        placeholder="Search Tags"
+        placeholderTextColor={"#cccccc"}
+        onKeyPress={({ nativeEvent }) => {
+          if (nativeEvent.key === 'Backspace') {
+            setDATA(selected_data),sett("1")
+          }
+        }}
+      />
+      <TouchableOpacity
+        onPress={() =>{ onsearch(),sett("2")}}
+      >
+<FontAwesome name="search" size={22} color="black" />
+      </TouchableOpacity>
+     
+    </View>
+     {t=="1"?<FlatList
+        style={{marginBottom:"15%"}}
+          data={DATA}
+         
+         
+          keyExtractor={(item, index) => index.toString()}
+         
+          renderItem={ItemView}
+          ListFooterComponent={renderFooter}
+          onEndReached={getData}
+          onEndReachedThreshold={0.5}
+        />:<FlatList
+        style={{marginBottom:"15%"}}
+          data={DATA}
+         
+         
+          keyExtractor={(item, index) => index.toString()}
+         
+          renderItem={ItemView}
+          // ListFooterComponent={renderFooter}
+          // onEndReached={getData}
+          // onEndReachedThreshold={0.5}
+        />}
+        
       </View>
-       
-          <FlatList
-          style={{marginBottom:"15%"}}
-            data={DATA}
-           
-           
-            keyExtractor={(item, index) => index.toString()}
-           
-            renderItem={ItemView}
-            ListFooterComponent={renderFooter}
-            onEndReached={getData}
-            onEndReachedThreshold={0.5}
-          />
-        </View>
-      )}
+    )}
 
       {d2 ? (
         <Animated.View

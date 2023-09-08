@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import {
   Dimensions,
   Text,
@@ -11,6 +14,8 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dropdown } from "react-native-element-dropdown";
@@ -62,53 +67,12 @@ function New_lead() {
   const [status, setstatus] = React.useState("");
   const [type, settype] = React.useState("");
   const [assign, setassign] = React.useState("");
-  const [id, setId] = React.useState("");
+  const [blank, setblank] = React.useState("");
   const [loading, setLoading] = React.useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     (async () => {
-      // const user_data = await AsyncStorage.getItem("user_data");
-      // const Follow_data = await AsyncStorage.getItem("Follow");
-      // const status_data = await AsyncStorage.getItem("Status");
-      // const assign_data = await AsyncStorage.getItem("Assign");
-      // const type_data = await AsyncStorage.getItem("Type");
-      // const d = JSON.parse(user_data);
-      // const F = JSON.parse(Follow_data);
-      // const S = JSON.parse(status_data);
-      // const T = JSON.parse(type_data);
-      // const A = JSON.parse(assign_data);
-      // setfollow(F);
-      // setassign(A);
-      // settype(T);
-      // setstatus(S);
-      // // console.log(dr)
-      // const data = {
-      //   email: d.email,
-      //   password: d.password,
-      //   id: route.params.id,
-      // };
-      // New_lead_detail(data)
-      //   .then((response) => response.json())
-      //   .then((result) => {
-      //     console.log(result.data.lead_detail.Lead)
-      // var Array = [];
-
-      // var item = result.data.lead_detail.Lead;
-      // setFirst_name(item?.first_name?.field_type);
-      // setLast_name(item?.last_name?.field_type);
-      // setEmail(item?.email?.field_type);
-      // setCompany(item?.company_name?.field_type);
-      // setPhone(item?.phone?.field_type);
-      // setAddress(item?.address?.field_type);
-      // setCity(item?.city?.field_type);
-      // setstate(item?.state?.field_type);
-      // setlogged_date(item?.new_grouped_date?.field_type);
-      // setcomments(item?.comments?.field_type);
-      // Array.push(item);
-      // setdata(Array);
-      // setLoading(false);
-      //   })
-      //   .catch((error) => console.log("error", error));
       const user_data = await AsyncStorage.getItem("user_data");
       const d = JSON.parse(user_data);
       const data = {
@@ -121,20 +85,22 @@ function New_lead() {
           var Array = [];
 
           var item = result.data.lead_detail.Lead;
+ 
+          // setFirst_name(item?.first_name?.field_type);
+          // setLast_name(item?.last_name?.field_type);
+          // setEmail(item?.email?.field_type);
+          // setCompany(item?.company_name?.field_type);
+          // setPhone(item?.phone?.field_type);
+          // setAddress(item?.address?.field_type);
 
-          setFirst_name(item?.first_name?.field_type);
-          setLast_name(item?.last_name?.field_type);
-          setEmail(item?.email?.field_type);
-          setCompany(item?.company_name?.field_type);
-          setPhone(item?.phone?.field_type);
-          setAddress(item?.address?.field_type);
+settype_value(item?.site_id?.dropdown_arr[0].label)
           setAssigned_value(item?.user_id?.dropdown_arr[0].label);
           settype(item?.lead_type_id?.dropdown_arr[0].label);
-          setCity(item?.city?.field_type);
-          setstate(item?.state?.field_type);
+          // setCity(item?.city?.field_type);
+          // setstate(item?.state?.field_type);
           setstatus_value(item?.is_grl_crea_lead?.dropdown_arr[0].label);
-          setfollow_value(item?.month?.dropdown_arr[17].label);
-          setcomments(item?.comments?.field_type);
+          setfollow_value(item?.month?.value);
+          // setcomments(item?.comments?.field_type);
           Array.push(item);
           setdata(Array);
           setLoading(false);
@@ -154,33 +120,37 @@ function New_lead() {
         first_name: First_name,
         last_name: last_name,
         lead_email: email,
-        phone: phone2,
+        phone: phone,
         is_grl_crea_lead: status_value,
         comments: comments,
         month: follow_value,
         state: state,
         address: address,
         city: city,
-
         company_name: company,
         address: address,
-
         password: d.password,
         email: d.email,
       };
       New_lead_detail_update(data).then((response) => {
         response.json().then((data) => {
           // Alert.alert(data.msg);
-          navigation.navigate(ScreenNames.MAIN_SCREEN);
+          AsyncStorage.setItem("op","2"),
+        navigation.push(ScreenNames.DRAWER)
         });
       });
     } catch (error) {
       console.error(error);
     }
   };
-  let phone2 = phone.replace(/^(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
-  console.log(status_value);
 
+  const save=(()=>{
+   First_name == ""? (setblank("fistname"),setModalVisible(true)):last_name == ""? 
+   (setblank("lastname"),setModalVisible(true)):email == ""? 
+   (setblank("email"),setModalVisible(true)):phone == ""? 
+   (setblank("phone"),setModalVisible(true)):postdata()
+  })
+ 
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -189,9 +159,8 @@ function New_lead() {
         onLeftPress={() => navigation.goBack()}
         customRight={true}
         onRightPress={() => {
-          state == "text"
-            ? Alert.alert("All the fields must be filled ")
-            : postdata();
+          // postdata();
+          save()
         }}
       />
 
@@ -243,7 +212,7 @@ function New_lead() {
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    placeholder={"Test2"}
+                    placeholder={type_value}
                     value={type_value}
                     onFocus={() => setIsFocus(true)}
                     onBlur={() => setIsFocus(false)}
@@ -463,6 +432,39 @@ function New_lead() {
           />
         </KeyboardAvoidingView>
       ) : null}
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.textStyle1}>Lead Booker</Text>
+            <Text style={styles.textStyle2}>
+              Enter{" "}{blank}
+            </Text>
+            <View
+              style={{
+                height: 1,
+                backgroundColor: "#cccccc",
+
+                width: "100%",
+              }}
+            ></View>
+            <Pressable
+              style={{}}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <Text style={styles.textStyle3}>Ok</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -543,6 +545,44 @@ const styles = StyleSheet.create({
     height: "5%",
     borderRadius: 6,
     fontFamily: "Inter-Black",
+  },
+  textStyle1: {
+    fontSize: wp("5.41%"),
+    fontFamily: "Inter-Black2",
+    marginTop: "7%",
+  },
+  textStyle2: {
+    fontSize: wp("4%"),
+    textAlign: "center",
+    width: "80%",
+    marginBottom: "7%",
+    marginTop: "1%",
+    color: "#262626",
+  },
+  textStyle3: {
+    fontSize: wp("5.31%"),
+    color: "#2b92ee",
+    fontFamily: "Inter-Black",
+    marginVertical: "5%",
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 0,
+    backgroundColor: "rgba(52, 52, 52, 0.3)",
+  },
+  modalView: {
+    width: "80%",
+    backgroundColor: "#ececee",
+    borderRadius: 20,
+
+    elevation: 5,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    // elevation: 20,
   },
 });
 

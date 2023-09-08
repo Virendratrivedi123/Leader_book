@@ -80,6 +80,8 @@ function P1({ data }) {
   const [search, setsearch] = useState("");
   const [offset, setOffset] = useState(1);
   const [isListEnd, setIsListEnd] = useState(false);
+  const [s, sets] = useState([]);
+  const [demo, setdemo] = useState(false);
   const tex = "";
   const searchref = useRef();
 
@@ -256,11 +258,21 @@ function P1({ data }) {
       }
       return i;
     });
+    let selected = temp.filter((i) => i.isChecked);
+    sets(selected);
     setDATA(temp);
   };
 
-  let selected = DATA.filter((i) => i.isChecked);
-  // console.log(selected)
+
+  const press = (item) => {
+    if (item.isChecked == true && s.length <= 1) {
+      setd(!d), navigation.navigate("P2", {
+        id: route.params?.id,
+        name: route.params?.name,
+      });;
+    }
+  };
+
 
   const selectAlldata = () => {
     let temp = DATA.map((i) => {
@@ -271,6 +283,7 @@ function P1({ data }) {
         return { ...i, isChecked: false };
       }
     });
+    setdemo(!demo)
     setd(!d);
     setDATA(temp);
   };
@@ -348,7 +361,10 @@ function P1({ data }) {
           {d == true ? (
             <Pressable
               style={{ marginStart: "6%" }}
-              onPress={() => handleChange(item.id)}
+              onPress={() => {
+                demo?handleChange(item.id):
+                (handleChange(item.id),press(item))
+              }}
             >
               {item.isChecked ? (
                 <AntDesign name="checkcircle" size={23} color={"#4775d1"} />
@@ -363,20 +379,28 @@ function P1({ data }) {
             onLongPress={() => {
               handleChange2(item.id), sett(!t);
             }}
+            onPress={() => {
+              d
+                ? (handleChange(item.id), press(item))
+                : navigation.navigate(ScreenNames.DETAIL, {
+                    user: {
+                      name: item.name,
+                      id: item.id,
+                      logo: item.name_initials,
+                    },
+                    index: index,
+                    DATA: DATA,
+                    r:'1',
+                    id2: route.params?.id,
+                    name2: route.params?.name,
+                  });
+            }}
           >
             <View
               activeOpacity={1}
-              style={{
-                backgroundColor: "white",
-
+              style={[styles.touch,{
                 width: d == true ? width * 0.8 : width * 0.93,
-
-                elevation: 5,
-                alignSelf: "center",
-                justifyContent: "center",
-                borderRadius: 5,
-                shadowColor: "white",
-              }}
+            }]}
             >
               {}
               <View style={styles.set}>
@@ -391,6 +415,7 @@ function P1({ data }) {
                       },
                       index: index,
                       DATA: DATA,
+                      r:'1'
                     });
                     // AsyncStorage.setItem("user_id", item.id);
                   }}
@@ -425,14 +450,7 @@ function P1({ data }) {
                             <> */}
 
                 <TouchableOpacity
-                  style={{
-                    marginTop: "2%",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 2, height: 4 },
-                    shadowOpacity: 0.95,
-                    shadowRadius: 2.84,
-                    elevation: 5,
-                  }}
+                     style={styles.note_box}
                   activeOpacity={1}
                   onPress={() => {
                     item?.pined_note == "Yes" ? setd1(3) : setd1(0);
@@ -567,19 +585,7 @@ function P1({ data }) {
         <View>
           {t ? (
             <View
-              style={{
-                flexDirection: "row",
-                alignSelf: "center",
-                height: height * 0.048,
-                width: width * 0.42,
-                // backgroundColor: d == true ? "orange" : null,
-                margin: "3%",
-                alignItems: "center",
-                justifyContent: "center",
-                borderWidth: 0.8,
-                borderRadius: 25,
-                borderColor: "black",
-              }}
+            style={styles.select}
             >
               <TouchableOpacity
                 style={{ alignItems: "center" }}
@@ -589,32 +595,15 @@ function P1({ data }) {
                 }}
               >
                 <Text
-                  style={{
-                    color: "#999999",
-                    fontSize: wp("5.41%"),
-
-                    fontFamily: "Inter-Black",
-                  }}
-                >
+                     style={styles.select_txt}
+                     >
                   Select All
                 </Text>
               </TouchableOpacity>
             </View>
           ) : (
             <View
-              style={{
-                flexDirection: "row",
-                alignSelf: "center",
-                height: height * 0.048,
-                width: width * 0.42,
-                backgroundColor: d == true ? "orange" : null,
-                margin: "3%",
-                alignItems: "center",
-                justifyContent: "center",
-                borderWidth: 0.8,
-                borderRadius: 25,
-                borderColor: "black",
-              }}
+            style={[styles.select, {backgroundColor: d == true ? "orange" : null}]}
             >
               <TouchableOpacity
                 style={{ alignItems: "center" }}
@@ -623,11 +612,10 @@ function P1({ data }) {
                 }}
               >
                 <Text
-                  style={{
+                  style={[styles.select_txt2,{
                     color: d == true ? "white" : "#999999",
-                    fontSize: wp("5.41%"),
-                    fontFamily: "Inter-Black",
-                  }}
+                    
+                  }]}
                 >
                   Select All
                 </Text>
@@ -790,11 +778,7 @@ function P1({ data }) {
                 </View>
 
                 <Text
-                  style={{
-                    color: "black",
-                    marginLeft: "4%",
-                    marginTop: "12%",
-                  }}
+                  style={styles.no_note}
                 >
                   No note added yet.
                 </Text>
@@ -805,11 +789,7 @@ function P1({ data }) {
                   style={styles.add_note}
                 >
                   <Text
-                    style={{
-                      color: "white",
-                      fontSize: wp("6%"),
-                      fontFamily: "Inter-Black4",
-                    }}
+                    style={styles.add_note_txt}
                   >
                     Add Note
                   </Text>
@@ -997,6 +977,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
+  note_box:{
+    marginTop: "2%",
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.95,
+    shadowRadius: 2.84,
+    elevation: 5,
+  },
+  touch:{ backgroundColor: "white",
+
+             
+
+  elevation: 5,
+  alignSelf: "center",
+  justifyContent: "center",
+  borderRadius: 5,
+  shadowColor: "white",},
   update_txt: {
     color: "white",
     fontSize: wp("6%"),
@@ -1108,6 +1105,32 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     margin: "4%",
   },
+  select:{
+    flexDirection: "row",
+    alignSelf: "center",
+    height: height * 0.048,
+    width: width * 0.42,
+    // backgroundColor: d == true ? "orange" : null,
+    margin: "3%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 0.8,
+    borderRadius: 25,
+    borderColor: "black",
+  },
+  no_note:{
+    color: "black",
+    marginLeft: "4%",
+    marginTop: "12%",
+  },
+  select_txt: {
+    color: "#999999",
+    fontSize: wp("5.41%"),
+
+    fontFamily: "Inter-Black",
+  },
+select_txt2: { fontSize: wp("5.41%"),
+                    fontFamily: "Inter-Black"},
   add_note: {
     height: height * 0.065,
     width: width * 0.36,
@@ -1118,6 +1141,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
+  },
+  add_note_txt:{
+    color: "white",
+    fontSize: wp("6%"),
+    fontFamily: "Inter-Black4",
   },
   update_note: {
     height: height * 0.065,

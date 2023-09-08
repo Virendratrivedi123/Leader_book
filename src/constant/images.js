@@ -65,5 +65,7 @@ down_tag:require('./../Images/down-tag.png'),
 bath:require('./../Images/bathroom.png'),
 bed:require('./../Images/bedroom.png'),
 home_drop:require('./../Images/home-drop.png'),
+check:require('./../Images/check.png'),
+uncheck:require('./../Images/uncheck.png'),
 }
 

@@ -46,7 +46,7 @@ import moment from "moment";
 import Header from "../header";
 import SelectDropdown from "react-native-select-dropdown";
 
-function Most_active_users({ data }) {
+function Active2({ data }) {
   const [fontsLoaded] = useFonts({
     "Inter-Black": require("../../../assets/fonts/Mulish-SemiBold.ttf"),
     "Inter-Black2": require("../../../assets/fonts/Mulish-Bold.ttf"),
@@ -66,7 +66,7 @@ function Most_active_users({ data }) {
 
   const [loading2, setLoading2] = React.useState(true);
   const [loading3, setLoading3] = React.useState(false);
-
+  const [modalVisible3, setModalVisible3] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible_box, setModalVisible_box] = useState(false);
@@ -86,21 +86,20 @@ function Most_active_users({ data }) {
 
   const [offset, setOffset] = useState(1);
   const [isListEnd, setIsListEnd] = useState(false);
-  const [fil_ter, setfil_ter] = useState(route?.params?.F);
+  const [fil_ter, setfil_ter] = useState(route?.params?.Value);
   const [fil_ter_data, setfil_ter_data] = useState([]);
-  const [f_v, setf_v] = useState("");
+  const [header, setheader] = useState(route?.params?.Label);
   const [I_v, setI_v] = useState("");
 
   React.useEffect(() => {
     (async () => {
-     const a= await AsyncStorage.getItem("label")
-     console.log(a,'aman')
-     setI_v(a)
-      get_it();
+    setModalVisible3(true)
       getData();
+    
     })();
   }, []);
-  async function get_it() {
+  
+   async function get_it() {
     const user_data = await AsyncStorage.getItem("user_data");
     const search = await AsyncStorage.getItem("search");
     const d = JSON.parse(user_data);
@@ -116,8 +115,14 @@ function Most_active_users({ data }) {
       .then((response) => response.json())
       .then(async (responseJson) => {
         // Successful response from the API Call
-        setf_v(responseJson.data.active_users_filter_value);
-       
+        const f_v=(responseJson.data.active_users_filter_value);
+        responseJson.data.active_users_filter.map((i)=>{
+          if(f_v == i.value){
+            AsyncStorage.setItem("label",i.label)
+            AsyncStorage.setItem("value",f_v)
+          }
+        })
+        
       })
       .catch((error) => {
         console.error(error);
@@ -136,14 +141,14 @@ function Most_active_users({ data }) {
         email: d.email,
         password: d.password,
         no: offset,
-        filters: fil_ter ? fil_ter : f_v,
+        filters: route.params.Value,
       };
       Active_filters(data)
         .then((response) => response.json())
         .then(async (responseJson) => {
           // Successful response from the API Call
           setfil_ter_data(responseJson.data.active_users_filter);
-
+         
           if (responseJson.data.active_leads_arr.length >= 0) {
             setOffset(offset + 1);
             // After the response increasing the offset
@@ -155,6 +160,7 @@ function Most_active_users({ data }) {
             drs();
 
             setLoading2(false);
+            
 
             setd2(true);
             Animated.timing(translation, {
@@ -168,6 +174,7 @@ function Most_active_users({ data }) {
 
             drs();
           }
+          
         })
         .catch((error) => {
           console.error(error);
@@ -218,7 +225,7 @@ function Most_active_users({ data }) {
 
       var a = [];
       dataSource.map((i) => {
-        a.push({ ...i.Lead, isChecked: false, note_value: "", ind: it++ });
+        a.push({ ...i.Lead,...i.LeadUserLog, isChecked: false, note_value: "", ind: it++ });
       });
 
       setDATA(a);
@@ -241,8 +248,7 @@ function Most_active_users({ data }) {
       Pin_note(data).then((response) => {
         response.json().then(async (data) => {
           setModalVisible(!modalVisible);
-          AsyncStorage.setItem("op", "1");
-          navigation.push(ScreenNames.DRAWER);
+          navigation.push("A1", { Value: route?.params?.Value ,Label:route?.params?.Label})
         });
       });
     } catch (error) {
@@ -250,6 +256,41 @@ function Most_active_users({ data }) {
     }
   };
   // console.log(DATA);
+
+  async function get_it(i,l) {
+    setLoading2(true)
+    const user_data = await AsyncStorage.getItem("user_data");
+    const search = await AsyncStorage.getItem("search");
+    const d = JSON.parse(user_data);
+
+    // console.log(dr)
+    const data = {
+      email: d.email,
+      password: d.password,
+      no: "",
+      filters: i,
+    };
+    Active_filters(data)
+      .then((response) => response.json())
+      .then(async (responseJson) => {
+        // Successful response from the API Call
+      //  console.log(responseJson.message);
+     
+      if(responseJson.message == "No lead logged yet.")
+       {setheader(l),setModalVisible3(true)}
+       else
+        {navigation.push("A", { Value: i ,Label:l})}
+        setLoading2(false)
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+const postdata2=((i,l)=>{
+  get_it(i,l)
+})
+  
 
   const handleChange = (id) => {
     let temp = DATA.map((i) => {
@@ -278,6 +319,7 @@ function Most_active_users({ data }) {
   };
 
   const selectAlldata2 = () => {
+    
     let temp = DATA.map((i) => {
       if (t == true) {
         return { ...i, isChecked: true };
@@ -287,7 +329,7 @@ function Most_active_users({ data }) {
       //   return { ...i, isChecked: false };
       // }
     });
-
+ 
     setDATA(temp);
     sett2(!t2);
   };
@@ -536,6 +578,20 @@ function Most_active_users({ data }) {
                   Voicemail
                 </Text>
               </TouchableOpacity>
+              <View style={styles.line2}></View>
+              <TouchableOpacity
+                activeOpacity={1}
+                // onPress={() => setModalVisible2(!modalVisible2)}
+                style={styles.set}
+              >
+                
+                <Text style={styles.logg_date}>
+                  {item.last_logged_date}
+               
+                </Text>
+               
+                
+              </TouchableOpacity>
               {/* </>
                       ) : <View style={styles.line3}></View>} */}
             </View>
@@ -556,7 +612,7 @@ function Most_active_users({ data }) {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        label="Most Active Users1"
+        label="Most Active Users"
         leftIcon={Images.backArrow}
         onLeftPress={() => navigation.navigate(ScreenNames.HOME)}
       ></Header>
@@ -564,48 +620,13 @@ function Most_active_users({ data }) {
         <Loader loading={loading2} />
       ) : (
         <View>
-          {/* <View
-            style={{
-              backgroundColor: "white",
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity
-              style={{
-                alignItems: "center",
-                height: height * 0.055,
-                width: width * 0.8,
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderWidth: 0.8,
-                borderRadius: 25,
-                borderColor: "black",
-                flexDirection: "row",
-                paddingHorizontal: "5%",
-                marginVertical: "3%",
-              }}
-              onPress={() => {
-                setModalVisible_box(!modalVisible_box);
-              }}
-            >
-              <Text
-                style={{
-                  color: "black",
-                  fontSize: wp("4.41%"),
-                  fontFamily: "Inter-Black",
-                }}
-              >
-                All Time
-              </Text>
-              <Image style={styles.home_drop} source={Images.home_drop}></Image>
-            </TouchableOpacity>
-          </View> */}
+         
           <SelectDropdown
             data={fil_ter_data}
             // defaultValueByIndex={0}
-            defaultButtonText={route?.params?.L?route?.params?.L:I_v}
+            defaultButtonText={header}
             onSelect={(item, index) => {
-              navigation.navigate("M1", { F: item.value ,L:item.label});
+              postdata2(item.value,item.label)
               // setValue3(item.label)
             }}
             
@@ -1096,8 +1117,39 @@ function Most_active_users({ data }) {
           />
         </View>
       </Modal>
+      <Modal
+            transparent={true}
+            visible={modalVisible3}
+            onRequestClose={() => {
+             
+              setModalVisible3(!modalVisible3);
+            }}
+          >
+            <View style={styles.centeredView_alert}>
+              <View style={styles.modalView_alert}>
+                <Text style={styles.textStyle1}>Lead Booker</Text>
+                <Text style={styles.textStyle2}>No lead logged yet.</Text>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#cccccc",
+                    
+                    width: "100%",
+                  }}
+                ></View>
+                <Pressable
+                  style={{  }}
+                  onPress={() => {
+                    setModalVisible3(!modalVisible3);
+                  }}
+                >
+                  <Text style={styles.textStyle3}>Ok</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
 
-      {d == true ? (
+      {/* {d == true ? (
         <View style={styles.tag_box}>
           <View style={styles.tag_view}>
             <View style={styles.btn1}>
@@ -1107,7 +1159,7 @@ function Most_active_users({ data }) {
             </View>
           </View>
         </View>
-      ) : null}
+      ) : null} */}
     </SafeAreaView>
   );
 }
@@ -1294,7 +1346,7 @@ const styles = StyleSheet.create({
   },
   tag_touch: { alignItems: "center" },
   tag: { color: "white", fontSize: wp("4.71%"), fontFamily: "Inter-Black2" },
-  flat: { marginBottom: "30%" },
+  flat: { marginBottom: "50%" },
   input: {
     height: height * 0.25,
     margin: 12,
@@ -1476,6 +1528,14 @@ const styles = StyleSheet.create({
     color: "#808080",
     fontFamily: "Inter-Black2",
   },
+ logg_date: {
+    fontSize: wp("4.01%"),
+    flex: 0.9,
+
+    // fontWeight: "700",
+    color: "#808080",
+    fontFamily: "Inter-Black",marginStart:"8%"
+  },
 
   circleview: { alignItems: "center" },
   circle_icon_v: { marginStart: "5%", marginEnd: "7%" },
@@ -1606,6 +1666,26 @@ const styles = StyleSheet.create({
                     fontFamily: "Inter-Black4",marginLeft:"-0.5%"
   },
   container: { backgroundColor: "#e6e6e6", flex: 1 },
+  textStyle1: { fontSize: wp("5.41%"), fontFamily:"Inter-Black2",marginTop:"7%" },
+  textStyle2: { fontSize: wp("4%") ,textAlign:"center",width:"80%",marginBottom:"7%",marginTop:"1%",color:"#262626",},
+  textStyle3: { fontSize: wp("5.31%"), color: "#2b92ee",fontFamily:"Inter-Black", marginVertical: "5%",},
+
+  centeredView_alert: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 0,
+    // backgroundColor: "rgba(52, 52, 52, 0.3)",
+  },
+  modalView_alert: {
+    width: "85%",
+    backgroundColor: "#ececee",
+    borderRadius: 20,
+
+    elevation: 5,
+    alignSelf: "center",alignItems:"center",justifyContent:"center",
+    // elevation: 20,
+  },
 });
 
-export default Most_active_users;
+export default Active2;
