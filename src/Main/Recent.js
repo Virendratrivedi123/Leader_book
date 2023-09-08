@@ -20,7 +20,7 @@ import {
   Alert,
   TouchableHighlight,
   ScrollView,
-  Keyboard,
+  Keyboard,LayoutAnimation, Platform,UIManager
 } from "react-native";
 import { useFonts } from "expo-font";
 const height = Dimensions.get("window").height;
@@ -57,6 +57,12 @@ import {
 
 import Slider from "@react-native-community/slider";
 
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+  ) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
 export default function Recent(data) {
   const [fontsLoaded] = useFonts({
     "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
@@ -68,6 +74,7 @@ export default function Recent(data) {
   // if (!fontsLoaded) {
   //   return null;
   // }
+  const [expanded, setExpanded] = useState(false);
   const AudioRecorder = useRef(new Audio.Recording());
   const AudioPlayer = useRef(new Audio.Sound());
 
@@ -148,7 +155,7 @@ export default function Recent(data) {
     // Will change fadeAnim value to 1 in 5 seconds
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 3000,
+      duration: 5000,
       useNativeDriver: true,
     }).start();
   };
@@ -695,15 +702,13 @@ export default function Recent(data) {
   const handleChange2 = (id) => {
     let temp = DATA.map((i) => {
       if (id === i.id) {
-       
         return { ...i, isChecked: (i.isChecked = !i.isChecked) };
       }
-    
+
       return i;
     });
-    
-    // fadeOut(),
     // sett2(!t2);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setd(!d);
     setDATA(temp);
     // sett2(true)
@@ -848,7 +853,8 @@ export default function Recent(data) {
                 <TouchableOpacity
                   style={{ alignItems: "center" }}
                   onPress={() => {
-                    selectAlldata();
+                    selectAlldata(); LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                    setd(!d);
                   }}
                 >
                   <Text
@@ -859,6 +865,7 @@ export default function Recent(data) {
                       },
                     ]}
                   >
+                    
                     Select All
                   </Text>
                 </TouchableOpacity>
@@ -873,15 +880,8 @@ export default function Recent(data) {
               renderItem={({ item, index }) => (
                 <View>
                   <View style={styles.flat_view}>
-                    {d == true ?  (
-                       <Animated.View
-                       style={[
-                         styles.fadingContainer,
-                         {
-                           // Bind opacity to animated value
-                           opacity: fadeAnim,
-                         },
-                       ]}>
+                    {d == true ? (
+                      
                       <Pressable
                         style={{ marginStart: "6%" }}
                         onPress={() => {
@@ -903,8 +903,6 @@ export default function Recent(data) {
                           />
                         )}
                       </Pressable>
-                     </Animated.View>
-                      
                     ) : null}
                     <TouchableHighlight
                       style={{ paddingVertical: "3%" }}

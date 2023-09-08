@@ -1,37 +1,43 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Animated } from 'react-native';
+import React, { useState } from "react";
+import { LayoutAnimation, Platform, StyleSheet, Text, TouchableOpacity, UIManager, View } from "react-native";
 
-function Demo() {
-  const [isVisible, setIsVisible] = useState(false);
-  const fadeAnim = new Animated.Value(0); // Initial value is 0
-
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-    Animated.timing(
-      fadeAnim,
-      {
-        toValue: isVisible ? 0 : 1, // Animate to 0 (hide) or 1 (show)
-        duration: 300, // Adjust the duration as needed
-        useNativeDriver: false, // Set this to true if possible for performance
-      }
-    ).start();
-  };
+if (
+Platform.OS === "android" &&
+UIManager.setLayoutAnimationEnabledExperimental
+) {
+UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+const Demo = () => {
+ const [expanded, setExpanded] = useState(false);
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <TouchableOpacity onPress={toggleVisibility}>
-        <Text>Show/Hide</Text>
-      </TouchableOpacity>
-      <Animated.View
-        style={{
-          marginTop: 20,
-          opacity: fadeAnim, // Use the animated value for opacity
-        }}
-      >
-        {isVisible && <Text>This is an animated element.</Text>}
-      </Animated.View>
-    </View>
-  );
+  <View style={style.container}>
+  <TouchableOpacity
+  style={{backgroundColor:'red',height:90,justifyContent:'center',alignItems:'center',borderRadius:7}}
+    onPress={() => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setExpanded(!expanded);
+    }}
+  >
+    <Text>Press me to {expanded ? "collapse" : "expand"}!</Text>
+  </TouchableOpacity>
+
+</View>
+);
+};
+
+const style = StyleSheet.create({
+ tile: {
+  backgroundColor: "lightgrey",
+  borderWidth: 0.5,
+  borderColor: "#d6d7da"
+ },
+container: {
+ flex: 1,
+ justifyContent: "center",
+ alignItems: "center",
+ overflow: "hidden"
 }
+});
 
 export default Demo;
