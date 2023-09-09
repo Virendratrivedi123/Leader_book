@@ -20,7 +20,12 @@ import {
   Alert,
   TouchableHighlight,
   ScrollView,
-  Keyboard,LayoutAnimation, Platform,UIManager
+  Keyboard,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  Button,
+  ActivityIndicator,
 } from "react-native";
 import { useFonts } from "expo-font";
 const height = Dimensions.get("window").height;
@@ -60,9 +65,9 @@ import Slider from "@react-native-community/slider";
 if (
   Platform.OS === "android" &&
   UIManager.setLayoutAnimationEnabledExperimental
-  ) {
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
+}
 export default function Recent(data) {
   const [fontsLoaded] = useFonts({
     "Inter-Black": require("../../assets/fonts/Mulish-SemiBold.ttf"),
@@ -71,12 +76,9 @@ export default function Recent(data) {
     "Inter-Black3": require("../../assets/fonts/Mulish-Regular.ttf"),
   });
 
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
-  const [expanded, setExpanded] = useState(false);
+  
   const AudioRecorder = useRef(new Audio.Recording());
-  const AudioPlayer = useRef(new Audio.Sound());
+ 
 
   // States for UI
   const [RecordedURI, SetRecordedURI] = useState("");
@@ -86,6 +88,7 @@ export default function Recent(data) {
   const [d, setd] = useState(false);
   const [t, sett] = useState(false);
   const [t2, sett2] = useState(true);
+  const [scrol, setscrol] = useState(true);
   const navigation = useNavigation();
   const route = useRoute();
   const [DATA, setDATA] = useState([]);
@@ -95,7 +98,7 @@ export default function Recent(data) {
   const [loading, setLoading] = React.useState(true);
   const [loading2, setLoading2] = React.useState(true);
   const [loading3, setLoading3] = React.useState(false);
-  
+
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible3, setModalVisible3] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -130,6 +133,7 @@ export default function Recent(data) {
   const [sliderValue, setSliderValue] = useState(0);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
+  const [m1, setm1] = useState("1");
 
   const searchref = useRef();
   const [search, setsearch] = useState("");
@@ -151,22 +155,35 @@ export default function Recent(data) {
   const [url_title, seturl_title] = useState("");
   const [demo, setdemo] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const fadeIn = () => {
-    // Will change fadeAnim value to 1 in 5 seconds
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 5000,
-      useNativeDriver: true,
-    }).start();
+  const [loading4, setLoading4] = useState(false);
+
+  const [running, setRunning] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const intervalRef = useRef();
+
+  const startStopwatch = () => {
+    if (!running) {
+      intervalRef.current = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds + 1);
+      }, 1000); // Update every second
+      setRunning(true);
+    } else {
+      clearInterval(intervalRef.current);
+      setRunning(false);
+    }
   };
 
-  const fadeOut = () => {
-    // Will change fadeAnim value to 0 in 3 seconds
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 3000,
-      useNativeDriver: true,
-    }).start();
+  const resetStopwatch = () => {
+    clearInterval(intervalRef.current);
+    setSeconds(0);
+    setRunning(false);
+  };
+
+  const startLoading = () => {
+    setLoading4(true);
+    setTimeout(() => {
+      setLoading4(false);
+    }, 6000);
   };
 
   useEffect(() => {
@@ -186,14 +203,13 @@ export default function Recent(data) {
   useEffect(() => {
     Audio.setAudioModeAsync({
       // allowsRecordingIOS: false,
-      extension: '.wav',
+      extension: ".wav",
       outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
       sampleRate: 16000,
-      bitRateStrategy:
-        Audio.RECORDING_OPTION_IOS_BIT_RATE_STRATEGY_CONSTANT,
+      bitRateStrategy: Audio.RECORDING_OPTION_IOS_BIT_RATE_STRATEGY_CONSTANT,
       playsInSilentModeIOS: true,
     });
-  
+
     return () => {
       // Clean up the audio resources if needed
     };
@@ -202,7 +218,6 @@ export default function Recent(data) {
   useEffect(() => {
     GetPermission();
   }, []);
-
 
   // Function to get the audio permission
   const GetPermission = async () => {
@@ -220,7 +235,7 @@ export default function Recent(data) {
       setIsPlaying(!isPlaying);
     }
   };
- 
+
   const handleSliderValueChange = (value) => {
     if (sound) {
       sound.setPositionAsync(value * duration);
@@ -279,10 +294,7 @@ export default function Recent(data) {
   };
 
   const handleChangeAudioUrl = (i) => {
-
     // Call your API to get the new audio URL and update the state
-   
-    
   };
 
   const time = () => {
@@ -290,7 +302,6 @@ export default function Recent(data) {
       setLoading3(false);
     }, 2000);
   };
-
 
   useEffect(() => {
     const updatePosition = async () => {
@@ -319,27 +330,21 @@ export default function Recent(data) {
 
   // Function to start recording
   const StartRecording = async () => {
+    startStopwatch()
     try {
       // Check if user has given the permission to record
       if (AudioPermission === true) {
         try {
           await Audio.setAudioModeAsync({
             allowsRecordingIOS: true,
-            
-         extension: '.wav',
+
+            extension: ".wav",
             outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
             sampleRate: 16000,
             bitRateStrategy:
               Audio.RECORDING_OPTION_IOS_BIT_RATE_STRATEGY_CONSTANT,
             playsInSilentModeIOS: true,
-          
-           
-          
-           
-            
-           
-         
-          })
+          });
           // Prepare the Audio Recorder
           await AudioRecorder.current.prepareToRecordAsync(
             Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
@@ -364,25 +369,29 @@ export default function Recent(data) {
 
   // Function to stop recording
   const StopRecording = async () => {
+    startStopwatch()
     try {
       // Stop recording
       await AudioRecorder.current.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync(
-        {
-          allowsRecordingIOS: false,
-       
-        }
-      );
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+      });
       // Get the recorded URI here
       const result = AudioRecorder.current.getURI();
       const status = await AudioRecorder.current.getStatusAsync();
       const soundDuration = status.durationMillis / 1000;
+
       setSoundStatus(soundDuration);
       if (result) SetRecordedURI(result);
-      replay(result)
+      replay(result);
       // console.log(RecordedURI);
       // SetRecordedURI(result)
-      // setModalVisible9(true);
+
+      // setModalVisible2(false)
+      // LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      // setModalVisible9(true)
+      setm1("2");
+      setscrol(false);
 
       // Reset the Audio Recorder
       AudioRecorder.current = new Audio.Recording();
@@ -396,12 +405,14 @@ export default function Recent(data) {
   useEffect(() => {
     (async () => {
       const user_data = await AsyncStorage.getItem("user_data");
-
+      const user_data2 = await AsyncStorage.getItem("userInfo");
+      const search = await AsyncStorage.getItem("search");
       const d = JSON.parse(user_data);
+      const d2 = JSON.parse(user_data2);
 
-      // console.log(dr)
+      // console.log(d2.userinfo.password)
       const data = {
-        email: d.email,
+        email: d2.userinfo.email,
         password: d.password,
       };
 
@@ -665,7 +676,7 @@ export default function Recent(data) {
         return { ...i, isChecked: false };
       }
     });
-    setdemo(!demo)
+    setdemo(!demo);
     setd(!d);
     setDATA(temp);
   };
@@ -809,7 +820,7 @@ export default function Recent(data) {
       console.error(error);
     }
   };
-
+  console.log(url, "aman");
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       // do something
@@ -853,7 +864,10 @@ export default function Recent(data) {
                 <TouchableOpacity
                   style={{ alignItems: "center" }}
                   onPress={() => {
-                    selectAlldata(); LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                    selectAlldata();
+                    LayoutAnimation.configureNext(
+                      LayoutAnimation.Presets.easeInEaseOut
+                    );
                     setd(!d);
                   }}
                 >
@@ -865,7 +879,6 @@ export default function Recent(data) {
                       },
                     ]}
                   >
-                    
                     Select All
                   </Text>
                 </TouchableOpacity>
@@ -881,12 +894,12 @@ export default function Recent(data) {
                 <View>
                   <View style={styles.flat_view}>
                     {d == true ? (
-                      
                       <Pressable
                         style={{ marginStart: "6%" }}
                         onPress={() => {
-                          demo?handleChange(item.id):
-                          (handleChange(item.id),press(item))
+                          demo
+                            ? handleChange(item.id)
+                            : (handleChange(item.id), press(item));
                         }}
                       >
                         {item.isChecked ? (
@@ -927,10 +940,12 @@ export default function Recent(data) {
                     >
                       <View
                         activeOpacity={1}
-                       
-                        style={[styles.touch,{
-                          width: d == true ? width * 0.8 : width * 0.93,
-                      }]}
+                        style={[
+                          styles.touch,
+                          {
+                            width: d == true ? width * 0.8 : width * 0.93,
+                          },
+                        ]}
                       >
                         {}
                         <View style={styles.set}>
@@ -979,7 +994,7 @@ export default function Recent(data) {
                             <> */}
 
                           <TouchableOpacity
-                             style={styles.note_box}
+                            style={styles.note_box}
                             activeOpacity={1}
                             onPress={() => {
                               item.pined_note == "Yes" ? setd1(3) : setd1(0);
@@ -1322,7 +1337,7 @@ export default function Recent(data) {
                       style={{
                         height: height * 0.85,
                         width: "90%",
-                        backgroundColor: "white",
+                        backgroundColor: m1 == "2" ? "#bfbfbf" : "white",
                         // borderRadius: 10,
 
                         elevation: 20,
@@ -1335,7 +1350,7 @@ export default function Recent(data) {
                         <Pressable
                           onPress={() => {
                             call_api();
-
+                            seturl("");
                             setModalVisible2(!modalVisible2);
                           }}
                         >
@@ -1382,7 +1397,7 @@ export default function Recent(data) {
                       </View>
 
                       <View style={{ height: height * 0.65 }}>
-                        <ScrollView style={{ flex: 1 }}>
+                        <ScrollView style={{}} scrollEnabled={scrol}>
                           <View
                             style={{
                               flexDirection: "row",
@@ -1492,6 +1507,7 @@ export default function Recent(data) {
                           <Text onPress={() => {}} style={styles.modal_header2}>
                             Please Select An Audio
                           </Text>
+
                           <SelectDropdown
                             data={Audio_data2}
                             defaultButtonText="Select An Audio"
@@ -1500,6 +1516,7 @@ export default function Recent(data) {
                               seturl(item.audio_url);
                               replay(item.audio_url);
                               setA_id(item?.audio_id);
+                              startLoading();
 
                               // SetRecordedURI(item.audio_url);
                               // call_api()
@@ -1538,102 +1555,179 @@ export default function Recent(data) {
                             dropdownOverlayColor="rgba(52, 52, 52, 0)"
                           />
 
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              marginVertical: "5%",
-                              marginStart: "5%",
-                            }}
-                          >
-                            <TouchableOpacity onPress={handlePlayPause}>
-                              {isPlaying ? (
-                                <Text style={styles.playPauseButton}>
-                                  <MaterialCommunityIcons
-                                    name="pause"
-                                    size={24}
-                                    color="black"
-                                  />
-                                </Text>
+                          {loading4 ? (
+                            <Loader loading={loading4} />
+                          ) : (
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                marginVertical: "5%",
+                                marginStart: "5%",
+                                alignItems: "center",
+                              }}
+                            >
+                              {url.length > 1 ? (
+                                <TouchableOpacity onPress={handlePlayPause}>
+                                  {isPlaying ? (
+                                    <Text style={styles.playPauseButton}>
+                                      <MaterialCommunityIcons
+                                        name="pause"
+                                        size={28}
+                                        color="black"
+                                      />
+                                    </Text>
+                                  ) : (
+                                    <Text style={styles.playPauseButton}>
+                                      <Ionicons
+                                        name="ios-play"
+                                        size={28}
+                                        color="black"
+                                      />
+                                    </Text>
+                                  )}
+                                </TouchableOpacity>
                               ) : (
                                 <Text style={styles.playPauseButton}>
                                   <Ionicons
                                     name="ios-play"
-                                    size={24}
+                                    size={28}
                                     color="black"
                                   />
                                 </Text>
                               )}
-                            </TouchableOpacity>
-                            <Slider
-                              style={{
-                                width: "80%",
-                                marginHorizontal: 20,
-                                alignSelf: "center",
-                              }}
-                              minimumTrackTintColor="blue"
-                              maximumTrackTintColor="#000000"
-                              minimumValue={0}
-                              maximumValue={1}
-                              value={sliderValue||0}
-                              onValueChange={handleSliderValueChange}
-                              disabled={!sound}
-                            />
-                          </View>
+
+                              <Slider
+                                style={{
+                                  width: "80%",
+                                  marginHorizontal: 20,
+                                  alignSelf: "center",
+                                }}
+                                minimumTrackTintColor="blue"
+                                maximumTrackTintColor="#000000"
+                                minimumValue={0}
+                                maximumValue={1}
+                                value={sliderValue || 0}
+                                onValueChange={handleSliderValueChange}
+                                disabled={!sound}
+                              />
+                            </View>
+                          )}
                           {/* 
                           <Text style={styles.time}>
                             {new Date(position).toISOString().substr(14, 5)} /{" "}
                             {new Date(duration).toISOString().substr(14, 5)}
                           </Text> */}
-
-                          <Text style={styles.modal_header3}>
-                            Record Your Message
-                          </Text>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              marginStart: "4%",
-                              alignItems: "center",
-                            }}
-                          >
-                            <TouchableOpacity
-                              style={{ flex: 0.9 }}
-                              onPress={
-                                IsRecording ? StopRecording : StartRecording
-                              }
-                            >
-                              {IsRecording ? (
-                                <Text style={styles.modal_header4}>
-                                  Stop Recording
+                          {m1 == "1" ? (
+                            <>
+                              <Text style={styles.modal_header3}>
+                                Record Your Message
+                              </Text>
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  marginStart: "4%",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <TouchableOpacity
+                                  style={{ flex: 0.9 }}
+                                  onPress={
+                                    IsRecording ? StopRecording : StartRecording
+                                  }
+                                >
+                                  {IsRecording ? (
+                                    <Text style={styles.modal_header4}>
+                                      Stop Recording
+                                    </Text>
+                                  ) : (
+                                    <Text style={styles.modal_header4}>
+                                      Start Recording
+                                    </Text>
+                                  )}
+                                </TouchableOpacity>
+                                <Text
+                                  onPress={() =>
+                                    navigation.navigate("demo", {
+                                      n: RecordedURI,
+                                    })
+                                  }
+                                  style={{ flex: 0.6 }}
+                                >
+                                  <SimpleLineIcons
+                                    name="microphone"
+                                    size={28}
+                                    color="blue"
+                                  />
                                 </Text>
-                              ) : (
-                                <Text style={styles.modal_header4}>
-                                  Start Recording
+                                <Text
+                                  style={{
+                                    flex: 0.3,
+                                    fontSize: wp("4.8%"),
+                                    // flex: 0.9,
+                                    fontFamily: "Inter-Black4",
+                                    color: "black",
+                                  }}
+                                  onPress={() => {}}
+                                >
+                                  {seconds}
                                 </Text>
-                              )}
-                            </TouchableOpacity>
-                            <Text
-                                 onPress={() => navigation.navigate("demo",{n:RecordedURI})}
-                            style={{ flex: 0.6 }}>
-                              <SimpleLineIcons
-                                name="microphone"
-                                size={28}
-                                color="blue"
-                              />
-                            </Text>
-                            <Text
-                              style={{
-                                flex: 0.3,
-                                fontSize: wp("4.8%"),
-                                // flex: 0.9,
+                              </View>
+                            </>
+                          ) : (
+                            <View style={styles.modalView_box3}>
+                              <TextInput
+                                placeholderTextColor="#cccccc"
+                                placeholder="Please Enter Audio File Name"
+                                onChangeText={(text) => {
+                                  seturl_title(text);
+                                }}
+                                style={{
+                                  color: "black",
+                                  fontSize: wp("4.41%"),
 
-                                fontFamily: "Inter-Black4",
-                                color: "black",
-                              }}
-                              onPress={() => {}}
-                            >
-                              {parseInt(soundStatus)}
-                            </Text>
-                          </View>
+                                  fontFamily: "Inter-Black",
+                                  marginBottom: "5%",
+                                }}
+                              ></TextInput>
+                              <View
+                                style={{
+                                  height: 1,
+                                  backgroundColor: "black",
+
+                                  width: "100%",
+                                  alignSelf: "center",
+                                }}
+                              ></View>
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                  justifyContent: "space-around",
+                                }}
+                              >
+                                <Pressable
+                                  onPress={() => {
+                                    setm1("1"), setscrol(true);resetStopwatch()
+                                  }}
+                                >
+                                  <Text style={styles.textStyle5_box}>
+                                    CANCEL
+                                  </Text>
+                                </Pressable>
+
+                                <Pressable
+                                  onPress={() => {
+                                    Audio_post();
+                                  }}
+                                >
+                                  <Text style={styles.textStyle5_box}>
+                                    SAVE
+                                  </Text>
+                                </Pressable>
+                              </View>
+                            </View>
+                          )}
+
                           {d3 ? (
                             <></>
                           ) : (
@@ -2033,52 +2127,68 @@ export default function Recent(data) {
               }}
             >
               <View style={styles.centeredView_box}>
-                <View style={styles.modalView_box3}>
-                  <TextInput
-                    placeholderTextColor="#cccccc"
-                    placeholder="Please Enter Audio File Name"
-                    onChangeText={(text) => {
-                      seturl_title(text);
-                    }}
-                    style={{
-                      color: "black",
-                      fontSize: wp("4.41%"),
+                <View
+                  style={{
+                    height: height * 0.85,
+                    width: "90%",
+                    backgroundColor: "white",
+                    // borderRadius: 10,
 
-                      fontFamily: "Inter-Black",
-                      marginBottom: "5%",
-                    }}
-                  ></TextInput>
-                  <View
-                    style={{
-                      height: 1,
-                      backgroundColor: "black",
+                    elevation: 20,
+                    alignSelf: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: c,
+                  }}
+                >
+                  <View style={styles.modalView_box3}>
+                    <TextInput
+                      placeholderTextColor="#cccccc"
+                      placeholder="Please Enter Audio File Name"
+                      onChangeText={(text) => {
+                        seturl_title(text);
+                      }}
+                      style={{
+                        color: "black",
+                        fontSize: wp("4.41%"),
 
-                      width: "100%",
-                      alignSelf: "center",
-                    }}
-                  ></View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-around",
-                    }}
-                  >
-                    <Pressable
-                      onPress={() => {
-                        setModalVisible9(!modalVisible9);
+                        fontFamily: "Inter-Black",
+                        marginBottom: "5%",
+                      }}
+                    ></TextInput>
+                    <View
+                      style={{
+                        height: 1,
+                        backgroundColor: "black",
+
+                        width: "100%",
+                        alignSelf: "center",
+                      }}
+                    ></View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-around",
                       }}
                     >
-                      <Text style={styles.textStyle5_box}>CANCEL</Text>
-                    </Pressable>
+                      <Pressable
+                        onPress={() => {
+                          setModalVisible9(!modalVisible9);
+                          setModalVisible2(!modalVisible2);
+                        }}
+                      >
+                        <Text style={styles.textStyle5_box}>CANCEL</Text>
+                      </Pressable>
 
-                    <Pressable
-                      onPress={() => {
-                        Audio_post();
-                      }}
-                    >
-                      <Text style={styles.textStyle5_box}>SAVE</Text>
-                    </Pressable>
+                      <Pressable
+                        onPress={() => {
+                          Audio_post();
+                        }}
+                      >
+                        <Text style={styles.textStyle5_box}>SAVE</Text>
+                      </Pressable>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -2329,9 +2439,7 @@ export default function Recent(data) {
 
                   // style={styles.floating_btn}
                 >
-                  <Image
-                    source={Images.addLeads}
-                    style={styles.ball_img} />
+                  <Image source={Images.addLeads} style={styles.ball_img} />
                 </TouchableOpacity>
               </Animated.View>
             ) : null}
@@ -2375,7 +2483,7 @@ const styles = StyleSheet.create({
     fontSize: wp("6%"),
     fontFamily: "Inter-Black4",
   },
-  note_box:{
+  note_box: {
     marginTop: "2%",
     shadowColor: "#000",
     shadowOffset: { width: 2, height: 4 },
@@ -2383,15 +2491,15 @@ const styles = StyleSheet.create({
     shadowRadius: 2.84,
     elevation: 5,
   },
-  touch:{ backgroundColor: "white",
+  touch: {
+    backgroundColor: "white",
 
-             
-
-  elevation: 5,
-  alignSelf: "center",
-  justifyContent: "center",
-  borderRadius: 5,
-  shadowColor: "white",},
+    elevation: 5,
+    alignSelf: "center",
+    justifyContent: "center",
+    borderRadius: 5,
+    shadowColor: "white",
+  },
   no_note: {
     color: "black",
     marginLeft: "4%",
@@ -2585,7 +2693,7 @@ const styles = StyleSheet.create({
       ) / 2,
     elevation: 5,
   },
-  ball_img:{
+  ball_img: {
     width: Dimensions.get("window").width * 0.18,
     height: Dimensions.get("window").width * 0.18,
     resizeMode: "contain",
@@ -3092,7 +3200,7 @@ const styles = StyleSheet.create({
     // elevation: 20,
   },
   modalView_box3: {
-    width: "85%",
+    width: "90%",
     backgroundColor: "#ececee",
 
     elevation: 5,

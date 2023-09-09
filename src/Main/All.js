@@ -104,12 +104,15 @@ function All() {
     console.log(offset);
     if (!loading && !isListEnd) {
       const user_data = await AsyncStorage.getItem("user_data");
-      const search = await AsyncStorage.getItem("search");
-      const d = JSON.parse(user_data);
-
-      // console.log(dr)
-      const data = {
-        email: d.email,
+      const user_data2 = await AsyncStorage.getItem("userInfo");
+        const search = await AsyncStorage.getItem("search");
+        const d = JSON.parse(user_data);
+        const d2 = JSON.parse(user_data2);
+  
+  
+        // console.log(d2.userinfo.password)
+        const data = {
+          email:d2.userinfo.email,
         password: d.password,
         no: offset,
       };

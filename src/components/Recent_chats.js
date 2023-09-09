@@ -60,67 +60,32 @@ function Recent_chats() {
   const [offset, setOffset] = useState(1);
   const [isListEnd, setIsListEnd] = useState(false);
 
-  React.useEffect(() => {
-    (async () => {
-      var myHeaders = new Headers();
-myHeaders.append("Cookie", "PHPSESSID=cf98f38f531a0f8eaba27560409909df");
-
-var formdata = new FormData();
-formdata.append("hash", "c0e4ac08899b02ca1a92b4e2f26fb0b6");
-formdata.append("key", "7632d69f1f8ddac65151c56dea11d76a");
-formdata.append("email", "san88work@gmail.com");
-formdata.append("password", "dGVzdC0xOTg0");
-formdata.append("page_number", "");
-
-var requestOptions = {
-  method: 'POST',
-  headers: myHeaders,
-  body: formdata,
-  redirect: 'follow'
-};
-
-fetch("http://www.advancewebsites.com/crm_api/recent_sms_conversations", requestOptions)
-  .then(response => response.json())
-  .then(result => console.log(result),setDataSource(result?.data?.recent_leads))
-  .catch(error => console.log('error', error));
-    })();
-  }, []);
-
+ 
   async function getData() {
-    console.log(offset);
-    if (!loading && !isListEnd) {
-      const user_data = await AsyncStorage.getItem("user_data");
-
+    const user_data = await AsyncStorage.getItem("user_data");
+    const user_data2 = await AsyncStorage.getItem("userInfo");
+      const search = await AsyncStorage.getItem("search");
       const d = JSON.parse(user_data);
+      const d2 = JSON.parse(user_data2);
 
-      // console.log(dr)
+
+      // console.log(d2.userinfo.password)
       const data = {
-        email: d.email,
+        email:d2.userinfo.email,
         password: d.password,
         no: offset,
       };
       recent_chat(data)
-        .then((response) => response.json())
-        .then((responseJson) => {
-          // Successful response from the API Call
-          // console.log(responseJson);
-          if (responseJson.data.recent_leads.length > 0) {
-            setOffset(offset + 1);
-            // After the response increasing the offset
-            setDataSource([...dataSource, ...responseJson?.data?.recent_leads]);
-            setLoading(false);
-            setLoading2(false);
-          
-          } else {
-            setIsListEnd(true);
-            setLoading(false);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
+      .then((response) => response.json())
+      .then((result) => setDataSource([...dataSource,...result.data.recent_leads],setLoading2(false)))
+      .catch((error) => console.log("error", error));
   }
+
+  useEffect(() => {
+    getData();
+  }, [offset]);
+
+
 
   const renderFooter = () => {
     return (
@@ -137,8 +102,14 @@ fetch("http://www.advancewebsites.com/crm_api/recent_sms_conversations", request
       <View>
         <View>
           <TouchableOpacity
-          style={{paddingHorizontal:"5%"}}
-          onPress={()=>{navigation.navigate("chat",{name:item?.name,id:item?.lead_id,n_i:item?.name_initials})}}
+            style={{ paddingHorizontal: "5%" }}
+            onPress={() => {
+              navigation.navigate("chat", {
+                name: item?.name,
+                id: item?.lead_id,
+                n_i: item?.name_initials,
+              });
+            }}
           >
             <View
               style={{
@@ -147,20 +118,21 @@ fetch("http://www.advancewebsites.com/crm_api/recent_sms_conversations", request
                 marginTop: "5%",
               }}
             >
-              <View style={{  }}>
+              <View style={{}}>
                 <View style={styles.circle}>
                   <Text style={styles.circle_text}>{item?.name_initials}</Text>
                 </View>
               </View>
 
-              <View style={{marginStart:"5%" ,flex: 1 }}>
+              <View style={{ marginStart: "5%", flex: 1 }}>
                 <Text style={styles.text2} numberOfLines={1}>
                   {item?.name}
                 </Text>
                 <Text style={styles.text1}>{item?.last_message}</Text>
               </View>
-              <Text style={styles.text3}>{moment(item?.last_message_time).format('Do MMMM h:mm')}
-                </Text>
+              <Text style={styles.text3}>
+                {moment(item?.last_message_time).format("Do MMMM h:mm")}
+              </Text>
               {/* <Text style={styles.text3}>fgfdgfh</Text> */}
             </View>
 
@@ -171,8 +143,6 @@ fetch("http://www.advancewebsites.com/crm_api/recent_sms_conversations", request
     );
   };
 
-  
-   
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -187,11 +157,12 @@ fetch("http://www.advancewebsites.com/crm_api/recent_sms_conversations", request
         <FlatList
           data={dataSource}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={ItemView}
           
+          onEndReachedThreshold={0.5}
+          onEndReached={()=>{setOffset(offset+1)}}
+          renderItem={ItemView}
         />
-      )}
-     
+      )} 
     </SafeAreaView>
   );
 }
@@ -239,7 +210,6 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
     justifyContent: "center",
-   
   },
   circle_text: {
     fontSize: 24,

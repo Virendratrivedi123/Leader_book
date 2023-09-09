@@ -236,6 +236,8 @@ const ChatScreen = () => {
   }, []);
 
   const DELETE = async () => {
+    setLoading(true)
+    setModalVisible(false);
     try {
       const user_data = await AsyncStorage.getItem("user_data");
       // const drop_data = await AsyncStorage.getItem("dropdown_data");
@@ -251,9 +253,10 @@ const ChatScreen = () => {
       Delete_sms(data).then((response) => {
         response.json().then((data) => {
           console.log(data);
-          setLoading(true);
-          setModalVisible(false);
+          
+         
           call_api();
+          setLoading(false);
 
           // Alert.alert(data.msg);
         });
@@ -404,6 +407,9 @@ const ChatScreen = () => {
                               setRec(item?.attachment_audio_url),
                                 setModalVisible1(true);
                             }}
+                            onLongPress={() => {
+                              setm_id(item.id), setModalVisible(true);
+                            }}
                           >
                             <Image
                               style={styles.img}
@@ -498,6 +504,7 @@ const ChatScreen = () => {
               style={styles.modalVieww}
               activeOpacity={1}
               onPress={() => {
+                
                 DELETE();
               }}
             >

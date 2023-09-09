@@ -1012,22 +1012,22 @@ export const system_Tag = (data) => {
 
 export const recent_chat = (data) => {
   var myHeaders = new Headers();
-  myHeaders.append("Cookie", "PHPSESSID=cf98f38f531a0f8eaba27560409909df");
-
+  myHeaders.append("Cookie", "PHPSESSID=56bcdd11dacc4731af7c6670b8025137");
+  
   var formdata = new FormData();
   formdata.append("hash", hash);
   formdata.append("key", key);
   formdata.append("email", data.email);
   formdata.append("password", data.password);
   formdata.append("page_number", data.no);
-
+  
   var requestOptions = {
-    method: "POST",
+    method: 'POST',
     headers: myHeaders,
     body: formdata,
-    redirect: "follow",
+    redirect: 'follow'
   };
-
+  
   return fetch(`${BASE_URI}/recent_sms_conversations`, requestOptions);
 };
 

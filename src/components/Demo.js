@@ -1,43 +1,35 @@
-import React, { useState } from "react";
-import { LayoutAnimation, Platform, StyleSheet, Text, TouchableOpacity, UIManager, View } from "react-native";
+import React, { useState, useRef } from 'react';
+import { View, Text, Button } from 'react-native';
 
-if (
-Platform.OS === "android" &&
-UIManager.setLayoutAnimationEnabledExperimental
-) {
-UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 const Demo = () => {
- const [expanded, setExpanded] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const intervalRef = useRef();
 
+  const startStopwatch = () => {
+    if (!running) {
+      intervalRef.current = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds + 1);
+      }, 1000); // Update every second
+      setRunning(true);
+    } else {
+      clearInterval(intervalRef.current);
+      setRunning(false);
+    }
+  };
+
+  const resetStopwatch = () => {
+    clearInterval(intervalRef.current);
+    setSeconds(0);
+    setRunning(false);
+  };
   return (
-  <View style={style.container}>
-  <TouchableOpacity
-  style={{backgroundColor:'red',height:90,justifyContent:'center',alignItems:'center',borderRadius:7}}
-    onPress={() => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setExpanded(!expanded);
-    }}
-  >
-    <Text>Press me to {expanded ? "collapse" : "expand"}!</Text>
-  </TouchableOpacity>
-
-</View>
-);
+    <View>
+       <Text style={{ fontSize: 40 }}>{seconds} seconds</Text>
+      <Button title={running ? 'Stop' : 'Start'} onPress={startStopwatch} />
+      <Button title="Reset" onPress={resetStopwatch} />
+    </View>
+  );
 };
-
-const style = StyleSheet.create({
- tile: {
-  backgroundColor: "lightgrey",
-  borderWidth: 0.5,
-  borderColor: "#d6d7da"
- },
-container: {
- flex: 1,
- justifyContent: "center",
- alignItems: "center",
- overflow: "hidden"
-}
-});
 
 export default Demo;
